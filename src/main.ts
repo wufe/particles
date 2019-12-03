@@ -13,7 +13,7 @@ export const getDefaultParams = (): DefaultObject<Params> => ({
     selectorOrCanvas: '#canvas',
     renderer: new LazyFactory(() => new Renderer2D()),
     systems: new LazyFactory(() => [new DefaultParticleSystem()]),
-    backgroundColor: [34, 34, 34, 1],
+    backgroundColor: [34, 34, 34, 0],
     detectRetina: true,
     camera: {
         pitch: 0,

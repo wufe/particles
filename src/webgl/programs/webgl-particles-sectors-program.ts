@@ -59,38 +59,48 @@ export class ParticlesSectorsProgram implements IProgram {
 
         this._vertices = new Float32Array(sectorsManager
             .getAllSectors()
-            .filter((_, i) => i < 3)
             .reduce((accumulator, sector) => {
 
                 const {x, y, z} = sector;
 
                 return accumulator.concat([
-                    // bottom
                     lengthByCoord(x), lengthByCoord(y), lengthByCoord(z),
-                    // 1, 1, 1, 1,
                     lengthByCoord(x+1), lengthByCoord(y), lengthByCoord(z),
-                    // 1, 1, 1, 1,
 
-                    // right
                     lengthByCoord(x) + sectorLength, lengthByCoord(y), lengthByCoord(z),
-                    // // 1, 1, 1, 1,
                     lengthByCoord(x) + sectorLength, lengthByCoord(y) + sectorLength, lengthByCoord(z),
-                    // // 1, 1, 1, 1,
 
-                    // // top
                     lengthByCoord(x) + sectorLength, lengthByCoord(y) + sectorLength, lengthByCoord(z),
-                    // // 1, 1, 1, 1,
                     lengthByCoord(x), lengthByCoord(y) + sectorLength, lengthByCoord(z),
-                    // // 1, 1, 1, 1,
 
-                    // // left
                     lengthByCoord(x), lengthByCoord(y) + sectorLength, lengthByCoord(z),
-                    // // 1, 1, 1, 1,
                     lengthByCoord(x), lengthByCoord(y), lengthByCoord(z),
-                    // 1, 1, 1, 1,
+
+                    lengthByCoord(x), lengthByCoord(y), lengthByCoord(z),
+                    lengthByCoord(x), lengthByCoord(y), lengthByCoord(z+1),
+
+                    lengthByCoord(x), lengthByCoord(y+1), lengthByCoord(z),
+                    lengthByCoord(x), lengthByCoord(y+1), lengthByCoord(z+1),
+
+                    lengthByCoord(x+1), lengthByCoord(y), lengthByCoord(z),
+                    lengthByCoord(x+1), lengthByCoord(y), lengthByCoord(z+1),
+
+                    lengthByCoord(x+1), lengthByCoord(y+1), lengthByCoord(z),
+                    lengthByCoord(x+1), lengthByCoord(y+1), lengthByCoord(z+1),
+
+                    lengthByCoord(x), lengthByCoord(y), lengthByCoord(z+1),
+                    lengthByCoord(x+1), lengthByCoord(y), lengthByCoord(z+1),
+
+                    lengthByCoord(x) + sectorLength, lengthByCoord(y), lengthByCoord(z+1),
+                    lengthByCoord(x) + sectorLength, lengthByCoord(y) + sectorLength, lengthByCoord(z+1),
+
+                    lengthByCoord(x) + sectorLength, lengthByCoord(y) + sectorLength, lengthByCoord(z+1),
+                    lengthByCoord(x), lengthByCoord(y) + sectorLength, lengthByCoord(z+1),
+
+                    lengthByCoord(x), lengthByCoord(y) + sectorLength, lengthByCoord(z+1),
+                    lengthByCoord(x), lengthByCoord(y), lengthByCoord(z+1),
                 ]);
             }, []));
-        console.log(this._vertices);
 
         this._programContainer = new ProgramContainer<Attr, Uni>(
             this._gl,
@@ -99,14 +109,14 @@ export class ParticlesSectorsProgram implements IProgram {
             Object.values(Attr),
             Object.values(Uni),
         );
-        this._gl.useProgram(this._programContainer.program);
 
         this._vectorsBuffer = this._gl.createBuffer();
         this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.POSITION));
-		// this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.COLOR));
     }
 
     update(deltaT: number, T: number): void {
+
+        this._willUpdateParams[UpdateableParam.CAMERA] = true;
 
         this._gl.useProgram(this._programContainer.program);
         this._gl.uniform1f(this._programContainer.uni(Uni.T), T);
@@ -122,6 +132,10 @@ export class ParticlesSectorsProgram implements IProgram {
             this._gl.uniformMatrix4fv(this._programContainer.uni(Uni.PROJECTION), false, this._viewBox.pMat);
             this._willUpdateParams[UpdateableParam.CAMERA] = false;
         }
+    }
+
+    draw() {
+        this._gl.useProgram(this._programContainer.program);
 
         this._gl.bindBuffer(this._gl.ARRAY_BUFFER, this._vectorsBuffer);
         this._gl.bufferData(this._gl.ARRAY_BUFFER, this._vertices, this._gl.STATIC_DRAW);
@@ -134,10 +148,9 @@ export class ParticlesSectorsProgram implements IProgram {
             3 * Float32Array.BYTES_PER_ELEMENT,
             0,
         );
-    }
 
-    draw() {
-        this._gl.useProgram(this._programContainer.program);
-        this._gl.drawArrays(this._gl.POINTS, 0, this._vertices.length / 3);
+        this._gl.bindBuffer(this._gl.ARRAY_BUFFER, null);
+
+        this._gl.drawArrays(this._gl.LINES, 0, this._vertices.length / 3);
     }
 }

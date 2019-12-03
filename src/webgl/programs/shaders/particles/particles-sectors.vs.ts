@@ -13,9 +13,9 @@ uniform float f_t;
 varying vec4 frag_col;
 
 void main() {
-    frag_col = vec4(1.0, 1.0, 1.0, 1.0);
+    frag_col = vec4(1.0, 1.0, 1.0, .05);
     vec3 pos = ((v_pos / v_res) * 2.0) - 1.0;
     gl_Position = m_projection * m_view * m_world * vec4(pos, 1.0);
-    gl_PointSize = 5.0;
+    gl_PointSize = 1.0;
 }
 `;

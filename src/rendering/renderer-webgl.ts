@@ -65,6 +65,8 @@ export class RendererWebGL implements IRenderer {
         const context = libraryInterface.context;
         context.viewport(0, 0, width, height);
 
+        context.blendFunc(context.SRC_ALPHA, context.ONE);
+        context.enable(context.BLEND);
         context.enable(context.DEPTH_TEST);
 		context.enable(context.CULL_FACE);
 		context.cullFace(context.BACK);

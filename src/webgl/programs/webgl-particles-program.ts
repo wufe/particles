@@ -70,7 +70,6 @@ export class ParticlesProgram implements IProgram {
             Object.values(Attr),
             Object.values(Uni),
         );
-        this._gl.useProgram(this._programContainer.program);
 
         this._vectorsBuffer = this._gl.createBuffer();
         this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.POSITION));
@@ -80,8 +79,8 @@ export class ParticlesProgram implements IProgram {
 
     update(deltaT: number, T: number): void {
 
-        // this._viewBox.yaw += .01;
-        // this._willUpdateParams[UpdateableParam.CAMERA] = true;
+        this._viewBox.yaw += .01;
+        this._willUpdateParams[UpdateableParam.CAMERA] = true;
 
         this._gl.useProgram(this._programContainer.program);
         this._gl.uniform1f(this._programContainer.uni(Uni.T), T);
@@ -96,7 +95,11 @@ export class ParticlesProgram implements IProgram {
 			this._gl.uniformMatrix4fv(this._programContainer.uni(Uni.VIEW), false, this._viewBox.vMat);
             this._gl.uniformMatrix4fv(this._programContainer.uni(Uni.PROJECTION), false, this._viewBox.pMat);
             this._willUpdateParams[UpdateableParam.CAMERA] = false;
-        }
+        }        
+    }
+
+    draw() {
+        this._gl.useProgram(this._programContainer.program);
 
         this._gl.bindBuffer(this._gl.ARRAY_BUFFER, this._vectorsBuffer);
         this._gl.bufferData(this._gl.ARRAY_BUFFER, this._vertices, this._gl.STATIC_DRAW);
@@ -127,10 +130,9 @@ export class ParticlesProgram implements IProgram {
 			10 * Float32Array.BYTES_PER_ELEMENT,
 			7 * Float32Array.BYTES_PER_ELEMENT,
         );
-    }
+        
+        this._gl.bindBuffer(this._gl.ARRAY_BUFFER, null);
 
-    draw() {
-        this._gl.useProgram(this._programContainer.program);
         this._gl.drawArrays(this._gl.POINTS, 0, this._vertices.length / 10);
     }
 }
