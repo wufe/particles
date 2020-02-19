@@ -9,9 +9,10 @@ import { Vector4D } from "../../models/vector4d";
 import { getColor } from "../../rendering/renderer-webgl";
 
 enum Attr {
-	POSITION = 'v_pos', // Vector of 3
-	COLOR    = 'v_col', // Vector of 4
-	VELOX    = 'v_vel', // TODO: Next refine, use velox if no coords specified in particles
+	POSITION = 'v_pos',    // Vector of 3
+	COLOR    = 'v_col',    // Vector of 4
+	VELOX    = 'v_vel',    // TODO: Next refine, use velox if no coords specified in particles
+	SIZE     = 'f_size',
 }
 
 enum Uni {
@@ -59,7 +60,8 @@ export class ParticlesProgram implements IProgram {
                 return accumulator.concat([
                     x, y, z,
                     cx, cy, cz, cw,
-                    vx, vy, vz
+                    vx, vy, vz,
+                    particle.size
                 ]);
             }, []));
 
@@ -74,7 +76,8 @@ export class ParticlesProgram implements IProgram {
         this._vectorsBuffer = this._gl.createBuffer();
         this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.POSITION));
 		this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.COLOR));
-		this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.VELOX));
+        this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.VELOX));
+        this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.SIZE));
     }
 
     update(deltaT: number, T: number): void {
@@ -109,7 +112,7 @@ export class ParticlesProgram implements IProgram {
             3,
             this._gl.FLOAT,
             false,
-            10 * Float32Array.BYTES_PER_ELEMENT,
+            11 * Float32Array.BYTES_PER_ELEMENT,
             0,
         );
 
@@ -118,7 +121,7 @@ export class ParticlesProgram implements IProgram {
 			4,
 			this._gl.FLOAT,
 			false,
-			10 * Float32Array.BYTES_PER_ELEMENT,
+			11 * Float32Array.BYTES_PER_ELEMENT,
 			3 * Float32Array.BYTES_PER_ELEMENT,
 		);
 
@@ -127,12 +130,21 @@ export class ParticlesProgram implements IProgram {
 			3,
 			this._gl.FLOAT,
 			false,
-			10 * Float32Array.BYTES_PER_ELEMENT,
+			11 * Float32Array.BYTES_PER_ELEMENT,
 			7 * Float32Array.BYTES_PER_ELEMENT,
+        );
+
+        this._gl.vertexAttribPointer(
+            this._programContainer.attr(Attr.SIZE),
+            1,
+            this._gl.FLOAT,
+            false,
+            11 * Float32Array.BYTES_PER_ELEMENT,
+            10 * Float32Array.BYTES_PER_ELEMENT
         );
         
         this._gl.bindBuffer(this._gl.ARRAY_BUFFER, null);
 
-        this._gl.drawArrays(this._gl.POINTS, 0, this._vertices.length / 10);
+        this._gl.drawArrays(this._gl.POINTS, 0, this._vertices.length / 11);
     }
 }

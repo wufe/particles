@@ -8,7 +8,6 @@ import { ParticleSector, IParticleSector } from "./particle-sector";
 // and a velocity, which automatically increments the coords accordingly.
 export interface IMoveable {
     coords    : IVector3D;
-    color     : IVector4D;
     // Change in position in one unit of time (*i.e.* 16ms)
     velocity  : IVector3D;
     sector    : IVector3D;
@@ -17,7 +16,14 @@ export interface IMoveable {
     getAdjacentSectors(): IParticleSector[];
 }
 
-export interface IParticle extends IMoveable {
+// Contains the properties required by the particle
+// to be drawn onto the scene.
+export interface IDrawable {
+    size : number;
+    color: IVector4D;
+}
+
+export interface IParticle extends IMoveable, IDrawable {
     
 }
 
@@ -25,8 +31,9 @@ export class Particle implements IParticle {
     
     constructor(public coords: Vector3D = new Vector3D()) {}
 
-    velocity    : Vector3D = new Vector3D();
-    color       : IVector4D       = new Vector4D({
+    size     : number    = 2;
+    velocity : Vector3D  = new Vector3D();
+    color    : IVector4D = new Vector4D({
         x: 255,
         y: 255,
         z: 255,
