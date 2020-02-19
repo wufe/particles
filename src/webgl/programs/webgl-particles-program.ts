@@ -82,7 +82,7 @@ export class ParticlesProgram implements IProgram {
 
     update(deltaT: number, T: number): void {
 
-        this._viewBox.yaw += .01;
+        // this._viewBox.yaw += .01;
         this._willUpdateParams[UpdateableParam.CAMERA] = true;
 
         this._gl.useProgram(this._programContainer.program);
