@@ -15,7 +15,7 @@ export class DefaultParticleSystem implements IParticleSystem {
         const sectionLength = Math.min(width, height) / 10;
         this._manager = manager;
 
-        this._particles = new Array(5000)
+        this._particles = new Array(100)
             .fill(null)
             .map(_ => {
                 const x = Math.random() * width;
