@@ -11,6 +11,6 @@ export abstract class BaseParticleSystem implements IParticleSystem {
 
     notifyWholeSystemChanged() {
         if (this.manager)
-            this.manager.notify(SystemBridgeEventNotification.CHANGE, this);
+            this.manager.notify(SystemBridgeEventNotification.SYSTEM_UPDATED, this);
     }
 }

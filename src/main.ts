@@ -125,7 +125,7 @@ export class Main extends DrawingInterface implements ILibraryInterface {
     }
 
     notify(type: SystemBridgeEventNotification, system: IParticleSystem) {
-        if (type === SystemBridgeEventNotification.CHANGE) {
+        if (type === SystemBridgeEventNotification.SYSTEM_UPDATED) {
             this._plugin.exec(HookType.SYSTEM_UPDATED, this);
         }
     }

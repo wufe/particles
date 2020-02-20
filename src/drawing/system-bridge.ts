@@ -1,7 +1,7 @@
 import { IParticleSystem } from "../models/particle-system";
 
 export enum SystemBridgeEventNotification {
-    CHANGE = 'change',
+    SYSTEM_UPDATED = 'systemUpdated',
 }
 
 export interface ISystemBridge {
