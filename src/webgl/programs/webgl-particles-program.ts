@@ -36,6 +36,7 @@ export class ParticlesProgram implements IProgram {
         res   : true,
     };
     private _vertices: Float32Array;
+    private _strideLength = 11;
 
     constructor(
         private _gl: WebGLRenderingContext,
@@ -71,7 +72,8 @@ export class ParticlesProgram implements IProgram {
 
     useParticles(particles: IParticle[]) {
         this._vertices = new Float32Array(particles
-            .reduce((accumulator, particle) => {
+            .reduce((accumulator, particle, index) => {
+                particle.onPositionUpdate = this._onParticlePositionUpdate(index);
                 const [x, y, z] = (particle.coords as Vector3D).components;
                 const [r, g, b, a] = (particle.color as Vector4D).components;
                 const [cx, cy, cz, cw] = getColor(r, g, b, a);
@@ -83,6 +85,14 @@ export class ParticlesProgram implements IProgram {
                     particle.size
                 ]);
             }, []));
+    }
+
+    private _onParticlePositionUpdate = (particleIndex: number) => (particle: IParticle) => {
+        const startIndex = particleIndex * this._strideLength;
+        this._vertices[startIndex] = particle.coords.x;
+        this._vertices[startIndex+1] = particle.coords.y;
+        this._vertices[startIndex+2] = particle.coords.z;
+        // console.log(particleIndex);
     }
 
     update(deltaT: number, T: number): void {
@@ -117,7 +127,7 @@ export class ParticlesProgram implements IProgram {
             3,
             this._gl.FLOAT,
             false,
-            11 * Float32Array.BYTES_PER_ELEMENT,
+            this._strideLength * Float32Array.BYTES_PER_ELEMENT,
             0,
         );
 
@@ -126,7 +136,7 @@ export class ParticlesProgram implements IProgram {
 			4,
 			this._gl.FLOAT,
 			false,
-			11 * Float32Array.BYTES_PER_ELEMENT,
+			this._strideLength * Float32Array.BYTES_PER_ELEMENT,
 			3 * Float32Array.BYTES_PER_ELEMENT,
 		);
 
@@ -135,7 +145,7 @@ export class ParticlesProgram implements IProgram {
 			3,
 			this._gl.FLOAT,
 			false,
-			11 * Float32Array.BYTES_PER_ELEMENT,
+			this._strideLength * Float32Array.BYTES_PER_ELEMENT,
 			7 * Float32Array.BYTES_PER_ELEMENT,
         );
 
@@ -144,12 +154,12 @@ export class ParticlesProgram implements IProgram {
             1,
             this._gl.FLOAT,
             false,
-            11 * Float32Array.BYTES_PER_ELEMENT,
+            this._strideLength * Float32Array.BYTES_PER_ELEMENT,
             10 * Float32Array.BYTES_PER_ELEMENT
         );
         
         this._gl.bindBuffer(this._gl.ARRAY_BUFFER, null);
 
-        this._gl.drawArrays(this._gl.POINTS, 0, this._vertices.length / 11);
+        this._gl.drawArrays(this._gl.POINTS, 0, this._vertices.length / this._strideLength);
     }
 }

@@ -3,7 +3,7 @@ import { DrawingInterface, IDrawingInterface } from "./drawing/drawing-interface
 import { IRenderer } from "./rendering/renderer";
 import { Renderer2D } from "./rendering/renderer-2d";
 import { getDefault, LazyFactory, DefaultObject } from "./utils/object-utils";
-import { IParticleSystem } from "./models/particle-system";
+import { IParticleSystem, IParticleSystemBuilder } from "./models/particle-system";
 import { ISystemBridge, SystemBridgeEventNotification } from "./drawing/system-bridge";
 import { IParticle } from "./models/particle";
 import { DefaultParticleSystem } from "./systems/default-particle-system";
@@ -12,7 +12,7 @@ import { ParticleSectorManager } from "./models/particle-sector-manager";
 export const getDefaultParams = (): DefaultObject<Params> => ({
     selectorOrCanvas: '#canvas',
     renderer: new LazyFactory(() => new Renderer2D()),
-    systems: new LazyFactory(() => [new DefaultParticleSystem()]),
+    systems: new LazyFactory(() => [DefaultParticleSystem]),
     backgroundColor: [34, 34, 34, 0],
     detectRetina: true,
     camera: {
@@ -37,6 +37,7 @@ export class Main extends DrawingInterface implements ILibraryInterface {
         initialized: false,
     };
     public particlesSectorManager: ParticleSectorManager;
+    public systems: IParticleSystem[] = [];
 
     constructor(public params: Params) {
         super();
@@ -55,6 +56,7 @@ export class Main extends DrawingInterface implements ILibraryInterface {
 
     private _initParams() {
         this.params = getDefault(this.params, getDefaultParams());
+        this.systems = this.params.systems.map(builder => new builder(this));
         let canvas = this.params.selectorOrCanvas;
         if (typeof canvas === 'string')
             canvas = document.querySelector(canvas) as HTMLCanvasElement;
@@ -94,7 +96,7 @@ export class Main extends DrawingInterface implements ILibraryInterface {
     private _initSystems() {
         const {width, height} = this.internals;
         this.particlesSectorManager = new ParticleSectorManager(width, height);
-        this.params.systems.forEach(x => x.attach(this));
+        this.systems.forEach(x => x.attach());
     }
 
     private _preStart() {
@@ -109,7 +111,7 @@ export class Main extends DrawingInterface implements ILibraryInterface {
         this.time = performance.now();
         this.deltaTime = this.time - this._lastPerf;
         this._lastPerf = this.time;
-        this.params.systems.forEach(x => x.tick && x.tick(this.deltaTime, this.time));
+        this.systems.forEach(x => x.tick && x.tick(this.deltaTime, this.time));
         this._plugin.exec(HookType.UPDATE, this);
         // #endregion
 
@@ -123,22 +125,20 @@ export class Main extends DrawingInterface implements ILibraryInterface {
     }
 
     notify(type: SystemBridgeEventNotification, system: IParticleSystem) {
-        console.log('system bridge received an event of type', type, 'from system', system.constructor.toString())
         if (type === SystemBridgeEventNotification.CHANGE) {
-            // TODO: Listen on this
             this._plugin.exec(HookType.SYSTEM_UPDATED, this);
         }
     }
 
     getAllParticles() {
-        return this.params.systems.reduce((accumulator, system) => accumulator.concat(system.getParticles()), []);
+        return this.systems.reduce((accumulator, system) => accumulator.concat(system.getParticles()), []);
     }
 }
 
 export type Params = {
     selectorOrCanvas    : string | HTMLCanvasElement;
     renderer?           : IRenderer;
-    systems?            : IParticleSystem[];
+    systems?            : IParticleSystemBuilder[];
     backgroundColor?    : number[];
     detectRetina?       : boolean;
     camera?: {
