@@ -12,7 +12,6 @@ export class DefaultParticleSystem extends BaseParticleSystem implements IPartic
 
     attach() {
         const { width, height } = this.manager.internals;
-        const sectionLength = Math.min(width, height) / 10;
 
         this._particles = new Array(100)
             .fill(null)
@@ -21,10 +20,6 @@ export class DefaultParticleSystem extends BaseParticleSystem implements IPartic
                 const y = Math.random() * height;
                 const z = Math.random() * Math.min(width, height);
                 const particle = new Particle(new Vector3D({ x, y, z }), this.manager);
-                const sectorX = Math.floor(x / sectionLength);
-                const sectorY = Math.floor(y / sectionLength);
-                const sectorZ = Math.floor(z / sectionLength);
-                particle.sector = this.manager.particlesSectorManager.getSectorByIndex(sectorX, sectorY, sectorZ);
                 return particle;
             });
     }

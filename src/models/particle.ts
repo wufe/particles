@@ -34,7 +34,9 @@ export interface IParticle extends IMoveable, IDrawable, IListenable {
 
 export class Particle implements IParticle {
     
-    constructor(public coords: Vector3D = new Vector3D(), private _manager: ILibraryInterface) {}
+    constructor(public coords: Vector3D = new Vector3D(), private _manager: ILibraryInterface) {
+        this.calculateSector();
+    }
 
     size     : number    = 2;
     velocity : Vector3D  = new Vector3D({ x: .1, y: .1, z: 0});
@@ -48,15 +50,28 @@ export class Particle implements IParticle {
 
     sector: IParticleSector;
 
+    calculateSector() {
+        const sectorLength = this._manager
+            .particlesSectorManager
+            .sectorLength;
+        const sectorX = Math.floor(this.coords.x / sectorLength);
+        const sectorY = Math.floor(this.coords.y / sectorLength);
+        const sectorZ = Math.floor(this.coords.z / sectorLength);
+        this.sector = this._manager
+            .particlesSectorManager
+            .getSectorByIndex(sectorX, sectorY, sectorZ);
+    }
+
     // Updates position according to velocity
     updatePosition() {
         if (this.velocity) {
             this.coords.add(this.velocity);
         }
-        this._notifyUpdate();
+        this._notifyPositionUpdate();
     }
 
-    private _notifyUpdate() {
+    private _notifyPositionUpdate() {
+        this.calculateSector();
         if (this.onPositionUpdate) {
             this.onPositionUpdate(this);
         }
