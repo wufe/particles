@@ -26,13 +26,10 @@ export const getColor = (r: number, g: number, b: number, a: number = 1) =>
     [ (1 / 255) * r, (1 / 255) * g, (1 / 255) * b, a ];
 
 export class RendererWebGL implements IRenderer {
-    _pluginAdapter: PluginAdapter;
 
-    constructor() {}
+    constructor(private _pluginAdapter: PluginAdapter) {}
 
-    register(pluginAdapter: PluginAdapter) {
-        // TODO: move into constructor
-        this._pluginAdapter = pluginAdapter;
+    register() {
         this._pluginAdapter.addAfter(HookType.RENDERER_INIT, this._initRenderer.bind(this));
         this._pluginAdapter.addAfter(HookType.CONTEXT_INIT, this._initContext.bind(this));
         this._pluginAdapter.addAfter(HookType.CANVAS_INIT, this._initCanvas.bind(this));

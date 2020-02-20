@@ -3,7 +3,7 @@ import { RendererWebGL } from '../src/rendering/renderer-webgl';
 
 init({
     selectorOrCanvas: '#canvas',
-    renderer: new RendererWebGL(),
+    renderer: RendererWebGL,
     camera: {
         enabled: true
     }

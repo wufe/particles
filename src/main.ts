@@ -1,6 +1,6 @@
 import { PluginAdapter, HookType } from "./plugin/plugin-adapter";
 import { DrawingInterface, IDrawingInterface } from "./drawing/drawing-interface";
-import { IRenderer } from "./rendering/renderer";
+import { IRenderer, IRendererBuilder } from "./rendering/renderer";
 import { Renderer2D } from "./rendering/renderer-2d";
 import { getDefault, LazyFactory, DefaultObject } from "./utils/object-utils";
 import { IParticleSystem, IParticleSystemBuilder } from "./models/particle-system";
@@ -11,7 +11,7 @@ import { ParticleSectorManager } from "./models/particle-sector-manager";
 
 export const getDefaultParams = (): DefaultObject<Params> => ({
     selectorOrCanvas: '#canvas',
-    renderer: new LazyFactory(() => new Renderer2D()),
+    renderer: new LazyFactory(() => Renderer2D),
     systems: new LazyFactory(() => [DefaultParticleSystem]),
     backgroundColor: [34, 34, 34, 0],
     detectRetina: true,
@@ -38,6 +38,7 @@ export class Main extends DrawingInterface implements ILibraryInterface {
     };
     public particlesSectorManager: ParticleSectorManager;
     public systems: IParticleSystem[] = [];
+    public renderer: IRenderer = null;
 
     constructor(public params: Params) {
         super();
@@ -57,6 +58,7 @@ export class Main extends DrawingInterface implements ILibraryInterface {
     private _initParams() {
         this.params = getDefault(this.params, getDefaultParams());
         this.systems = this.params.systems.map(builder => new builder(this));
+        this.renderer = new this.params.renderer(this._plugin);
         let canvas = this.params.selectorOrCanvas;
         if (typeof canvas === 'string')
             canvas = document.querySelector(canvas) as HTMLCanvasElement;
@@ -64,7 +66,7 @@ export class Main extends DrawingInterface implements ILibraryInterface {
     }
 
     private _initRenderer() {
-        this.params.renderer.register(this._plugin);
+        this.renderer.register();
         this._plugin.exec(HookType.RENDERER_INIT, this);
     }
 
@@ -137,7 +139,7 @@ export class Main extends DrawingInterface implements ILibraryInterface {
 
 export type Params = {
     selectorOrCanvas    : string | HTMLCanvasElement;
-    renderer?           : IRenderer;
+    renderer?           : IRendererBuilder;
     systems?            : IParticleSystemBuilder[];
     backgroundColor?    : number[];
     detectRetina?       : boolean;
