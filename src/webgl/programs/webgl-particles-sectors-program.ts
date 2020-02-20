@@ -4,7 +4,7 @@ import { ViewBox } from "../camera/view-box";
 import { IParticle } from "../../models/particle";
 import { Vector3D } from "../../models/vector3d";
 import { Vector4D } from "../../models/vector4d";
-import { getColor } from "../../rendering/renderer-webgl";
+import { getColor, IWebGLLibraryInterface } from "../../rendering/renderer-webgl";
 import { particlesSectorsVSText } from "./shaders/particles/particles-sectors.vs";
 import { particlesSectorsFSText } from "./shaders/particles/particles-sectors.fs";
 import { ParticleSectorManager } from "../../models/particle-sector-manager";
@@ -38,7 +38,8 @@ export class ParticlesSectorsProgram implements IProgram {
 
     constructor(
         private _gl: WebGLRenderingContext,
-        private _viewBox: ViewBox
+        private _viewBox: ViewBox,
+        private _libraryInterface: IWebGLLibraryInterface,
     ) {}
 
     notifyParamChange(param: UpdateableParam) {

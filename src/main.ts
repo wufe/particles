@@ -16,6 +16,7 @@ export const getDefaultParams = (): DefaultObject<Params> => ({
     backgroundColor: [34, 34, 34, 0],
     detectRetina: true,
     camera: {
+        enabled: true,
         pitch: 0,
         yaw: 0
     }
@@ -141,8 +142,9 @@ export type Params = {
     backgroundColor?    : number[];
     detectRetina?       : boolean;
     camera?: {
-        pitch           : number;
-        yaw             : number;
+        enabled?: boolean;
+        pitch?  : number;
+        yaw?    : number;
     };
     // This parameter should be set by the system, and not by the library
     //particles?          : RecursivePartial<ParticlesProps>;

@@ -6,7 +6,7 @@ import { particlesVSText } from "./shaders/particles/particles.vs";
 import { particlesFSText } from "./shaders/particles/particles.fs";
 import { Vector3D } from "../../models/vector3d";
 import { Vector4D } from "../../models/vector4d";
-import { getColor } from "../../rendering/renderer-webgl";
+import { getColor, IWebGLLibraryInterface } from "../../rendering/renderer-webgl";
 
 enum Attr {
 	POSITION = 'v_pos',    // Vector of 3
@@ -39,7 +39,8 @@ export class ParticlesProgram implements IProgram {
 
     constructor(
         private _gl: WebGLRenderingContext,
-        private _viewBox: ViewBox
+        private _viewBox: ViewBox,
+        private _libraryInterface: IWebGLLibraryInterface,
     ) {}
 
     notifyParamChange(param: UpdateableParam) {
@@ -51,19 +52,7 @@ export class ParticlesProgram implements IProgram {
     }
 
     init(particles: IParticle[]) {
-        this._vertices = new Float32Array(particles
-            .reduce((accumulator, particle) => {
-                const [x, y, z] = (particle.coords as Vector3D).components;
-                const [r, g, b, a] = (particle.color as Vector4D).components;
-                const [cx, cy, cz, cw] = getColor(r, g, b, a);
-                const [vx, vy, vz] = (particle.velocity as Vector3D).components;
-                return accumulator.concat([
-                    x, y, z,
-                    cx, cy, cz, cw,
-                    vx, vy, vz,
-                    particle.size
-                ]);
-            }, []));
+        this.useParticles(particles);
 
         this._programContainer = new ProgramContainer<Attr, Uni>(
             this._gl,
@@ -78,6 +67,22 @@ export class ParticlesProgram implements IProgram {
 		this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.COLOR));
         this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.VELOX));
         this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.SIZE));
+    }
+
+    useParticles(particles: IParticle[]) {
+        this._vertices = new Float32Array(particles
+            .reduce((accumulator, particle) => {
+                const [x, y, z] = (particle.coords as Vector3D).components;
+                const [r, g, b, a] = (particle.color as Vector4D).components;
+                const [cx, cy, cz, cw] = getColor(r, g, b, a);
+                const [vx, vy, vz] = (particle.velocity as Vector3D).components;
+                return accumulator.concat([
+                    x, y, z,
+                    cx, cy, cz, cw,
+                    vx, vy, vz,
+                    particle.size
+                ]);
+            }, []));
     }
 
     update(deltaT: number, T: number): void {

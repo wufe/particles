@@ -15,7 +15,7 @@ export interface IWebGLInternals {
     }
 }
 
-interface IWebGLLibraryInterface extends ILibraryInterface {
+export interface IWebGLLibraryInterface extends ILibraryInterface {
     context: WebGLRenderingContext;
     internals: ILibraryInterface['internals'] & {
         webgl: IWebGLInternals;
@@ -26,17 +26,20 @@ export const getColor = (r: number, g: number, b: number, a: number = 1) =>
     [ (1 / 255) * r, (1 / 255) * g, (1 / 255) * b, a ];
 
 export class RendererWebGL implements IRenderer {
+    _pluginAdapter: PluginAdapter;
 
     constructor() {}
 
     register(pluginAdapter: PluginAdapter) {
-        pluginAdapter.addAfter(HookType.RENDERER_INIT, this._initRenderer.bind(this));
-        pluginAdapter.addAfter(HookType.CONTEXT_INIT, this._initContext.bind(this));
-        pluginAdapter.addAfter(HookType.CANVAS_INIT, this._initCanvas.bind(this));
-        pluginAdapter.addAfter(HookType.PRE_START, this._preStart.bind(this));
-        pluginAdapter.addAfter(HookType.CANVAS_CLEAR, this._clearCanvas.bind(this));
-        pluginAdapter.addAfter(HookType.DRAW, this._draw.bind(this));
-        pluginAdapter.addAfter(HookType.UPDATE, this._update.bind(this));
+        // TODO: move into constructor
+        this._pluginAdapter = pluginAdapter;
+        this._pluginAdapter.addAfter(HookType.RENDERER_INIT, this._initRenderer.bind(this));
+        this._pluginAdapter.addAfter(HookType.CONTEXT_INIT, this._initContext.bind(this));
+        this._pluginAdapter.addAfter(HookType.CANVAS_INIT, this._initCanvas.bind(this));
+        this._pluginAdapter.addAfter(HookType.PRE_START, this._preStart.bind(this));
+        this._pluginAdapter.addAfter(HookType.CANVAS_CLEAR, this._clearCanvas.bind(this));
+        this._pluginAdapter.addAfter(HookType.DRAW, this._draw.bind(this));
+        this._pluginAdapter.addAfter(HookType.UPDATE, this._update.bind(this));
     }
 
     private _initRenderer(libraryInterface: IWebGLLibraryInterface) {
@@ -78,8 +81,8 @@ export class RendererWebGL implements IRenderer {
         const context = libraryInterface.context;
 
         // #region ViewBox
-        const { pitch, yaw } = libraryInterface.params.camera;
-        const viewBox = new ViewBox(width, height, pitch, yaw);
+        const { enabled, pitch, yaw } = libraryInterface.params.camera;
+        const viewBox = new ViewBox(width, height, pitch, yaw, enabled);
         // #endregion
 
         // #region CameraEvents
@@ -90,16 +93,21 @@ export class RendererWebGL implements IRenderer {
         // #endregion
 
         // #region Sectors program
-        const particlesSectorsProgram = new ParticlesSectorsProgram(context, viewBox);
+        const particlesSectorsProgram = new ParticlesSectorsProgram(context, viewBox, libraryInterface);
         particlesSectorsProgram.init(libraryInterface.particlesSectorManager);
         libraryInterface.internals.webgl.programs.sectors = particlesSectorsProgram;
         // #endregion
 
         // #region Particles program
-        const particlesProgram = new ParticlesProgram(context, viewBox);
+        const particlesProgram = new ParticlesProgram(context, viewBox, libraryInterface);
         const particles = libraryInterface.getAllParticles();
         particlesProgram.init(particles);
+        
         libraryInterface.internals.webgl.programs.particles = particlesProgram;
+        // #endregion
+
+        // #region Particles change events
+        this._pluginAdapter.addAfter(HookType.SYSTEM_UPDATED, this._onSystemUpdated.bind(this));
         // #endregion
     }
 
@@ -126,6 +134,11 @@ export class RendererWebGL implements IRenderer {
             libraryInterface.internals.webgl.programs.sectors.notifyParamChange(UpdateableParam.CAMERA);
             libraryInterface.internals.webgl.programs.particles.notifyParamChange(UpdateableParam.CAMERA);
         };
+    }
+
+    private _onSystemUpdated(libraryInterface: IWebGLLibraryInterface) {
+        const particles = libraryInterface.getAllParticles();
+        libraryInterface.internals.webgl.programs.particles.useParticles(particles);
     }
 
 }

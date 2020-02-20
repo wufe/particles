@@ -28,6 +28,40 @@ export class DefaultParticleSystem implements IParticleSystem {
                 particle.sector = manager.particlesSectorManager.getSectorByIndex(sectorX, sectorY, sectorZ);
                 return particle;
             });
+
+        setTimeout(() => {
+            this._particles = new Array(1)
+                .fill(null)
+                .map(_ => {
+                    const x = Math.random() * width;
+                    const y = Math.random() * height;
+                    const z = Math.random() * Math.min(width, height);
+                    const particle = new Particle(new Vector3D({ x, y, z }));
+                    const sectorX = Math.floor(x / sectionLength);
+                    const sectorY = Math.floor(y / sectionLength);
+                    const sectorZ = Math.floor(z / sectionLength);
+                    particle.sector = manager.particlesSectorManager.getSectorByIndex(sectorX, sectorY, sectorZ);
+                    return particle;
+            });
+            this.notifyChange();
+        }, 2000)
+
+        setTimeout(() => {
+            this._particles = new Array(1000)
+                .fill(null)
+                .map(_ => {
+                    const x = Math.random() * width;
+                    const y = Math.random() * height;
+                    const z = Math.random() * Math.min(width, height);
+                    const particle = new Particle(new Vector3D({ x, y, z }));
+                    const sectorX = Math.floor(x / sectionLength);
+                    const sectorY = Math.floor(y / sectionLength);
+                    const sectorZ = Math.floor(z / sectionLength);
+                    particle.sector = manager.particlesSectorManager.getSectorByIndex(sectorX, sectorY, sectorZ);
+                    return particle;
+                });
+            this.notifyChange();
+        }, 4000)
     }
 
     notifyChange() {

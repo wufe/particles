@@ -18,16 +18,19 @@ export class ViewBox {
 		public height: number,
 		private _pitch: number,
 		private _yaw: number,
+		public enabled: boolean,
 	) {
 		this.calculate();
 	}
 
 	calculate() {
-		this.eulerAngle.x = this._pitch;
-		this.eulerAngle.y = this._yaw;
-		this.eulerAngle.z = 0;
-		mat4.lookAt(this.vMat, this.eulerVec, [0, 0, 0], [0, 0, 1]);
-		mat4.perspective(this.pMat, Math.PI / 4, this.width / this.height, .00001, 15);
+		if (this.enabled) {
+			this.eulerAngle.x = this._pitch;
+			this.eulerAngle.y = this._yaw;
+			this.eulerAngle.z = 0;
+			mat4.lookAt(this.vMat, this.eulerVec, [0, 0, 0], [0, 0, 1]);
+			mat4.perspective(this.pMat, Math.PI / 4, this.width / this.height, .00001, 15);
+		}
 	}
 
 	recalculate() {
