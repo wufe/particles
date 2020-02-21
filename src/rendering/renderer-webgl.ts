@@ -74,12 +74,12 @@ export class RendererWebGL implements IRenderer {
     }
 
     private _preStart(libraryInterface: IWebGLLibraryInterface) {
-        const { width, height } = libraryInterface.internals;
+        const { width, height, depth } = libraryInterface.internals;
         const context = libraryInterface.context;
 
         // #region ViewBox
         const { enabled, pitch, yaw } = libraryInterface.params.camera;
-        const viewBox = new ViewBox(width, height, pitch, yaw, enabled);
+        const viewBox = new ViewBox(width, height, depth, pitch, yaw, enabled);
         // #endregion
 
         // #region CameraEvents

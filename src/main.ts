@@ -90,14 +90,15 @@ export class Main extends DrawingInterface implements ILibraryInterface {
         }
         this.internals.width    = width;
         this.internals.height   = height;
+        this.internals.depth    = Math.max(width, height);
         this.canvas.width       = width;
         this.canvas.height      = height;
         this._plugin.exec(HookType.CANVAS_INIT, this);
     }
 
     private _initSystems() {
-        const {width, height} = this.internals;
-        this.particlesSectorManager = new ParticleSectorManager(width, height);
+        const {width, height, depth} = this.internals;
+        this.particlesSectorManager = new ParticleSectorManager(width, height, depth);
         this.systems.forEach(x => x.attach());
     }
 
@@ -153,11 +154,12 @@ export type Params = {
 };
 
 export type InternalParams = {
-    pixelRatio?   : number;
-    isRetina?     : boolean;
-    initialized   : boolean;
-    width?        : number;
-    height?       : number;
+    pixelRatio?            : number;
+    isRetina?              : boolean;
+    initialized            : boolean;
+    width?                 : number;
+    height?                : number;
+    depth?                 : number;
     [k            : string]: any;
 };
 

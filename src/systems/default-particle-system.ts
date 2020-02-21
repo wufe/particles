@@ -11,14 +11,14 @@ export class DefaultParticleSystem extends BaseParticleSystem implements IPartic
     private _particles: IParticle[] = [];
 
     attach() {
-        const { width, height } = this.manager.internals;
+        const { width, height, depth } = this.manager.internals;
 
         this._particles = new Array(100)
             .fill(null)
             .map(_ => {
                 const x = Math.random() * width;
                 const y = Math.random() * height;
-                const z = Math.random() * Math.min(width, height);
+                const z = Math.random() * depth;
                 const particle = new Particle(new Vector3D({ x, y, z }), this.manager);
                 return particle;
             });

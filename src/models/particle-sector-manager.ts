@@ -10,9 +10,9 @@ export class ParticleSectorManager {
 
     private _sectors: IParticleSector[] = [];
 
-    constructor(public width: number, public height: number) {
-        this.sectorLength = Math.min(width, height) / 6;
-        this.zSectorsCount = Math.ceil(Math.min(width, height) / this.sectorLength);
+    constructor(public width: number, public height: number, public depth: number) {
+        this.sectorLength = Math.min(width, height, depth) / 6;
+        this.zSectorsCount = Math.ceil(depth / this.sectorLength);
         this.xSectorsCount = Math.ceil(width / this.sectorLength);
         this.ySectorsCount = Math.ceil(height / this.sectorLength);
 

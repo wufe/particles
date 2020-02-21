@@ -16,6 +16,7 @@ export class ViewBox {
 	constructor(
 		public width: number,
 		public height: number,
+		public depth: number,
 		private _pitch: number,
 		private _yaw: number,
 		public enabled: boolean,
@@ -73,7 +74,7 @@ export class ViewBox {
 		return [
 			this.width,
 			this.height,
-			Math.min(this.width, this.height),
+			this.depth,
 		]
 	}
 }
