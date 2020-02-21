@@ -11,7 +11,7 @@ export class DefaultParticleSystem extends BaseParticleSystem implements IPartic
     private _particles: IParticle[] = [];
 
     attach() {
-        const { width, height, depth } = this.manager.internals;
+        const { width, height, depth } = this.manager.configuration;
 
         this._particles = new Array(100)
             .fill(null)

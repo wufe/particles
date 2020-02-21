@@ -7,7 +7,7 @@ import { ViewBox } from "../webgl/camera/view-box";
 import { CameraEvents } from "../webgl/camera/camera-events";
 import { ParticlesSectorsProgram } from "../webgl/programs/webgl-particles-sectors-program";
 
-export interface IWebGLInternals {
+export type TWebGLConfiguration = {
     backgroundColor: number[];
     programs: {
         particles   : ParticlesProgram | null;
@@ -17,8 +17,8 @@ export interface IWebGLInternals {
 
 export interface IWebGLLibraryInterface extends ILibraryInterface {
     context: WebGLRenderingContext;
-    internals: ILibraryInterface['internals'] & {
-        webgl: IWebGLInternals;
+    configuration: ILibraryInterface['configuration'] & {
+        webgl: TWebGLConfiguration;
     }
 }
 
@@ -44,14 +44,14 @@ export class RendererWebGL implements IRenderer {
         const [r, g, b, a] = libraryInterface.params.backgroundColor;
         const backgroundColor = getColor(r, g, b, a);
         
-        const webglInternals: IWebGLInternals = {
+        const webglConfiguration: TWebGLConfiguration = {
             backgroundColor,
             programs: {
                 particles   : null,
                 sectors     : null,
             }
         };
-        libraryInterface.internals.webgl = webglInternals;
+        libraryInterface.configuration.webgl = webglConfiguration;
     }
 
     private _initContext(libraryInterface: IWebGLLibraryInterface) {
@@ -61,7 +61,7 @@ export class RendererWebGL implements IRenderer {
     }
 
     private _initCanvas(libraryInterface: IWebGLLibraryInterface) {
-        const { width, height } = libraryInterface.internals;
+        const { width, height } = libraryInterface.configuration;
         const context = libraryInterface.context;
         context.viewport(0, 0, width, height);
 
@@ -74,7 +74,7 @@ export class RendererWebGL implements IRenderer {
     }
 
     private _preStart(libraryInterface: IWebGLLibraryInterface) {
-        const { width, height, depth } = libraryInterface.internals;
+        const { width, height, depth } = libraryInterface.configuration;
         const context = libraryInterface.context;
 
         // #region ViewBox
@@ -92,7 +92,7 @@ export class RendererWebGL implements IRenderer {
         // #region Sectors program
         const particlesSectorsProgram = new ParticlesSectorsProgram(context, viewBox, libraryInterface);
         particlesSectorsProgram.init(libraryInterface.particlesSectorManager);
-        libraryInterface.internals.webgl.programs.sectors = particlesSectorsProgram;
+        libraryInterface.configuration.webgl.programs.sectors = particlesSectorsProgram;
         // #endregion
 
         // #region Particles program
@@ -100,7 +100,7 @@ export class RendererWebGL implements IRenderer {
         const particles = libraryInterface.getAllParticles();
         particlesProgram.init(particles);
         
-        libraryInterface.internals.webgl.programs.particles = particlesProgram;
+        libraryInterface.configuration.webgl.programs.particles = particlesProgram;
         // #endregion
 
         // #region Particles change events
@@ -109,33 +109,33 @@ export class RendererWebGL implements IRenderer {
     }
 
     private _clearCanvas(libraryInterface: IWebGLLibraryInterface) {
-        const webglInternals = libraryInterface.internals.webgl;
+        const webglConfiguration = libraryInterface.configuration.webgl;
         const context = libraryInterface.context;
-        const [r, g, b, a] = webglInternals.backgroundColor;
+        const [r, g, b, a] = webglConfiguration.backgroundColor;
         context.clearColor(r, g, b, a);
         context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
     }
 
     private _draw(libraryInterface: IWebGLLibraryInterface) {
-        libraryInterface.internals.webgl.programs.sectors.draw();
-        libraryInterface.internals.webgl.programs.particles.draw();
+        libraryInterface.configuration.webgl.programs.sectors.draw();
+        libraryInterface.configuration.webgl.programs.particles.draw();
     }
 
     private _update(libraryInterface: IWebGLLibraryInterface) {
-        libraryInterface.internals.webgl.programs.sectors.update(libraryInterface.deltaTime, libraryInterface.time);
-        libraryInterface.internals.webgl.programs.particles.update(libraryInterface.deltaTime, libraryInterface.time);
+        libraryInterface.configuration.webgl.programs.sectors.update(libraryInterface.deltaTime, libraryInterface.time);
+        libraryInterface.configuration.webgl.programs.particles.update(libraryInterface.deltaTime, libraryInterface.time);
     }
 
     private _onCameraChange(libraryInterface: IWebGLLibraryInterface) {
         return () => {
-            libraryInterface.internals.webgl.programs.sectors.notifyParamChange(UpdateableParam.CAMERA);
-            libraryInterface.internals.webgl.programs.particles.notifyParamChange(UpdateableParam.CAMERA);
+            libraryInterface.configuration.webgl.programs.sectors.notifyParamChange(UpdateableParam.CAMERA);
+            libraryInterface.configuration.webgl.programs.particles.notifyParamChange(UpdateableParam.CAMERA);
         };
     }
 
     private _onSystemUpdated(libraryInterface: IWebGLLibraryInterface) {
         const particles = libraryInterface.getAllParticles();
-        libraryInterface.internals.webgl.programs.particles.useParticles(particles);
+        libraryInterface.configuration.webgl.programs.particles.useParticles(particles);
     }
 
 }

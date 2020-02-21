@@ -24,7 +24,7 @@ export const getDefaultParams = (): DefaultObject<Params> => ({
 
 export interface ILibraryInterface extends IDrawingInterface, ISystemBridge {
     params: Params;
-    internals: InternalParams;
+    configuration: TConfiguration;
     time: number;
     deltaTime: number;
     particlesSectorManager: ParticleSectorManager;
@@ -33,7 +33,7 @@ export interface ILibraryInterface extends IDrawingInterface, ISystemBridge {
 
 export class Main extends DrawingInterface implements ILibraryInterface {
     private _plugin = new PluginAdapter();
-    public internals: InternalParams = {
+    public configuration: TConfiguration = {
         initialized: false,
     };
     public particlesSectorManager: ParticleSectorManager;
@@ -79,25 +79,25 @@ export class Main extends DrawingInterface implements ILibraryInterface {
         if (this.params.detectRetina) {
             const pixelRatio = window.devicePixelRatio;
             if (pixelRatio > 1) {
-                this.internals.isRetina = true;
-                this.internals.pixelRatio = pixelRatio;
+                this.configuration.isRetina = true;
+                this.configuration.pixelRatio = pixelRatio;
                 width = this.canvas.offsetWidth * pixelRatio;
                 height = this.canvas.offsetHeight * pixelRatio;
             } else {
-                this.internals.pixelRatio = 1;
-                this.internals.isRetina = false;
+                this.configuration.pixelRatio = 1;
+                this.configuration.isRetina = false;
             }
         }
-        this.internals.width    = width;
-        this.internals.height   = height;
-        this.internals.depth    = Math.max(width, height);
+        this.configuration.width    = width;
+        this.configuration.height   = height;
+        this.configuration.depth    = Math.max(width, height);
         this.canvas.width       = width;
         this.canvas.height      = height;
         this._plugin.exec(HookType.CANVAS_INIT, this);
     }
 
     private _initSystems() {
-        const {width, height, depth} = this.internals;
+        const {width, height, depth} = this.configuration;
         this.particlesSectorManager = new ParticleSectorManager(width, height, depth);
         this.systems.forEach(x => x.attach());
     }
@@ -153,7 +153,7 @@ export type Params = {
     //particles?          : RecursivePartial<ParticlesProps>;
 };
 
-export type InternalParams = {
+export type TConfiguration = {
     pixelRatio?            : number;
     isRetina?              : boolean;
     initialized            : boolean;

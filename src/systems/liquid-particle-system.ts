@@ -19,7 +19,7 @@ export class LiquidParticleSystemBuilder {
             private _particles: IParticle[] = [];
 
             attach() {
-                const { width, height } = this.manager.internals;
+                const { width, height } = this.manager.configuration;
 
                 this._particles = new Array(params.particles.background.count)
                     .fill(null)
