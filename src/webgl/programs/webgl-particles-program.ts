@@ -7,6 +7,7 @@ import { particlesFSText } from "./shaders/particles/particles.fs";
 import { Vector3D } from "../../models/vector3d";
 import { Vector4D } from "../../models/vector4d";
 import { getColor, IWebGLLibraryInterface } from "../../rendering/renderer-webgl";
+import { ParticleEventType } from "../../models/base-particle";
 
 enum Attr {
 	POSITION = 'v_pos',    // Vector of 3
@@ -73,7 +74,7 @@ export class ParticlesProgram implements IProgram {
     useParticles(particles: IParticle[]) {
         this._vertices = new Float32Array(particles
             .reduce((accumulator, particle, index) => {
-                particle.onPositionUpdate = this._onParticlePositionUpdate(index);
+                particle.on(ParticleEventType.POSITION_UPDATE, this._onParticlePositionUpdate(index));
                 const [x, y, z] = (particle.coords as Vector3D).components;
                 const [r, g, b, a] = (particle.color as Vector4D).components;
                 const [cx, cy, cz, cw] = getColor(r, g, b, a);
@@ -92,7 +93,6 @@ export class ParticlesProgram implements IProgram {
         this._vertices[startIndex] = particle.coords.x;
         this._vertices[startIndex+1] = particle.coords.y;
         this._vertices[startIndex+2] = particle.coords.z;
-        // console.log(particleIndex);
     }
 
     update(deltaT: number, T: number): void {

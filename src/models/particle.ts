@@ -2,6 +2,7 @@ import { IVector3D, Vector3D } from "./vector3d";
 import { Vector4D, IVector4D } from "./vector4d";
 import { ParticleSector, IParticleSector } from "./particle-sector";
 import { ILibraryInterface } from "../main";
+import { IListenable, ParticleEventType, BaseListenableParticle } from "./base-particle";
 
 // Represents the parameter and the methods required by the particle
 // to move through the available space.
@@ -24,17 +25,15 @@ export interface IDrawable {
     color: IVector4D;
 }
 
-export interface IListenable {
-    onPositionUpdate?: (particle: IParticle) => any;
-}
 
-export interface IParticle extends IMoveable, IDrawable, IListenable {
+export interface IParticle extends IMoveable, IDrawable, IListenable<ParticleEventType> {
     
 }
 
-export class Particle implements IParticle {
+export class Particle extends BaseListenableParticle implements IParticle {
     
     constructor(public coords: Vector3D = new Vector3D(), private _manager: ILibraryInterface) {
+        super();
         this.calculateSector();
     }
 
@@ -46,7 +45,6 @@ export class Particle implements IParticle {
         z: 255,
         w: 1
     });
-    onPositionUpdate?: (particle: IParticle) => any;
 
     sector: IParticleSector;
 
@@ -72,9 +70,7 @@ export class Particle implements IParticle {
 
     private _notifyPositionUpdate() {
         this.calculateSector();
-        if (this.onPositionUpdate) {
-            this.onPositionUpdate(this);
-        }
+        this.call(ParticleEventType.POSITION_UPDATE, this);
     }
 
     getAdjacentSectors(): IParticleSector[] {
