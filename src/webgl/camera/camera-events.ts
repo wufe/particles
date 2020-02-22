@@ -47,11 +47,15 @@ export class CameraEvents {
 				this._lastMouseY = this._currMouseY;
 
 				let { pitch, yaw } = this._libraryInterface.configuration.webgl.camera;
-				pitch = Math.max(pitch - mouseMovX, -1 * (Math.PI / 2));
-				pitch = Math.min(pitch - mouseMovX, Math.PI / 2);
 
-				yaw = Math.max(yaw - mouseMovY, -1 * (Math.PI / 2));
-				yaw = Math.min(yaw - mouseMovY, Math.PI / 2);
+				pitch -= mouseMovX;
+				yaw -= mouseMovY;
+
+				// pitch = Math.max(pitch, -1 * (Math.PI / 2));
+				// pitch = Math.min(pitch, Math.PI / 2);
+
+				yaw = Math.max(yaw, (-1 * (Math.PI / 2)) + .0001);
+				yaw = Math.min(yaw, Math.PI / 2);
 
 				this._libraryInterface.configuration.webgl.camera.pitch = pitch;
 				this._libraryInterface.configuration.webgl.camera.yaw = yaw;
