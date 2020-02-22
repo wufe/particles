@@ -21,6 +21,7 @@ export const getDefaultParams = (): DefaultObject<Params> => ({
         yaw: 0,
         zoom: 2,
         ortho: false,
+        fov: Math.PI / 5
     }
 });
 
@@ -152,6 +153,7 @@ export type Params = {
         yaw?    : number;
         zoom?   : number;
         ortho?  : boolean;
+        fov?    : number;
     };
     // This parameter should be set by the system, and not by the library
     //particles?          : RecursivePartial<ParticlesProps>;

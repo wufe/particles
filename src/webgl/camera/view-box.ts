@@ -16,7 +16,7 @@ export class ViewBox {
 	calculate() {
 
 		const { width, height, webgl } = this._library.configuration;
-		const { enabled, pitch, yaw, zoom, ortho } = webgl.camera;
+		const { enabled, pitch, yaw, zoom, ortho, fov } = webgl.camera;
 
 		if (enabled) {
 			//#region Camera matrix (view matrix)
@@ -36,7 +36,7 @@ export class ViewBox {
 			if (ortho)
 				mat4.ortho(this.pMat, -1, 1, -1, 1, .000001, 15);
 			else
-				mat4.perspective(this.pMat, Math.PI / 3, width / height, .00001, 15);
+				mat4.perspective(this.pMat, fov, width / height, .00001, 15);
 		}
 	}
 

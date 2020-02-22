@@ -15,6 +15,7 @@ export type TWebGLConfiguration = {
         yaw    : number;
         zoom   : number;
         ortho  : boolean;
+        fov    : number;
     };
     viewBox: ViewBox | null;
     programs: {
@@ -52,7 +53,7 @@ export class RendererWebGL implements IRenderer {
         const [r, g, b, a] = libraryInterface.params.backgroundColor;
         const backgroundColor = getColor(r, g, b, a);
 
-        const { enabled, pitch, yaw, zoom, ortho } = libraryInterface.params.camera;
+        const { enabled, pitch, yaw, zoom, ortho, fov } = libraryInterface.params.camera;
         
         const webglConfiguration: TWebGLConfiguration = {
             backgroundColor,
@@ -67,6 +68,7 @@ export class RendererWebGL implements IRenderer {
                 yaw,
                 zoom,
                 ortho,
+                fov,
             }
         };
         libraryInterface.configuration.webgl = webglConfiguration;
