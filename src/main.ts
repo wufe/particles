@@ -19,7 +19,7 @@ export const getDefaultParams = (): DefaultObject<Params> => ({
         enabled: true,
         pitch: 0,
         yaw: 0,
-        zoom: 4,
+        zoom: 2,
         ortho: false,
     }
 });
