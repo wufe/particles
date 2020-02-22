@@ -12,7 +12,6 @@ import { ParticleEventType } from "../../models/base-particle";
 enum Attr {
 	POSITION = 'v_pos',    // Vector of 3
 	COLOR    = 'v_col',    // Vector of 4
-	VELOX    = 'v_vel',    // TODO: Next refine, use velox if no coords specified in particles
 	SIZE     = 'f_size',
 }
 
@@ -37,7 +36,7 @@ export class ParticlesProgram implements IProgram {
         res   : true,
     };
     private _vertices: Float32Array;
-    private _strideLength = 11;
+    private _strideLength = 8;
 
     constructor(
         private _gl: WebGLRenderingContext,
@@ -67,7 +66,6 @@ export class ParticlesProgram implements IProgram {
         this._vectorsBuffer = this._gl.createBuffer();
         this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.POSITION));
 		this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.COLOR));
-        this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.VELOX));
         this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.SIZE));
     }
 
@@ -78,11 +76,9 @@ export class ParticlesProgram implements IProgram {
                 const [x, y, z] = (particle.coords as Vector3D).components;
                 const [r, g, b, a] = (particle.color as Vector4D).components;
                 const [cx, cy, cz, cw] = getColor(r, g, b, a);
-                const [vx, vy, vz] = (particle.velocity as Vector3D).components;
                 return accumulator.concat([
                     x, y, z,
                     cx, cy, cz, cw,
-                    vx, vy, vz,
                     particle.size
                 ]);
             }, []));
@@ -96,8 +92,6 @@ export class ParticlesProgram implements IProgram {
     }
 
     update(deltaT: number, T: number): void {
-
-        // this._viewBox.yaw += .01;
         this._willUpdateParams[UpdateableParam.CAMERA] = true;
 
         this._gl.useProgram(this._programContainer.program);
@@ -140,22 +134,13 @@ export class ParticlesProgram implements IProgram {
 			3 * Float32Array.BYTES_PER_ELEMENT,
 		);
 
-		this._gl.vertexAttribPointer(
-			this._programContainer.attr(Attr.VELOX),
-			3,
-			this._gl.FLOAT,
-			false,
-			this._strideLength * Float32Array.BYTES_PER_ELEMENT,
-			7 * Float32Array.BYTES_PER_ELEMENT,
-        );
-
         this._gl.vertexAttribPointer(
             this._programContainer.attr(Attr.SIZE),
             1,
             this._gl.FLOAT,
             false,
             this._strideLength * Float32Array.BYTES_PER_ELEMENT,
-            10 * Float32Array.BYTES_PER_ELEMENT
+            7 * Float32Array.BYTES_PER_ELEMENT
         );
         
         this._gl.bindBuffer(this._gl.ARRAY_BUFFER, null);

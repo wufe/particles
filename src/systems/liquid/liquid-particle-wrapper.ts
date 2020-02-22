@@ -10,9 +10,9 @@ export class LiquidParticleWrapper {
 
     onParticlePositionUpdate = () => {
         const { width, height, depth } = this._manager.configuration;
-        if (this.particle.coords.z > depth + 100) {
-            this.particle.coords.z = 0;
-        }
+        // if (this.particle.coords.z > depth + 100) {
+        //     this.particle.coords.z = 0;
+        // }
         if (this.particle.coords.y > height + 100) {
             this.particle.coords.y = 0;
         }

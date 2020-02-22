@@ -63,7 +63,7 @@ export class Particle extends BaseListenableParticle implements IParticle {
     }
 
     size     : number    = 2;
-    velocity : Vector3D  = new Vector3D({ x: .1, y: .1, z: 0});
+    velocity : Vector3D  = new Vector3D({ x: 0, y: 0, z: 0});
     color    : IVector4D = new Vector4D({
         x: 255,
         y: 255,

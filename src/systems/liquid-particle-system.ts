@@ -27,14 +27,11 @@ export class LiquidParticleSystemBuilder {
                 this._particles = new Array(params.particles.background.count)
                     .fill(null)
                     .map(_ => {
-                        // const x = Math.random() * width;
-                        // const y = Math.random() * height;
-                        // const z = (zSection * 2 * Math.random()) + startZ;
-                        const x = width;
+                        const x = Math.random() * width;
                         const y = Math.random() * height;
                         const z = depth / 2;
                         const particle = new Particle(new Vector3D({ x, y, z }), this.manager);
-                        particle.size = 20 + Math.random() * 30;
+                        particle.size = 5 + Math.random() * 10;
                         particle.color.w = Math.random() / 3 + .1;
                         particle.setVelocity(ParticleDirection.UP, {
                             randomize: true,
