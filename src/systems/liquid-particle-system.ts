@@ -29,7 +29,7 @@ export class LiquidParticleSystemBuilder {
                     .map(_ => {
                         const x = Math.random() * width;
                         const y = Math.random() * height;
-                        const z = depth / 2;
+                        const z = Math.random() * depth;
                         const particle = new Particle(new Vector3D({ x, y, z }), this.manager);
                         particle.size = 5 + Math.random() * 10;
                         particle.color.w = Math.random() / 3 + .1;
@@ -37,7 +37,7 @@ export class LiquidParticleSystemBuilder {
                             randomize: true,
                             boundary: {
                                 min: .2,
-                                max: 2
+                                max: 1.5
                             }
                         })
                         return new LiquidParticleWrapper(particle, this.manager);
