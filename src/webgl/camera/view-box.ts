@@ -1,5 +1,5 @@
 import { mat4 } from "gl-matrix";
-import { EulerAngle } from "../../models/euler-angle-vector";
+import { IWebGLLibraryInterface } from "../../rendering/renderer-webgl";
 
 export class ViewBox {
 
@@ -7,30 +7,36 @@ export class ViewBox {
 	public vMat = mat4.create();
 	public pMat = mat4.create();
 
-	public eulerAngle: EulerAngle = new EulerAngle({
-		pitch: 0,
-		roll: 0,
-		yaw: 0
-	});
-
 	constructor(
-		public width: number,
-		public height: number,
-		public depth: number,
-		private _pitch: number,
-		private _yaw: number,
-		public enabled: boolean,
+		private _library: IWebGLLibraryInterface
 	) {
 		this.calculate();
 	}
 
 	calculate() {
-		if (this.enabled) {
-			this.eulerAngle.x = this._pitch;
-			this.eulerAngle.y = this._yaw;
-			this.eulerAngle.z = 0;
-			mat4.lookAt(this.vMat, this.eulerVec, [0, 0, 0], [0, 0, 1]);
-			mat4.perspective(this.pMat, Math.PI / 4, this.width / this.height, .00001, 15);
+
+		const { width, height, webgl } = this._library.configuration;
+		const { enabled, pitch, yaw, zoom, ortho } = webgl.camera;
+
+		if (enabled) {
+			//#region Camera matrix (view matrix)
+			const cameraMatrix = mat4.rotateY(mat4.create(), mat4.create(), pitch);
+			mat4.rotateX(cameraMatrix, cameraMatrix, yaw);
+			mat4.translate(cameraMatrix, cameraMatrix, [0, 0, zoom]);
+
+			const target = [0, 0, 0];
+			const eye = [cameraMatrix[12], cameraMatrix[13], cameraMatrix[14]];
+			const up = [0, 1, 0];
+
+			mat4.lookAt(this.vMat, eye, target, up);
+
+			// mat4.invert(this.vMat, cameraMatrix);
+			//#endregion
+
+			if (ortho)
+				mat4.ortho(this.pMat, -1, 1, -1, 1, .000001, 15);
+			else
+				mat4.perspective(this.pMat, Math.PI / 3, width / height, .00001, 15);
 		}
 	}
 
@@ -38,43 +44,8 @@ export class ViewBox {
 		this.calculate();
 	}
 
-	private _zoom = 4;
-	get zoom() {
-		return this._zoom;
-	}
-
-	set zoom(value: number) {
-		this._zoom = value;
-		this.recalculate();
-	}
-
-	get pitch() {
-		return this._pitch;
-	}
-
-	set pitch(value: number) {
-		this._pitch = value;
-		this.recalculate();
-	}
-
-	get yaw() {
-		return this._yaw;
-	}
-
-	set yaw(value: number) {
-		this._yaw = value;
-		this.recalculate();
-	}
-
-	get eulerVec() {
-		return this.eulerAngle.toVector().mul(this._zoom).components;
-	}
-
 	get resolutionVec() {
-		return [
-			this.width,
-			this.height,
-			this.depth,
-		]
+		const { width, height, depth } = this._library.configuration;
+		return [width, height, depth];
 	}
 }

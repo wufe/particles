@@ -3,6 +3,7 @@ import { Vector4D, IVector4D } from "./vector4d";
 import { ParticleSector, IParticleSector } from "./particle-sector";
 import { ILibraryInterface } from "../main";
 import { IListenable, ParticleEventType, BaseListenableParticle } from "./base-particle";
+import { RecursivePartial, getDefault } from "../utils/object-utils";
 
 // Represents the parameter and the methods required by the particle
 // to move through the available space.
@@ -28,6 +29,30 @@ export interface IDrawable {
 
 export interface IParticle extends IMoveable, IDrawable, IListenable<ParticleEventType> {
     
+}
+
+export enum ParticleDirection {
+    UP    = 'up',
+    RIGHT = 'right',
+    DOWN  = 'down',
+    LEFT  = 'left',
+    // TODO: Implement other directions
+}
+
+type TVelocityConfigurationOptions = {
+    randomize            : boolean;
+    boundary             : {
+        min: number;
+        max: number;
+    };
+}
+
+const defaultVelocityConfigurationOptions: TVelocityConfigurationOptions = {
+    randomize: false,
+    boundary: {
+        min: 0,
+        max: 1
+    }
 }
 
 export class Particle extends BaseListenableParticle implements IParticle {
@@ -58,6 +83,40 @@ export class Particle extends BaseListenableParticle implements IParticle {
         this.sector = this._manager
             .particlesSectorManager
             .getSectorByIndex(sectorX, sectorY, sectorZ);
+    }
+
+    setVelocity(direction: ParticleDirection, options: RecursivePartial<TVelocityConfigurationOptions> | null ) {
+        const velocity = new Vector3D();
+        switch (direction) {
+            case ParticleDirection.UP:
+                velocity.y = 1;
+                break;
+            case ParticleDirection.DOWN:
+                velocity.y = -1;
+                break;
+            // TODO: Implement other directions
+        }
+
+        let velocityOptions: TVelocityConfigurationOptions;
+
+        if (options === null) {
+            velocityOptions = defaultVelocityConfigurationOptions;
+        } else {
+            velocityOptions = getDefault(options, defaultVelocityConfigurationOptions);
+        }
+
+        if (velocityOptions.randomize) {
+            const { min, max } = options.boundary;
+            const range = max-min;
+
+            switch (direction) {
+                case ParticleDirection.UP:
+                    velocity.y = velocity.y * Math.random() * range + min;
+                    break;
+            }
+        }
+
+        this.velocity = velocity;
     }
 
     // Updates position according to velocity

@@ -1,14 +1,15 @@
-import { ViewBox } from "./view-box";
-import { EulerAngle } from "../../models/euler-angle-vector";
+import { IWebGLLibraryInterface } from "../../rendering/renderer-webgl";
 
 const radiansToDegrees = (r: number) => r * 180 / Math.PI;
 
 const degreesToRadians = (d: number) => d * Math.PI / 180;
 
 export class CameraEvents {
+	private _gl: WebGLRenderingContext;
+
+
 	constructor(
-		private _gl: WebGLRenderingContext,
-		private _viewBox: ViewBox,
+		private _libraryInterface: IWebGLLibraryInterface
 	) {}
 
 	private _lastMouseX: number;
@@ -45,15 +46,16 @@ export class CameraEvents {
 				this._lastMouseX = this._currMouseX;
 				this._lastMouseY = this._currMouseY;
 
-				this._viewBox.pitch += mouseMovY;
-				this._viewBox.yaw -= mouseMovX;
-	
-				const pitch = radiansToDegrees(this._viewBox.pitch);
-	
-				if (pitch > 89)
-					this._viewBox.pitch = degreesToRadians(89);
-				if (pitch < -89)
-					this._viewBox.pitch = degreesToRadians(-89);
+				let { pitch, yaw } = this._libraryInterface.configuration.webgl.camera;
+				pitch = Math.max(pitch - mouseMovX, -1 * (Math.PI / 2));
+				pitch = Math.min(pitch - mouseMovX, Math.PI / 2);
+
+				yaw = Math.max(yaw - mouseMovY, -1 * (Math.PI / 2));
+				yaw = Math.min(yaw - mouseMovY, Math.PI / 2);
+
+				this._libraryInterface.configuration.webgl.camera.pitch = pitch;
+				this._libraryInterface.configuration.webgl.camera.yaw = yaw;
+
 				if (this.onChange)
 					this.onChange();
 				
@@ -61,9 +63,9 @@ export class CameraEvents {
 		});
 	
 		canvas.addEventListener('wheel', event => {
-			this._viewBox.zoom += event.deltaY * this._zoomSensitivity;
-			this._viewBox.zoom = Math.min(10, this._viewBox.zoom);
-			this._viewBox.zoom = Math.max(0.001, this._viewBox.zoom);
+			this._libraryInterface.configuration.webgl.camera.zoom += event.deltaY * this._zoomSensitivity;
+			this._libraryInterface.configuration.webgl.camera.zoom = Math.min(10, this._libraryInterface.configuration.webgl.camera.zoom);
+			this._libraryInterface.configuration.webgl.camera.zoom = Math.max(0.001, this._libraryInterface.configuration.webgl.camera.zoom);
 			if (this.onChange)
 				this.onChange();
 		});
@@ -72,6 +74,8 @@ export class CameraEvents {
 		const KEY_S = 115;
 		const KEY_D = 100;
 		const KEY_A = 97;
+		const KEY_PLUS = 43;
+		const KEY_MINUS = 45;
 		document.addEventListener('keypress', event => {
 			if (KEY_W === event.keyCode) {
 				if (this.onForward) {
@@ -89,6 +93,14 @@ export class CameraEvents {
 				if (this.onLeft) {
 					this.onLeft(this._mouseSensitivity);
 				}
+			} else if (KEY_PLUS === event.keyCode) {
+				this._libraryInterface.configuration.webgl.camera.zoom -= this._zoomSensitivity * 300;
+				if (this.onChange)
+					this.onChange();
+			} else if (KEY_MINUS === event.keyCode) {
+				this._libraryInterface.configuration.webgl.camera.zoom += this._zoomSensitivity * 300;
+				if (this.onChange)
+					this.onChange();
 			}
 		});
 	}

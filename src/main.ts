@@ -18,7 +18,9 @@ export const getDefaultParams = (): DefaultObject<Params> => ({
     camera: {
         enabled: true,
         pitch: 0,
-        yaw: 0
+        yaw: 0,
+        zoom: 4,
+        ortho: false,
     }
 });
 
@@ -148,6 +150,8 @@ export type Params = {
         enabled?: boolean;
         pitch?  : number;
         yaw?    : number;
+        zoom?   : number;
+        ortho?  : boolean;
     };
     // This parameter should be set by the system, and not by the library
     //particles?          : RecursivePartial<ParticlesProps>;

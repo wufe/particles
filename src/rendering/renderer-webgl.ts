@@ -9,10 +9,18 @@ import { ParticlesSectorsProgram } from "../webgl/programs/webgl-particles-secto
 
 export type TWebGLConfiguration = {
     backgroundColor: number[];
+    camera: {
+        enabled: boolean;
+        pitch  : number;
+        yaw    : number;
+        zoom   : number;
+        ortho  : boolean;
+    };
+    viewBox: ViewBox | null;
     programs: {
         particles   : ParticlesProgram | null;
         sectors     : ParticlesSectorsProgram | null;
-    }
+    };
 }
 
 export interface IWebGLLibraryInterface extends ILibraryInterface {
@@ -43,12 +51,22 @@ export class RendererWebGL implements IRenderer {
         
         const [r, g, b, a] = libraryInterface.params.backgroundColor;
         const backgroundColor = getColor(r, g, b, a);
+
+        const { enabled, pitch, yaw, zoom, ortho } = libraryInterface.params.camera;
         
         const webglConfiguration: TWebGLConfiguration = {
             backgroundColor,
             programs: {
                 particles   : null,
                 sectors     : null,
+            },
+            viewBox: null,
+            camera: {
+                enabled,
+                pitch,
+                yaw,
+                zoom,
+                ortho,
             }
         };
         libraryInterface.configuration.webgl = webglConfiguration;
@@ -78,13 +96,13 @@ export class RendererWebGL implements IRenderer {
         const context = libraryInterface.context;
 
         // #region ViewBox
-        const { enabled, pitch, yaw } = libraryInterface.params.camera;
-        const viewBox = new ViewBox(width, height, depth, pitch, yaw, enabled);
+        const viewBox = new ViewBox(libraryInterface);
+        libraryInterface.configuration.webgl.viewBox = viewBox;
         // #endregion
 
         // #region CameraEvents
         const canvas = libraryInterface.canvas;
-        const cameraEvents = new CameraEvents(context, viewBox);
+        const cameraEvents = new CameraEvents(libraryInterface);
         cameraEvents.bind(canvas);
         cameraEvents.onChange = this._onCameraChange.bind(this)(libraryInterface);
         // #endregion
@@ -128,6 +146,7 @@ export class RendererWebGL implements IRenderer {
 
     private _onCameraChange(libraryInterface: IWebGLLibraryInterface) {
         return () => {
+            libraryInterface.configuration.webgl.viewBox.recalculate();
             libraryInterface.configuration.webgl.programs.sectors.notifyParamChange(UpdateableParam.CAMERA);
             libraryInterface.configuration.webgl.programs.particles.notifyParamChange(UpdateableParam.CAMERA);
         };

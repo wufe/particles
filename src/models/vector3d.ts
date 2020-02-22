@@ -83,7 +83,9 @@ export class Vector3D {
 	}
 
 	unit() {
-		return this.div(this.length);
+		if (this.length > .0001)
+			return this.div(this.length);
+		return {...ZeroVector3D};
 	}
 
 	cross(vector: IVector3D) {

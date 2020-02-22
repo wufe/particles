@@ -1,7 +1,8 @@
 import { BaseParticleSystem } from "./base-particle-system";
 import { IParticleSystem } from "../models/particle-system";
-import { IParticle, Particle } from "../models/particle";
+import { IParticle, Particle, ParticleDirection } from "../models/particle";
 import { Vector3D } from "../models/vector3d";
+import { LiquidParticleWrapper } from "./liquid/liquid-particle-wrapper";
 
 export interface ILiquidParticleSystemParams {
     particles: {
@@ -16,26 +17,43 @@ export class LiquidParticleSystemBuilder {
     public static build(params: ILiquidParticleSystemParams) {
         return class extends BaseParticleSystem implements IParticleSystem {
 
-            private _particles: IParticle[] = [];
+            private _particles: LiquidParticleWrapper[] = [];
 
             attach() {
-                const { width, height } = this.manager.configuration;
+                const { width, height, depth } = this.manager.configuration;
+                const zSection = depth / 6;
+                const startZ = zSection * -1;
 
                 this._particles = new Array(params.particles.background.count)
                     .fill(null)
                     .map(_ => {
-                        const x = Math.random() * 500 - 250;
-                        const y = Math.random() * 500 - 250;
-                        const z = 0;
+                        // const x = Math.random() * width;
+                        // const y = Math.random() * height;
+                        // const z = (zSection * 2 * Math.random()) + startZ;
+                        const x = width;
+                        const y = Math.random() * height;
+                        const z = depth / 2;
                         const particle = new Particle(new Vector3D({ x, y, z }), this.manager);
                         particle.size = 20 + Math.random() * 30;
-                        particle.color.w = Math.random() / 2 + .5;
-                        return particle;
+                        particle.color.w = Math.random() / 3 + .1;
+                        particle.setVelocity(ParticleDirection.UP, {
+                            randomize: true,
+                            boundary: {
+                                min: .2,
+                                max: 2
+                            }
+                        })
+                        return new LiquidParticleWrapper(particle, this.manager);
                     });
             }
 
             getParticles() {
-                return this._particles;
+                return this._particles.map(x => x.particle);;
+            }
+
+            tick() {
+                this._particles
+                    .forEach(x => x.particle.updatePosition());
             }
         }
     }
