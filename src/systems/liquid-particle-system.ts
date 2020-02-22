@@ -3,6 +3,7 @@ import { IParticleSystem } from "../models/particle-system";
 import { IParticle, Particle, ParticleDirection } from "../models/particle";
 import { Vector3D } from "../models/vector3d";
 import { LiquidParticleWrapper } from "./liquid/liquid-particle-wrapper";
+import { RecursivePartial, getDefault } from "../utils/object-utils";
 
 export interface ILiquidParticleSystemParams {
     particles: {
@@ -12,9 +13,20 @@ export interface ILiquidParticleSystemParams {
     }
 }
 
+const defaultLiquidParticleSystemParams: ILiquidParticleSystemParams = {
+    particles: {
+        background: {
+            count: 100
+        }
+    }
+}
+
 export class LiquidParticleSystemBuilder {
 
-    public static build(params: ILiquidParticleSystemParams) {
+    public static build(params?: RecursivePartial<ILiquidParticleSystemParams>) {
+
+        params = getDefault(params, defaultLiquidParticleSystemParams);
+
         return class extends BaseParticleSystem implements IParticleSystem {
 
             private _particles: LiquidParticleWrapper[] = [];

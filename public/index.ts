@@ -5,7 +5,7 @@ import { LiquidParticleSystemBuilder } from '../src/systems/liquid-particle-syst
 init({
     selectorOrCanvas: '#canvas',
     renderer: RendererWebGL,
-    systems: [LiquidParticleSystemBuilder.build({particles:{background:{count:80}}})],
+    systems: [LiquidParticleSystemBuilder.build()],
     camera: {
         enabled: true
     }
