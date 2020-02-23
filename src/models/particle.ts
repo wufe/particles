@@ -28,7 +28,7 @@ export interface IDrawable {
 
 
 export interface IParticle extends IMoveable, IDrawable, IListenable<ParticleEventType> {
-    
+    update(): void;
 }
 
 export enum ParticleDirection {
@@ -39,13 +39,15 @@ export enum ParticleDirection {
     // TODO: Implement other directions
 }
 
-type TVelocityConfigurationOptions = {
+type TRandomizeOptions = {
     randomize            : boolean;
     boundary             : {
         min: number;
         max: number;
     };
-}
+};
+
+type TVelocityConfigurationOptions = TRandomizeOptions;
 
 const defaultVelocityConfigurationOptions: TVelocityConfigurationOptions = {
     randomize: false,
@@ -117,6 +119,22 @@ export class Particle extends BaseListenableParticle implements IParticle {
         }
 
         this.velocity = velocity;
+    }
+
+    setSize(value: number): void;
+    setSize(options: TRandomizeOptions['boundary']): void;
+    setSize(valueOrRandom: number | TRandomizeOptions['boundary']) {
+        if (typeof valueOrRandom === 'number') {
+            this.size = valueOrRandom;
+        } else {
+            const { min, max } = valueOrRandom;
+            const range = max - min;
+            this.size = Math.random() * range + min;
+        }
+    }
+
+    update() {
+        this.updatePosition();
     }
 
     // Updates position according to velocity

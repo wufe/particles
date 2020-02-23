@@ -56,7 +56,7 @@ export class LiquidParticleSystemBuilder {
                         const y = Math.random() * height;
                         const z = Math.random() * depth;
                         const particle = new Particle(new Vector3D({ x, y, z }), this.manager);
-                        particle.size = 5 + Math.random() * 10;
+                        particle.setSize({ min: 5, max: 15 });
                         particle.color.w = Math.random() / 2 + .2;
                         particle.setVelocity(ParticleDirection.UP, {
                             randomize: true,
@@ -79,7 +79,7 @@ export class LiquidParticleSystemBuilder {
                         const y = Math.random() * height;
                         const z = Math.random() * depth;
                         const particle = new Particle(new Vector3D({ x, y, z }), this.manager);
-                        particle.size = 50 + Math.random() * 50;
+                        particle.setSize({ min: 50, max: 100 });
                         particle.color.w = Math.random() / 4 + .2;
                         particle.setVelocity(ParticleDirection.UP, {
                             randomize: true,
@@ -98,14 +98,14 @@ export class LiquidParticleSystemBuilder {
 
             tick() {
                 this._particles
-                    .forEach(x => x.particle.updatePosition());
+                    .forEach(x => x.particle.update());
             }
 
             public static configuration: RecursivePartial<TParticleSystemConfiguration> = {
                 renderer: {
                     webgl: {
-                        [RendererHook.INIT_CONTEXT]: (canvas: HTMLCanvasElement) =>
-                            canvas.getContext('webgl', { premultipliedAlpha: false })
+                        // [RendererHook.INIT_CONTEXT]: (canvas: HTMLCanvasElement) =>
+                        //     canvas.getContext('webgl', { premultipliedAlpha: false })
                     }
                 }
             }
