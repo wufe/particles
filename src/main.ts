@@ -78,6 +78,13 @@ export class Main extends DrawingInterface implements ILibraryInterface {
     }
 
     private _initCanvas() {
+        this._configureSize();
+        this._plugin.exec(HookType.CANVAS_INIT, this);
+
+        window.addEventListener('resize', this._configureSize.bind(this));
+    }
+
+    private _configureSize() {
         let { clientWidth: width, clientHeight: height } = this.canvas;
         if (this.params.detectRetina) {
             const pixelRatio = window.devicePixelRatio;
@@ -91,12 +98,11 @@ export class Main extends DrawingInterface implements ILibraryInterface {
                 this.configuration.isRetina = false;
             }
         }
-        this.configuration.width    = width;
-        this.configuration.height   = height;
-        this.configuration.depth    = Math.max(width, height);
-        this.canvas.width       = width;
-        this.canvas.height      = height;
-        this._plugin.exec(HookType.CANVAS_INIT, this);
+        this.configuration.width  = width;
+        this.configuration.height = height;
+        this.configuration.depth  = Math.max(width, height);
+        this.canvas.width         = width;
+        this.canvas.height        = height;
     }
 
     private _initSystems() {
