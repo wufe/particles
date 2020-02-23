@@ -26,17 +26,8 @@ export interface IDrawable {
     color: IVector4D;
 }
 
-
 export interface IParticle extends IMoveable, IDrawable, IListenable<ParticleEventType> {
     update(): void;
-}
-
-export enum ParticleDirection {
-    UP    = 'up',
-    RIGHT = 'right',
-    DOWN  = 'down',
-    LEFT  = 'left',
-    // TODO: Implement other directions
 }
 
 type TRandomizeOptions = {
@@ -47,8 +38,19 @@ type TRandomizeOptions = {
     };
 };
 
-type TVelocityConfigurationOptions = TRandomizeOptions;
+//#region Movement
+export enum ParticleDirection {
+    UP    = 'up',
+    RIGHT = 'right',
+    DOWN  = 'down',
+    LEFT  = 'left',
+    FRONT = 'front',
+    BACK  = 'back',
+}
+//#endregion
 
+//#region Velocity
+type TVelocityConfigurationOptions = TRandomizeOptions;
 const defaultVelocityConfigurationOptions: TVelocityConfigurationOptions = {
     randomize: false,
     boundary: {
@@ -56,6 +58,7 @@ const defaultVelocityConfigurationOptions: TVelocityConfigurationOptions = {
         max: 1
     }
 }
+//#endregion
 
 export class Particle extends BaseListenableParticle implements IParticle {
     
@@ -88,15 +91,27 @@ export class Particle extends BaseListenableParticle implements IParticle {
     }
 
     setVelocity(direction: ParticleDirection, options: RecursivePartial<TVelocityConfigurationOptions> | null ) {
+
         const velocity = new Vector3D();
         switch (direction) {
             case ParticleDirection.UP:
                 velocity.y = 1;
                 break;
+            case ParticleDirection.RIGHT:
+                velocity.x = 1;
+                break;
             case ParticleDirection.DOWN:
                 velocity.y = -1;
                 break;
-            // TODO: Implement other directions
+            case ParticleDirection.LEFT:
+                velocity.x = -1;
+                break;
+            case ParticleDirection.FRONT:
+                velocity.z = 1;
+                break;
+            case ParticleDirection.BACK:
+                velocity.z = -1;
+                break;
         }
 
         let velocityOptions: TVelocityConfigurationOptions;
@@ -111,14 +126,17 @@ export class Particle extends BaseListenableParticle implements IParticle {
             const { min, max } = options.boundary;
             const range = max-min;
 
-            switch (direction) {
-                case ParticleDirection.UP:
-                    velocity.y = velocity.y * Math.random() * range + min;
-                    break;
-            }
+            this._randomizeVectorComponent(velocity, 'x', range, min);
+            this._randomizeVectorComponent(velocity, 'y', range, min);
+            this._randomizeVectorComponent(velocity, 'z', range, min);
         }
 
         this.velocity = velocity;
+    }
+
+    private _randomizeVectorComponent(vector: IVector3D, component: keyof IVector3D, range: number, min: number) {
+        if (vector[component])
+            vector[component] = vector[component] * Math.random() * range + min;
     }
 
     setSize(value: number): void;
