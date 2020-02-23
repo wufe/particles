@@ -17,6 +17,9 @@ export type TWebGLConfiguration = {
         ortho  : boolean;
         fov    : number;
     };
+    sectors: {
+        enabled: boolean;
+    };
     viewBox: ViewBox | null;
     programs: {
         particles   : ParticlesProgram | null;
@@ -69,13 +72,18 @@ export class RendererWebGL implements IRenderer {
                 zoom,
                 ortho,
                 fov,
+            },
+            sectors: {
+                enabled: false
             }
         };
         libraryInterface.configuration.webgl = webglConfiguration;
     }
 
     private _initContext(libraryInterface: IWebGLLibraryInterface) {
-        const context = libraryInterface.canvas.getContext('webgl');
+        const context = libraryInterface.canvas.getContext('webgl', {
+            premultipliedAlpha: false
+        });
         libraryInterface.context = context;
 
     }
@@ -110,9 +118,11 @@ export class RendererWebGL implements IRenderer {
         // #endregion
 
         // #region Sectors program
-        const particlesSectorsProgram = new ParticlesSectorsProgram(context, viewBox, libraryInterface);
-        particlesSectorsProgram.init(libraryInterface.particlesSectorManager);
-        libraryInterface.configuration.webgl.programs.sectors = particlesSectorsProgram;
+        if (libraryInterface.configuration.webgl.sectors.enabled) {
+            const particlesSectorsProgram = new ParticlesSectorsProgram(context, viewBox, libraryInterface);
+            particlesSectorsProgram.init(libraryInterface.particlesSectorManager);
+            libraryInterface.configuration.webgl.programs.sectors = particlesSectorsProgram;
+        }
         // #endregion
 
         // #region Particles program
@@ -132,24 +142,28 @@ export class RendererWebGL implements IRenderer {
         const webglConfiguration = libraryInterface.configuration.webgl;
         const context = libraryInterface.context;
         const [r, g, b, a] = webglConfiguration.backgroundColor;
+        // context.colorMask(false, false, false, true);
         context.clearColor(r, g, b, a);
         context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
     }
 
     private _draw(libraryInterface: IWebGLLibraryInterface) {
-        libraryInterface.configuration.webgl.programs.sectors.draw();
+        if (libraryInterface.configuration.webgl.programs.sectors)
+            libraryInterface.configuration.webgl.programs.sectors.draw();
         libraryInterface.configuration.webgl.programs.particles.draw();
     }
 
     private _update(libraryInterface: IWebGLLibraryInterface) {
-        libraryInterface.configuration.webgl.programs.sectors.update(libraryInterface.deltaTime, libraryInterface.time);
+        if (libraryInterface.configuration.webgl.programs.sectors)
+            libraryInterface.configuration.webgl.programs.sectors.update(libraryInterface.deltaTime, libraryInterface.time);
         libraryInterface.configuration.webgl.programs.particles.update(libraryInterface.deltaTime, libraryInterface.time);
     }
 
     private _onCameraChange(libraryInterface: IWebGLLibraryInterface) {
         return () => {
             libraryInterface.configuration.webgl.viewBox.recalculate();
-            libraryInterface.configuration.webgl.programs.sectors.notifyParamChange(UpdateableParam.CAMERA);
+            if (libraryInterface.configuration.webgl.programs.sectors)
+                libraryInterface.configuration.webgl.programs.sectors.notifyParamChange(UpdateableParam.CAMERA);
             libraryInterface.configuration.webgl.programs.particles.notifyParamChange(UpdateableParam.CAMERA);
         };
     }
