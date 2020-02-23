@@ -1,5 +1,5 @@
 import { BaseParticleSystem } from "./base-particle-system";
-import { IParticleSystem } from "../models/particle-system";
+import { IParticleSystem, IParticleSystemBuilder, TParticleSystemConfiguration, RendererHook } from "../models/particle-system";
 import { IParticle, Particle, ParticleDirection } from "../models/particle";
 import { Vector3D } from "../models/vector3d";
 import { LiquidParticleWrapper } from "./liquid/liquid-particle-wrapper";
@@ -36,6 +36,7 @@ export class LiquidParticleSystemBuilder {
         return class extends BaseParticleSystem implements IParticleSystem {
 
             private _particles: LiquidParticleWrapper[] = [];
+
 
             attach() {
                 const environmentalParticles = this._buildEnvironmentalParticles();
@@ -99,7 +100,15 @@ export class LiquidParticleSystemBuilder {
                 this._particles
                     .forEach(x => x.particle.updatePosition());
             }
+
+            public static configuration: RecursivePartial<TParticleSystemConfiguration> = {
+                renderer: {
+                    webgl: {
+                        [RendererHook.INIT_CONTEXT]: (canvas: HTMLCanvasElement) =>
+                            canvas.getContext('webgl', { premultipliedAlpha: false })
+                    }
+                }
+            }
         }
     }
-
 }

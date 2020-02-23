@@ -1,4 +1,4 @@
-import { IParticleSystem } from "../models/particle-system";
+import { IParticleSystem, TParticleSystemConfiguration } from "../models/particle-system";
 import { ILibraryInterface } from "../main";
 import { IParticle, Particle } from "../models/particle";
 import { Vector3D } from "../models/vector3d";

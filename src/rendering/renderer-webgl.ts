@@ -6,6 +6,8 @@ import { ParticlesProgram, UpdateableParam } from "../webgl/programs/webgl-parti
 import { ViewBox } from "../webgl/camera/view-box";
 import { CameraEvents } from "../webgl/camera/camera-events";
 import { ParticlesSectorsProgram } from "../webgl/programs/webgl-particles-sectors-program";
+import { getDefault } from "../utils/object-utils";
+import { TParticleSystemConfiguration, RendererHook, TWebGLRendererHooksConfiguration } from "../models/particle-system";
 
 export type TWebGLConfiguration = {
     backgroundColor: number[];
@@ -81,11 +83,16 @@ export class RendererWebGL implements IRenderer {
     }
 
     private _initContext(libraryInterface: IWebGLLibraryInterface) {
-        const context = libraryInterface.canvas.getContext('webgl', {
-            premultipliedAlpha: false
-        });
-        libraryInterface.context = context;
+        let context: WebGLRenderingContext;
 
+        const customContext = this._callSystemsConfigurationHooks(libraryInterface, RendererHook.INIT_CONTEXT, [libraryInterface.canvas]);
+
+        if (customContext)
+            context = customContext;
+        else
+            context = libraryInterface.canvas.getContext('webgl');
+        
+        libraryInterface.context = context;
     }
 
     private _initCanvas(libraryInterface: IWebGLLibraryInterface) {
@@ -99,7 +106,11 @@ export class RendererWebGL implements IRenderer {
 		context.enable(context.CULL_FACE);
 		context.cullFace(context.BACK);
         context.frontFace(context.CW);
+
+        this._callSystemsConfigurationHooks(libraryInterface, RendererHook.INIT_CANVAS, [context]);
     }
+
+    
 
     private _preStart(libraryInterface: IWebGLLibraryInterface) {
         const { width, height, depth } = libraryInterface.configuration;
@@ -171,6 +182,30 @@ export class RendererWebGL implements IRenderer {
     private _onSystemUpdated(libraryInterface: IWebGLLibraryInterface) {
         const particles = libraryInterface.getAllParticles();
         libraryInterface.configuration.webgl.programs.particles.useParticles(particles);
+    }
+
+    private _callSystemsConfigurationHooks(libraryInterface: IWebGLLibraryInterface, hookType: RendererHook, params: any[]) {
+
+        let retValue: any;
+
+        const defaultWebGLHooksConfiguration: TParticleSystemConfiguration = {
+            renderer: {
+                webgl: <TWebGLRendererHooksConfiguration>{
+                    initCanvas: (_: WebGLRenderingContext) => {},
+                    initContext: (_: HTMLCanvasElement) => {},
+                }
+            }
+        };
+
+        libraryInterface.params.systems
+            .forEach(system => {
+                const configuration = getDefault(system.configuration, defaultWebGLHooksConfiguration);
+                const selectedHook = configuration.renderer.webgl[hookType];
+                retValue = selectedHook.call(this, ...params);
+            });
+
+        // Last particle system's configuration gets the initialization priority
+        return retValue;
     }
 
 }
