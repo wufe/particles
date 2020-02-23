@@ -68,7 +68,7 @@ export class Particle extends BaseListenableParticle implements IParticle {
     }
 
     size     : number    = 2;
-    velocity : Vector3D  = new Vector3D({ x: 0, y: 0, z: 0});
+    velocity : Vector3D  = new Vector3D();
     color    : IVector4D = new Vector4D({
         x: 255,
         y: 255,
@@ -92,28 +92,6 @@ export class Particle extends BaseListenableParticle implements IParticle {
 
     setVelocity(direction: ParticleDirection, options: RecursivePartial<TVelocityConfigurationOptions> | null ) {
 
-        const velocity = new Vector3D();
-        switch (direction) {
-            case ParticleDirection.UP:
-                velocity.y = 1;
-                break;
-            case ParticleDirection.RIGHT:
-                velocity.x = 1;
-                break;
-            case ParticleDirection.DOWN:
-                velocity.y = -1;
-                break;
-            case ParticleDirection.LEFT:
-                velocity.x = -1;
-                break;
-            case ParticleDirection.FRONT:
-                velocity.z = 1;
-                break;
-            case ParticleDirection.BACK:
-                velocity.z = -1;
-                break;
-        }
-
         let velocityOptions: TVelocityConfigurationOptions;
 
         if (options === null) {
@@ -122,13 +100,35 @@ export class Particle extends BaseListenableParticle implements IParticle {
             velocityOptions = getDefault(options, defaultVelocityConfigurationOptions);
         }
 
-        if (velocityOptions.randomize) {
-            const { min, max } = options.boundary;
-            const range = max-min;
+        const { min, max } = options.boundary;
+        const range = max - min;
 
-            this._randomizeVectorComponent(velocity, 'x', range, min);
-            this._randomizeVectorComponent(velocity, 'y', range, min);
-            this._randomizeVectorComponent(velocity, 'z', range, min);
+        const velocity = this.velocity;
+        switch (direction) {
+            case ParticleDirection.UP:
+                velocity.y = 1;
+                velocityOptions.randomize && this._randomizeVectorComponent(velocity, 'y', range, min);
+                break;
+            case ParticleDirection.RIGHT:
+                velocity.x = 1;
+                velocityOptions.randomize && this._randomizeVectorComponent(velocity, 'x', range, min);
+                break;
+            case ParticleDirection.DOWN:
+                velocity.y = -1;
+                velocityOptions.randomize && this._randomizeVectorComponent(velocity, 'y', range, min);
+                break;
+            case ParticleDirection.LEFT:
+                velocity.x = -1;
+                velocityOptions.randomize && this._randomizeVectorComponent(velocity, 'x', range, min);
+                break;
+            case ParticleDirection.FRONT:
+                velocity.z = 1;
+                velocityOptions.randomize && this._randomizeVectorComponent(velocity, 'z', range, min);
+                break;
+            case ParticleDirection.BACK:
+                velocity.z = -1;
+                velocityOptions.randomize && this._randomizeVectorComponent(velocity, 'z', range, min);
+                break;
         }
 
         this.velocity = velocity;

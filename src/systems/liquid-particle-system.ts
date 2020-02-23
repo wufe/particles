@@ -62,9 +62,23 @@ export class LiquidParticleSystemBuilder {
                             randomize: true,
                             boundary: {
                                 min: .2,
-                                max: 1.5
+                                max: 1
                             }
-                        })
+                        });
+                        particle.setVelocity(ParticleDirection.RIGHT, {
+                            randomize: true,
+                            boundary: {
+                                min: -.2,
+                                max: .2
+                            }
+                        });
+                        particle.setVelocity(ParticleDirection.FRONT, {
+                            randomize: true,
+                            boundary: {
+                                min: -.2,
+                                max: .2
+                            }
+                        });
                         return new LiquidParticleWrapper(particle, this.manager);
                     });
             }
