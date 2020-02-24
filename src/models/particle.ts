@@ -23,7 +23,10 @@ export interface IMoveable {
 // to be drawn onto the scene.
 export interface IDrawable {
     size : number;
+    setSize(value: number): void;
     color: IVector4D;
+    alpha: number;
+    setAlpha(value: number): void;
 }
 
 export interface IParticle extends IMoveable, IDrawable, IListenable<ParticleEventType> {
@@ -75,6 +78,7 @@ export class Particle extends BaseListenableParticle implements IParticle {
         z: 255,
         w: 1
     });
+    alpha: number = 1;
 
     sector: IParticleSector;
 
@@ -151,8 +155,18 @@ export class Particle extends BaseListenableParticle implements IParticle {
         }
     }
 
+    setAlpha(value: number): void {
+        if (value !== this.alpha) {
+            this.alpha = value;
+            this.call(ParticleEventType.ALPHA_UPDATE, this);
+        }
+    }
+
     update() {
         this.updatePosition();
+        this.calculateSector();
+        this.call(ParticleEventType.POSITION_UPDATE, this);
+        this.call(ParticleEventType.UPDATE, this);
     }
 
     // Updates position according to velocity
@@ -160,12 +174,6 @@ export class Particle extends BaseListenableParticle implements IParticle {
         if (this.velocity) {
             this.coords.add(this.velocity);
         }
-        this._notifyPositionUpdate();
-    }
-
-    private _notifyPositionUpdate() {
-        this.calculateSector();
-        this.call(ParticleEventType.POSITION_UPDATE, this);
     }
 
     getAdjacentSectors(): IParticleSector[] {

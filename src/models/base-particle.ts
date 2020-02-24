@@ -11,7 +11,9 @@ export interface IListenable<TEvent> {
 }
 
 export enum ParticleEventType {
-    POSITION_UPDATE = 'positionUpdate'
+    POSITION_UPDATE = 'positionUpdate',
+    ALPHA_UPDATE = 'alphaUpdate',
+    UPDATE = 'update',
 }
 
 type TEventListener<TEvent, TCallback> = {

@@ -72,23 +72,32 @@ export class ParticlesProgram implements IProgram {
     useParticles(particles: IParticle[]) {
         this._vertices = new Float32Array(particles
             .reduce((accumulator, particle, index) => {
-                particle.on(ParticleEventType.POSITION_UPDATE, this._onParticlePositionUpdate(index));
+                particle.on(ParticleEventType.UPDATE, this._onParticleUpdate(index));
                 const [x, y, z] = (particle.coords as Vector3D).components;
                 const [r, g, b, a] = (particle.color as Vector4D).components;
                 const [cx, cy, cz, cw] = getColor(r, g, b, a);
                 return accumulator.concat([
                     x, y, z,
-                    cx, cy, cz, cw,
+                    cx, cy, cz, Math.max(cw * particle.alpha, .001),
                     particle.size
                 ]);
             }, []));
     }
 
-    private _onParticlePositionUpdate = (particleIndex: number) => (particle: IParticle) => {
+    private _onParticleUpdate = (particleIndex: number) => (particle: IParticle) => {
         const startIndex = particleIndex * this._strideLength;
-        this._vertices[startIndex] = particle.coords.x;
-        this._vertices[startIndex+1] = particle.coords.y;
-        this._vertices[startIndex+2] = particle.coords.z;
+        const [x, y, z] = (particle.coords as Vector3D).components;
+        const [r, g, b, a] = (particle.color as Vector4D).components;
+        const [cr, cg, cb, ca] = getColor(r, g, b, a);
+        const {alpha, size} = particle;
+        this._vertices[startIndex] = x;
+        this._vertices[startIndex+1] = y;
+        this._vertices[startIndex+2] = z;
+        this._vertices[startIndex+3] = cr;
+        this._vertices[startIndex+4] = cg;
+        this._vertices[startIndex+5] = cb;
+        this._vertices[startIndex+6] = Math.max(ca * alpha, .001);
+        this._vertices[startIndex+7] = size;
     }
 
     update(deltaT: number, T: number): void {
