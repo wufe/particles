@@ -76,7 +76,7 @@ export class RendererWebGL implements IRenderer {
                 fov,
             },
             sectors: {
-                enabled: false
+                enabled: true
             }
         };
         libraryInterface.configuration.webgl = webglConfiguration;
@@ -101,7 +101,7 @@ export class RendererWebGL implements IRenderer {
         context.viewport(0, 0, width, height);
 
         context.enable(context.BLEND);
-        context.blendFunc(context.SRC_COLOR, context.DST_COLOR);
+        context.blendFunc(context.SRC_ALPHA, context.DST_ALPHA);
         // context.enable(context.DEPTH_TEST);
 		context.enable(context.CULL_FACE);
 		context.cullFace(context.BACK);
