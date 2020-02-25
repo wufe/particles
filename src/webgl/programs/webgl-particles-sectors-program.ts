@@ -52,6 +52,21 @@ export class ParticlesSectorsProgram implements IProgram {
 
     init(sectorsManager: ParticleSectorManager) {
 
+        this.useSectors(sectorsManager);
+
+        this._programContainer = new ProgramContainer<Attr, Uni>(
+            this._gl,
+            particlesSectorsVSText,
+            particlesSectorsFSText,
+            Object.values(Attr),
+            Object.values(Uni),
+        );
+
+        this._vectorsBuffer = this._gl.createBuffer();
+        this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.POSITION));
+    }
+
+    useSectors(sectorsManager: ParticleSectorManager) {
         const sectorLength = sectorsManager.sectorLength;
 
         const lengthByCoord = (n: number) => {
@@ -102,17 +117,6 @@ export class ParticlesSectorsProgram implements IProgram {
                     lengthByCoord(x), lengthByCoord(y), lengthByCoord(z+1),
                 ]);
             }, []));
-
-        this._programContainer = new ProgramContainer<Attr, Uni>(
-            this._gl,
-            particlesSectorsVSText,
-            particlesSectorsFSText,
-            Object.values(Attr),
-            Object.values(Uni),
-        );
-
-        this._vectorsBuffer = this._gl.createBuffer();
-        this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.POSITION));
     }
 
     update(deltaT: number, T: number): void {

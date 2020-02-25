@@ -41,5 +41,6 @@ export enum HookType {
     DRAW,
     UPDATE,
     CANVAS_CLEAR,
-    SYSTEM_UPDATED
+    SYSTEM_UPDATED,
+    WINDOW_RESIZE,
 }

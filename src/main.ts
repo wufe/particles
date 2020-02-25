@@ -81,7 +81,10 @@ export class Main extends DrawingInterface implements ILibraryInterface {
         this._configureSize();
         this._plugin.exec(HookType.CANVAS_INIT, this);
 
-        window.addEventListener('resize', this._configureSize.bind(this));
+        window.addEventListener('resize', () => {
+            this._configureSize();
+            this._plugin.exec(HookType.WINDOW_RESIZE, this);
+        });
     }
 
     private _configureSize() {

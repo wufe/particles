@@ -8,6 +8,7 @@ import { CameraEvents } from "../webgl/camera/camera-events";
 import { ParticlesSectorsProgram } from "../webgl/programs/webgl-particles-sectors-program";
 import { getDefault } from "../utils/object-utils";
 import { TParticleSystemConfiguration, RendererHook, TWebGLRendererHooksConfiguration } from "../models/particle-system";
+import { ParticleSectorManager } from "../models/particle-sector-manager";
 
 export type TWebGLConfiguration = {
     backgroundColor: number[];
@@ -51,6 +52,7 @@ export class RendererWebGL implements IRenderer {
         this._pluginAdapter.addAfter(HookType.CANVAS_CLEAR, this._clearCanvas.bind(this));
         this._pluginAdapter.addAfter(HookType.DRAW, this._draw.bind(this));
         this._pluginAdapter.addAfter(HookType.UPDATE, this._update.bind(this));
+        this._pluginAdapter.addAfter(HookType.WINDOW_RESIZE, this._onResize.bind(this));
     }
 
     private _initRenderer(libraryInterface: IWebGLLibraryInterface) {
@@ -168,6 +170,15 @@ export class RendererWebGL implements IRenderer {
         if (libraryInterface.configuration.webgl.programs.sectors)
             libraryInterface.configuration.webgl.programs.sectors.update(libraryInterface.deltaTime, libraryInterface.time);
         libraryInterface.configuration.webgl.programs.particles.update(libraryInterface.deltaTime, libraryInterface.time);
+    }
+
+    private _onResize(libraryInterface: IWebGLLibraryInterface) {
+        if (libraryInterface.configuration.webgl.sectors.enabled) {
+            const {width, height, depth} = libraryInterface.configuration;
+            // TODO: Update existing particle sector manager instead of creating a new one
+            libraryInterface.particlesSectorManager = new ParticleSectorManager(width, height, depth);
+            libraryInterface.configuration.webgl.programs.sectors.useSectors(libraryInterface.particlesSectorManager);
+        }
     }
 
     private _onCameraChange(libraryInterface: IWebGLLibraryInterface) {
