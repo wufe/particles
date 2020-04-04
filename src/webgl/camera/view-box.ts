@@ -44,7 +44,7 @@ export class ViewBox {
 		this.calculate();
 	}
 
-	get resolutionVec() {
+	getResolutionVector() {
 		const { width, height, depth } = this._library.configuration;
 		return [width, height, depth];
 	}

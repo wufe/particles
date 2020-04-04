@@ -23,7 +23,7 @@ enum Uni {
 	T          = 'f_t',
 }
 
-export enum UpdateableParam {
+export enum UpdateableParticlesProgramParam {
     CAMERA = 'cam',
     RESOLUTION = 'res',
 }
@@ -31,7 +31,7 @@ export enum UpdateableParam {
 export class ParticlesProgram implements IProgram {
     private _vectorsBuffer: WebGLBuffer;
     private _programContainer: ProgramContainer;
-    private _willUpdateParams: {[k in UpdateableParam]?: boolean} = {
+    private _willUpdateParams: {[k in UpdateableParticlesProgramParam]?: boolean} = {
         cam   : true,
         res   : true,
     };
@@ -44,12 +44,12 @@ export class ParticlesProgram implements IProgram {
         private _libraryInterface: IWebGLLibraryInterface,
     ) {}
 
-    notifyParamChange(param: UpdateableParam) {
+    notifyParamChange(param: UpdateableParticlesProgramParam) {
         this._willUpdateParams[param] = true;
     }
 
-    get resolutionVector() {
-        return this._viewBox.resolutionVec;
+    getResolutionVector() {
+        return this._viewBox.getResolutionVector();
     }
 
     init(particles: IParticle[]) {
@@ -101,21 +101,21 @@ export class ParticlesProgram implements IProgram {
     }
 
     update(deltaT: number, T: number): void {
-        this._willUpdateParams[UpdateableParam.CAMERA] = true;
+        this._willUpdateParams[UpdateableParticlesProgramParam.CAMERA] = true;
 
         this._gl.useProgram(this._programContainer.program);
         this._gl.uniform1f(this._programContainer.uni(Uni.T), T);
 
-        if (this._willUpdateParams[UpdateableParam.RESOLUTION]) {
-            this._gl.uniform3fv(this._programContainer.uni(Uni.RESOLUTION), new Float32Array(this.resolutionVector));
-            this._willUpdateParams[UpdateableParam.RESOLUTION] = false;
+        if (this._willUpdateParams[UpdateableParticlesProgramParam.RESOLUTION]) {
+            this._gl.uniform3fv(this._programContainer.uni(Uni.RESOLUTION), new Float32Array(this.getResolutionVector()));
+            this._willUpdateParams[UpdateableParticlesProgramParam.RESOLUTION] = false;
         }
 
-        if (this._willUpdateParams[UpdateableParam.CAMERA]) {
+        if (this._willUpdateParams[UpdateableParticlesProgramParam.CAMERA]) {
             this._gl.uniformMatrix4fv(this._programContainer.uni(Uni.WORLD), false, this._viewBox.wMat);
 			this._gl.uniformMatrix4fv(this._programContainer.uni(Uni.VIEW), false, this._viewBox.vMat);
             this._gl.uniformMatrix4fv(this._programContainer.uni(Uni.PROJECTION), false, this._viewBox.pMat);
-            this._willUpdateParams[UpdateableParam.CAMERA] = false;
+            this._willUpdateParams[UpdateableParticlesProgramParam.CAMERA] = false;
         }        
     }
 

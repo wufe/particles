@@ -22,7 +22,7 @@ enum Uni {
 	T          = 'f_t',
 }
 
-export enum UpdateableParam {
+export enum UpdateableSectorsProgramParam {
     CAMERA = 'cam',
     RESOLUTION = 'res',
 }
@@ -30,7 +30,7 @@ export enum UpdateableParam {
 export class ParticlesSectorsProgram implements IProgram {
     private _vectorsBuffer: WebGLBuffer;
     private _programContainer: ProgramContainer;
-    private _willUpdateParams: {[k in UpdateableParam]?: boolean} = {
+    private _willUpdateParams: {[k in UpdateableSectorsProgramParam]?: boolean} = {
         cam   : true,
         res   : true,
     };
@@ -42,12 +42,12 @@ export class ParticlesSectorsProgram implements IProgram {
         private _libraryInterface: IWebGLLibraryInterface,
     ) {}
 
-    notifyParamChange(param: UpdateableParam) {
+    notifyParamChange(param: UpdateableSectorsProgramParam) {
         this._willUpdateParams[param] = true;
     }
 
-    get resolutionVector() {
-        return this._viewBox.resolutionVec;
+    getResolutionVector() {
+        return this._viewBox.getResolutionVector();
     }
 
     init(sectorsManager: ParticleSectorManager) {
@@ -121,21 +121,21 @@ export class ParticlesSectorsProgram implements IProgram {
 
     update(deltaT: number, T: number): void {
 
-        this._willUpdateParams[UpdateableParam.CAMERA] = true;
+        this._willUpdateParams[UpdateableSectorsProgramParam.CAMERA] = true;
 
         this._gl.useProgram(this._programContainer.program);
         this._gl.uniform1f(this._programContainer.uni(Uni.T), T);
 
-        if (this._willUpdateParams[UpdateableParam.RESOLUTION]) {
-            this._gl.uniform3fv(this._programContainer.uni(Uni.RESOLUTION), new Float32Array(this.resolutionVector));
-            this._willUpdateParams[UpdateableParam.RESOLUTION] = false;
+        if (this._willUpdateParams[UpdateableSectorsProgramParam.RESOLUTION]) {
+            this._gl.uniform3fv(this._programContainer.uni(Uni.RESOLUTION), new Float32Array(this.getResolutionVector()));
+            this._willUpdateParams[UpdateableSectorsProgramParam.RESOLUTION] = false;
         }
 
-        if (this._willUpdateParams[UpdateableParam.CAMERA]) {
+        if (this._willUpdateParams[UpdateableSectorsProgramParam.CAMERA]) {
             this._gl.uniformMatrix4fv(this._programContainer.uni(Uni.WORLD), false, this._viewBox.wMat);
 			this._gl.uniformMatrix4fv(this._programContainer.uni(Uni.VIEW), false, this._viewBox.vMat);
             this._gl.uniformMatrix4fv(this._programContainer.uni(Uni.PROJECTION), false, this._viewBox.pMat);
-            this._willUpdateParams[UpdateableParam.CAMERA] = false;
+            this._willUpdateParams[UpdateableSectorsProgramParam.CAMERA] = false;
         }
     }
 

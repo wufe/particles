@@ -2,10 +2,10 @@ import { PluginAdapter, HookType } from "../plugin/plugin-adapter";
 import { IRenderer } from "./renderer";
 import { ILibraryInterface } from "../main";
 import { IVector4D } from "../models/vector4d";
-import { ParticlesProgram, UpdateableParam } from "../webgl/programs/webgl-particles-program";
+import { ParticlesProgram, UpdateableParticlesProgramParam } from "../webgl/programs/webgl-particles-program";
 import { ViewBox } from "../webgl/camera/view-box";
 import { CameraEvents } from "../webgl/camera/camera-events";
-import { ParticlesSectorsProgram } from "../webgl/programs/webgl-particles-sectors-program";
+import { ParticlesSectorsProgram, UpdateableSectorsProgramParam } from "../webgl/programs/webgl-particles-sectors-program";
 import { getDefault } from "../utils/object-utils";
 import { TParticleSystemConfiguration, RendererHook, TWebGLRendererHooksConfiguration } from "../models/particle-system";
 import { ParticleSectorManager } from "../models/particle-sector-manager";
@@ -178,15 +178,18 @@ export class RendererWebGL implements IRenderer {
             // TODO: Update existing particle sector manager instead of creating a new one
             libraryInterface.particlesSectorManager = new ParticleSectorManager(width, height, depth);
             libraryInterface.configuration.webgl.programs.sectors.useSectors(libraryInterface.particlesSectorManager);
+            libraryInterface.configuration.webgl.programs.sectors.notifyParamChange(UpdateableSectorsProgramParam.RESOLUTION);
         }
+        libraryInterface.configuration.webgl.programs.particles.notifyParamChange(UpdateableParticlesProgramParam.RESOLUTION);
+        this._onCameraChange(libraryInterface);
     }
 
     private _onCameraChange(libraryInterface: IWebGLLibraryInterface) {
         return () => {
             libraryInterface.configuration.webgl.viewBox.recalculate();
             if (libraryInterface.configuration.webgl.programs.sectors)
-                libraryInterface.configuration.webgl.programs.sectors.notifyParamChange(UpdateableParam.CAMERA);
-            libraryInterface.configuration.webgl.programs.particles.notifyParamChange(UpdateableParam.CAMERA);
+                libraryInterface.configuration.webgl.programs.sectors.notifyParamChange(UpdateableSectorsProgramParam.CAMERA);
+            libraryInterface.configuration.webgl.programs.particles.notifyParamChange(UpdateableParticlesProgramParam.CAMERA);
         };
     }
 
