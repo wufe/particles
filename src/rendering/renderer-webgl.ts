@@ -173,8 +173,9 @@ export class RendererWebGL implements IRenderer {
     }
 
     private _onResize(libraryInterface: IWebGLLibraryInterface) {
+        const {width, height, depth} = libraryInterface.configuration;
         if (libraryInterface.configuration.webgl.sectors.enabled) {
-            const {width, height, depth} = libraryInterface.configuration;
+            
             // TODO: Update existing particle sector manager instead of creating a new one
             libraryInterface.particlesSectorManager = new ParticleSectorManager(width, height, depth);
             libraryInterface.configuration.webgl.programs.sectors.useSectors(libraryInterface.particlesSectorManager);
@@ -182,6 +183,7 @@ export class RendererWebGL implements IRenderer {
         }
         libraryInterface.configuration.webgl.programs.particles.notifyParamChange(UpdateableParticlesProgramParam.RESOLUTION);
         this._onCameraChange(libraryInterface);
+        libraryInterface.context.viewport(0, 0, width, height);
     }
 
     private _onCameraChange(libraryInterface: IWebGLLibraryInterface) {
