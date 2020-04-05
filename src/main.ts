@@ -22,6 +22,12 @@ export const getDefaultParams = (): DefaultObject<Params> => ({
         zoom: 2,
         ortho: false,
         fov: Math.PI / 5
+    },
+    events: {
+        resize: {
+            enabled: true,
+            debounce: -1
+        }
     }
 });
 
@@ -53,6 +59,7 @@ export class Main extends DrawingInterface implements ILibraryInterface {
         this._initRenderer();
         this._initContext();
         this._initCanvas();
+        this._initResizeEventListeners();
         this._initSystems();
         this._preStart();
         this._loop();
@@ -80,11 +87,25 @@ export class Main extends DrawingInterface implements ILibraryInterface {
     private _initCanvas() {
         this._configureSize();
         this._plugin.exec(HookType.CANVAS_INIT, this);
+    }
 
-        window.addEventListener('resize', () => {
-            this._configureSize();
-            this._plugin.exec(HookType.WINDOW_RESIZE, this);
-        });
+    private _resizeDebounceTimer: number | null = null;
+    private _initResizeEventListeners() {
+        const resizeEvent = this.params.events.resize;
+        if (resizeEvent.enabled) {
+            window.addEventListener('resize', () => {
+                if (resizeEvent.debounce === -1 || resizeEvent.debounce === 0) {
+                    this._configureSize();
+                    this._plugin.exec(HookType.WINDOW_RESIZE, this);
+                } else {
+                    clearTimeout(this._resizeDebounceTimer);
+                    this._resizeDebounceTimer = setTimeout(() => {
+                        this._configureSize();
+                        this._plugin.exec(HookType.WINDOW_RESIZE, this);
+                    }, resizeEvent.debounce);
+                }
+            });
+        }
     }
 
     private _configureSize() {
@@ -163,6 +184,12 @@ export type Params = {
         zoom?   : number;
         ortho?  : boolean;
         fov?    : number;
+    };
+    events?: {
+        resize?: {
+            enabled?: boolean;
+            debounce?: number;
+        }
     };
     // This parameter should be set by the system, and not by the library
     //particles?          : RecursivePartial<ParticlesProps>;

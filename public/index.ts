@@ -8,5 +8,11 @@ init({
     systems: [LiquidParticleSystemBuilder.build()],
     camera: {
         enabled: true
+    },
+    events: {
+        resize: {
+            enabled: true,
+            debounce: -1
+        }
     }
 })
