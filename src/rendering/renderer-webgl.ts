@@ -78,7 +78,7 @@ export class RendererWebGL implements IRenderer {
                 fov,
             },
             sectors: {
-                enabled: true
+                enabled: false
             }
         };
         libraryInterface.configuration.webgl = webglConfiguration;
@@ -155,7 +155,6 @@ export class RendererWebGL implements IRenderer {
         const webglConfiguration = libraryInterface.configuration.webgl;
         const context = libraryInterface.context;
         const [r, g, b, a] = webglConfiguration.backgroundColor;
-        // context.colorMask(false, false, false, true);
         context.clearColor(r, g, b, a);
         context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
     }
