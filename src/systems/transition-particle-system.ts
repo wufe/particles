@@ -1,11 +1,11 @@
-import { BaseParticleSystem } from "./base-particle-system";
-import { IParticleSystem, IParticleSystemBuilder, TParticleSystemConfiguration, RendererHook } from "../models/particle-system";
-import { IParticle, Particle, ParticleDirection } from "../models/particle";
-import { Vector3D } from "../models/vector3d";
-import { LiquidParticleWrapper } from "./liquid/liquid-particle-wrapper";
 import { RecursivePartial, getDefault } from "../utils/object-utils";
+import { LiquidParticleWrapper } from "./liquid/liquid-particle-wrapper";
+import { BaseParticleSystem } from "./base-particle-system";
+import { IParticleSystem } from "../models/particle-system";
+import { ParticleDirection, Particle } from "../models/particle";
+import { Vector3D } from "../models/vector3d";
 
-export interface ILiquidParticleSystemParams {
+export interface ITransitionParticleSystemParams {
     particles: {
         environment: {
             count: number;
@@ -16,7 +16,7 @@ export interface ILiquidParticleSystemParams {
     }
 }
 
-const defaultLiquidParticleSystemParams: ILiquidParticleSystemParams = {
+const defaultTransitionParticleSystemParams: ITransitionParticleSystemParams = {
     particles: {
         environment: {
             count: 100
@@ -27,17 +27,20 @@ const defaultLiquidParticleSystemParams: ILiquidParticleSystemParams = {
     }
 }
 
-export class LiquidParticleSystemBuilder {
+export class TransitionParticleSystemBuilder {
 
-    public static build(params?: RecursivePartial<ILiquidParticleSystemParams>) {
+    public static build(params?: RecursivePartial<ITransitionParticleSystemParams>) {
 
-        params = getDefault(params, defaultLiquidParticleSystemParams);
+        params = getDefault(params, defaultTransitionParticleSystemParams);
 
         return class extends BaseParticleSystem implements IParticleSystem {
 
             private _particles: LiquidParticleWrapper[] = [];
 
             attach() {
+
+                // this.manager.context
+
                 const environmentalParticles = this._buildEnvironmentalParticles();
                 const backgroundParticles = this._buildBackgroundParticles();
 
@@ -101,6 +104,10 @@ export class LiquidParticleSystemBuilder {
                                 max: .9
                             }
                         });
+                        particle.useTransition()
+                            .from(new Vector3D({ x: width / 2, y: height / 2, z: 0 }))
+                            .to(new Vector3D({ x, y, z }))
+                            .in(2000);
                         return new LiquidParticleWrapper(particle, this.manager);
                     });
             }

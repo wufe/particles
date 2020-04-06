@@ -10,17 +10,23 @@ import { getColor, IWebGLLibraryInterface } from "../../rendering/renderer-webgl
 import { ParticleEventType } from "../../models/base-particle";
 
 enum Attr {
-	POSITION = 'v_pos',    // Vector of 3
-	COLOR    = 'v_col',    // Vector of 4
-	SIZE     = 'f_size',
+	POSITION        = 'v_pos',              // Vector of 3
+	COLOR           = 'v_col',              // Vector of 4
+	SIZE            = 'f_size',
+	USE_TRANSITIONS = 'b_useTransitions',
+	START_POSITION  = 'v_startPos',
+	TARGET_POSITION = 'v_targetPos',
+	START_TIME      = 'f_startTime',
+	TARGET_TIME     = 'f_targetTime',
+	EASING          = 'f_easing',
 }
 
 enum Uni {
-	RESOLUTION = 'v_res',
-	WORLD      = 'm_world',
-	VIEW       = 'm_view',
-	PROJECTION = 'm_projection',
-	T          = 'f_t',
+	RESOLUTION      = 'v_res',
+	WORLD           = 'm_world',
+	VIEW            = 'm_view',
+	PROJECTION      = 'm_projection',
+	T               = 'f_t',
 }
 
 export enum UpdateableParticlesProgramParam {
@@ -36,7 +42,7 @@ export class ParticlesProgram implements IProgram {
         res   : true,
     };
     private _vertices: Float32Array;
-    private _strideLength = 8;
+    private _strideLength = 18;
 
     constructor(
         private _gl: WebGLRenderingContext,
@@ -67,6 +73,12 @@ export class ParticlesProgram implements IProgram {
         this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.POSITION));
 		this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.COLOR));
         this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.SIZE));
+        this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.USE_TRANSITIONS));
+        this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.START_POSITION));
+        this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.TARGET_POSITION));
+        this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.START_TIME));
+        this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.TARGET_TIME));
+        this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.EASING));
     }
 
     useParticles(particles: IParticle[]) {
@@ -77,10 +89,17 @@ export class ParticlesProgram implements IProgram {
                 const [x, y, z] = (particle.coords as Vector3D).components;
                 const [r, g, b, a] = (particle.color as Vector4D).components;
                 const [cx, cy, cz, cw] = getColor(r, g, b, a);
+                const transition = particle.getTransitionSpecification();
                 return accumulator.concat([
                     x, y, z,
                     cx, cy, cz, Math.max(cw * particle.alpha, .001),
-                    particle.size
+                    particle.size,
+                    +transition.enabled,
+                    transition.from.x, transition.from.y, transition.from.z,
+                    transition.target.x, transition.target.y, transition.target.z,
+                    0,
+                    transition.until,
+                    transition.easing
                 ]);
             }, []));
     }
@@ -98,6 +117,8 @@ export class ParticlesProgram implements IProgram {
         const [r, g, b, a] = (particle.color as Vector4D).components;
         const [cr, cg, cb, ca] = getColor(r, g, b, a);
         const {alpha, size} = particle;
+        const transition = particle.getTransitionSpecification();
+        const useTransitions = (transition && transition.enabled) ? 1 : 0;
         this._vertices[startIndex] = x;
         this._vertices[startIndex+1] = y;
         this._vertices[startIndex+2] = z;
@@ -106,6 +127,7 @@ export class ParticlesProgram implements IProgram {
         this._vertices[startIndex+5] = cb;
         this._vertices[startIndex+6] = Math.max(ca * alpha, .001);
         this._vertices[startIndex+7] = size;
+        this._vertices[startIndex+8] = useTransitions;
     }
 
     private _emptyEventAttachedParticles() {
@@ -165,6 +187,60 @@ export class ParticlesProgram implements IProgram {
             false,
             this._strideLength * Float32Array.BYTES_PER_ELEMENT,
             7 * Float32Array.BYTES_PER_ELEMENT
+        );
+
+        this._gl.vertexAttribPointer(
+            this._programContainer.attr(Attr.USE_TRANSITIONS),
+            1,
+            this._gl.FLOAT,
+            false,
+            this._strideLength * Float32Array.BYTES_PER_ELEMENT,
+            8 * Float32Array.BYTES_PER_ELEMENT
+        );
+
+        this._gl.vertexAttribPointer(
+            this._programContainer.attr(Attr.START_POSITION),
+            3,
+            this._gl.FLOAT,
+            false,
+            this._strideLength * Float32Array.BYTES_PER_ELEMENT,
+            9 * Float32Array.BYTES_PER_ELEMENT,
+        );
+
+        this._gl.vertexAttribPointer(
+            this._programContainer.attr(Attr.TARGET_POSITION),
+            3,
+            this._gl.FLOAT,
+            false,
+            this._strideLength * Float32Array.BYTES_PER_ELEMENT,
+            12 * Float32Array.BYTES_PER_ELEMENT,
+        );
+
+        this._gl.vertexAttribPointer(
+            this._programContainer.attr(Attr.START_TIME),
+            1,
+            this._gl.FLOAT,
+            false,
+            this._strideLength * Float32Array.BYTES_PER_ELEMENT,
+            15 * Float32Array.BYTES_PER_ELEMENT
+        );
+
+        this._gl.vertexAttribPointer(
+            this._programContainer.attr(Attr.TARGET_TIME),
+            1,
+            this._gl.FLOAT,
+            false,
+            this._strideLength * Float32Array.BYTES_PER_ELEMENT,
+            16 * Float32Array.BYTES_PER_ELEMENT
+        );
+
+        this._gl.vertexAttribPointer(
+            this._programContainer.attr(Attr.EASING),
+            1,
+            this._gl.FLOAT,
+            false,
+            this._strideLength * Float32Array.BYTES_PER_ELEMENT,
+            17 * Float32Array.BYTES_PER_ELEMENT
         );
         
         this._gl.bindBuffer(this._gl.ARRAY_BUFFER, null);

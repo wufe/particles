@@ -4,6 +4,7 @@ import { ParticleSector, IParticleSector } from "./particle-sector";
 import { ILibraryInterface } from "../main";
 import { IListenable, ParticleEventType, BaseListenableParticle } from "./base-particle";
 import { RecursivePartial, getDefault } from "../utils/object-utils";
+import { ITransitionSpecification, TransitionSpecificationBuilder } from "../systems/transition/transition-specification";
 
 // Represents the parameter and the methods required by the particle
 // to move through the available space.
@@ -11,11 +12,11 @@ import { RecursivePartial, getDefault } from "../utils/object-utils";
 // and a velocity, which automatically increments the coords accordingly.
 export interface IMoveable {
     coords    : IVector3D;
-    // Change in position in one unit of time (*i.e.* 16ms)
-    velocity  : IVector3D;
+    velocity  : IVector3D; // Change in position in one unit of time (*i.e.* 16ms)
     sector    : IVector3D;
 
     updatePosition(): void;
+    getTransitionSpecification(): ITransitionSpecification | null;
     getAdjacentSectors(): IParticleSector[];
 }
 
@@ -68,6 +69,18 @@ export class Particle extends BaseListenableParticle implements IParticle {
     constructor(public coords: Vector3D = new Vector3D(), private _manager: ILibraryInterface) {
         super();
         this.calculateSector();
+    }
+
+    private _transitionSpecificationBuilder = new TransitionSpecificationBuilder(this);
+
+    getTransitionSpecification() {
+        return this._transitionSpecificationBuilder && this._transitionSpecificationBuilder.specification;
+    }
+
+    useTransition() {
+        const transitionSpecificationBuilder = new TransitionSpecificationBuilder(this);
+        this._transitionSpecificationBuilder = transitionSpecificationBuilder;
+        return transitionSpecificationBuilder.enable();
     }
 
     size     : number    = 2;
