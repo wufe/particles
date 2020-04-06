@@ -7,7 +7,7 @@ export interface IListenable<TEvent> {
     // in order to be used by the renderer and by a possible wrapper
     // which would be responsible for the lifetime of the particle
     on(type: TEvent, callback: TParticleCallback): void;
-    off(type: TEvent, callback: TParticleCallback): void;
+    off(type: TEvent, callback?: TParticleCallback): void;
 }
 
 export enum ParticleEventType {
@@ -29,11 +29,18 @@ export class BaseListenableParticle implements IListenable<ParticleEventType> {
         this._attachedEventListeners.push({ type, callback });
     }
 
-    off(type: ParticleEventType, callback: TParticleCallback): void {
+    off(type: ParticleEventType, callback?: TParticleCallback): void {
 
-        const eventIndex = this._attachedEventListeners.findIndex(e =>
-            e.type === type && e.callback === callback);
+        let eventIndex = -1;
 
+        if (callback !== undefined) {
+            eventIndex = this._attachedEventListeners.findIndex(e =>
+                e.type === type && e.callback === callback);
+        } else {
+            eventIndex = this._attachedEventListeners.findIndex(e =>
+                e.type === type);
+        }
+        
         if (eventIndex > -1) {
             this._attachedEventListeners =
                 this._attachedEventListeners.slice(0, eventIndex).concat(

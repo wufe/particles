@@ -70,9 +70,10 @@ export class ParticlesProgram implements IProgram {
     }
 
     useParticles(particles: IParticle[]) {
+        this._emptyEventAttachedParticles();
         this._vertices = new Float32Array(particles
             .reduce((accumulator, particle, index) => {
-                particle.on(ParticleEventType.UPDATE, this._onParticleUpdate(index));
+                this._attachParticleUpdateEventHandler(index, particle);
                 const [x, y, z] = (particle.coords as Vector3D).components;
                 const [r, g, b, a] = (particle.color as Vector4D).components;
                 const [cx, cy, cz, cw] = getColor(r, g, b, a);
@@ -82,6 +83,13 @@ export class ParticlesProgram implements IProgram {
                     particle.size
                 ]);
             }, []));
+    }
+
+    // #region Particles live update
+    private _updateEventAttachedParticles: IParticle[] = [];
+    private _attachParticleUpdateEventHandler = (index: number, particle: IParticle) => {
+        particle.on(ParticleEventType.UPDATE, this._onParticleUpdate(index));
+        this._updateEventAttachedParticles.push(particle);
     }
 
     private _onParticleUpdate = (particleIndex: number) => (particle: IParticle) => {
@@ -99,6 +107,13 @@ export class ParticlesProgram implements IProgram {
         this._vertices[startIndex+6] = Math.max(ca * alpha, .001);
         this._vertices[startIndex+7] = size;
     }
+
+    private _emptyEventAttachedParticles() {
+        this._updateEventAttachedParticles.forEach(particle =>
+            particle.off(ParticleEventType.UPDATE));
+        this._updateEventAttachedParticles = [];
+    }
+    // #endregion
 
     update(deltaT: number, T: number): void {
         this._willUpdateParams[UpdateableParticlesProgramParam.CAMERA] = true;
