@@ -1,4 +1,3 @@
-export const particlesFSText =  `
 precision mediump float;
 
 varying vec4 frag_col;
@@ -12,4 +11,3 @@ void main() {
     }
     gl_FragColor = vec4(frag_col.xyz * alpha, alpha);
 }
-`;

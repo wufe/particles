@@ -2,23 +2,25 @@ import { IProgram } from "./webgl-program";
 import { ProgramContainer } from "./webgl-program-container";
 import { ViewBox } from "../camera/view-box";
 import { IParticle } from "../../models/particle";
-import { particlesVSText } from "./shaders/particles/particles.vs";
-import { particlesFSText } from "./shaders/particles/particles.fs";
+import particlesVertexShader from "./shaders/particles/particles.vert";
+import particlesFragmentShader from "./shaders/particles/particles.frag";
 import { Vector3D } from "../../models/vector3d";
 import { Vector4D } from "../../models/vector4d";
 import { getColor, IWebGLLibraryInterface } from "../../rendering/renderer-webgl";
 import { ParticleEventType } from "../../models/base-particle";
 
 enum Attr {
-	POSITION        = 'v_pos',              // Vector of 3
-	COLOR           = 'v_col',              // Vector of 4
-	SIZE            = 'f_size',
-	USE_TRANSITIONS = 'b_useTransitions',
-	START_POSITION  = 'v_startPos',
-	TARGET_POSITION = 'v_targetPos',
-	START_TIME      = 'f_startTime',
-	TARGET_TIME     = 'f_targetTime',
-	EASING          = 'f_easing',
+	POSITION                            = 'v_pos',
+	COLOR                               = 'v_col',
+    SIZE                                = 'f_size',
+    
+    // Position transition
+	POSITION_TRANSITION_ENABLED         = 't_position_enabled',
+	POSITION_TRANSITION_START           = 't_position_start',
+	POSITION_TRANSITION_END             = 't_position_end',
+	POSITION_TRANSITION_START_TIME      = 't_position_start_time',
+	POSITION_TRANSITION_END_TIME        = 't_position_end_time',
+	POSITION_TRANSITION_EASING_FUNCTION = 't_position_easing_function',
 }
 
 enum Uni {
@@ -63,8 +65,8 @@ export class ParticlesProgram implements IProgram {
 
         this._programContainer = new ProgramContainer<Attr, Uni>(
             this._gl,
-            particlesVSText,
-            particlesFSText,
+            particlesVertexShader,
+            particlesFragmentShader,
             Object.values(Attr),
             Object.values(Uni),
         );
@@ -73,12 +75,13 @@ export class ParticlesProgram implements IProgram {
         this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.POSITION));
 		this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.COLOR));
         this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.SIZE));
-        this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.USE_TRANSITIONS));
-        this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.START_POSITION));
-        this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.TARGET_POSITION));
-        this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.START_TIME));
-        this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.TARGET_TIME));
-        this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.EASING));
+        
+        this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.POSITION_TRANSITION_ENABLED));
+        this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.POSITION_TRANSITION_START));
+        this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.POSITION_TRANSITION_END));
+        this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.POSITION_TRANSITION_START_TIME));
+        this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.POSITION_TRANSITION_END_TIME));
+        this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.POSITION_TRANSITION_EASING_FUNCTION));
     }
 
     useParticles(particles: IParticle[]) {
@@ -190,7 +193,7 @@ export class ParticlesProgram implements IProgram {
         );
 
         this._gl.vertexAttribPointer(
-            this._programContainer.attr(Attr.USE_TRANSITIONS),
+            this._programContainer.attr(Attr.POSITION_TRANSITION_ENABLED),
             1,
             this._gl.FLOAT,
             false,
@@ -199,7 +202,7 @@ export class ParticlesProgram implements IProgram {
         );
 
         this._gl.vertexAttribPointer(
-            this._programContainer.attr(Attr.START_POSITION),
+            this._programContainer.attr(Attr.POSITION_TRANSITION_START),
             3,
             this._gl.FLOAT,
             false,
@@ -208,7 +211,7 @@ export class ParticlesProgram implements IProgram {
         );
 
         this._gl.vertexAttribPointer(
-            this._programContainer.attr(Attr.TARGET_POSITION),
+            this._programContainer.attr(Attr.POSITION_TRANSITION_END),
             3,
             this._gl.FLOAT,
             false,
@@ -217,7 +220,7 @@ export class ParticlesProgram implements IProgram {
         );
 
         this._gl.vertexAttribPointer(
-            this._programContainer.attr(Attr.START_TIME),
+            this._programContainer.attr(Attr.POSITION_TRANSITION_START_TIME),
             1,
             this._gl.FLOAT,
             false,
@@ -226,7 +229,7 @@ export class ParticlesProgram implements IProgram {
         );
 
         this._gl.vertexAttribPointer(
-            this._programContainer.attr(Attr.TARGET_TIME),
+            this._programContainer.attr(Attr.POSITION_TRANSITION_END_TIME),
             1,
             this._gl.FLOAT,
             false,
@@ -235,7 +238,7 @@ export class ParticlesProgram implements IProgram {
         );
 
         this._gl.vertexAttribPointer(
-            this._programContainer.attr(Attr.EASING),
+            this._programContainer.attr(Attr.POSITION_TRANSITION_EASING_FUNCTION),
             1,
             this._gl.FLOAT,
             false,

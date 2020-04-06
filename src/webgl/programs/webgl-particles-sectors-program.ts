@@ -5,8 +5,8 @@ import { IParticle } from "../../models/particle";
 import { Vector3D } from "../../models/vector3d";
 import { Vector4D } from "../../models/vector4d";
 import { getColor, IWebGLLibraryInterface } from "../../rendering/renderer-webgl";
-import { particlesSectorsVSText } from "./shaders/particles/particles-sectors.vs";
-import { particlesSectorsFSText } from "./shaders/particles/particles-sectors.fs";
+import particlesSectorsVertexShader from "./shaders/particles/particles-sectors.vert";
+import particlesSectorsFragmentShader from "./shaders/particles/particles-sectors.frag";
 import { ParticleSectorManager } from "../../models/particle-sector-manager";
 
 enum Attr {
@@ -56,8 +56,8 @@ export class ParticlesSectorsProgram implements IProgram {
 
         this._programContainer = new ProgramContainer<Attr, Uni>(
             this._gl,
-            particlesSectorsVSText,
-            particlesSectorsFSText,
+            particlesSectorsVertexShader,
+            particlesSectorsFragmentShader,
             Object.values(Attr),
             Object.values(Uni),
         );

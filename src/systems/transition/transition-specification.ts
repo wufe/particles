@@ -2,7 +2,10 @@ import { IVector3D, ZeroVector3D, Vector3D } from "../../models/vector3d";
 import { Particle } from "../../models/particle";
 
 export enum TransitionEasingFunction {
-    LINEAR = 1,
+    LINEAR           = 1,
+    QUADRATIC_IN     = 2,
+    QUADRATIC_OUT    = 3,
+    QUADRATIC_IN_OUT = 4,
 }
 
 export interface ITransitionSpecification {
@@ -42,6 +45,11 @@ export class TransitionSpecificationBuilder {
 
     in(value: number) {
         this.specification.until = value;
+        return this;
+    }
+
+    easing(value: TransitionEasingFunction) {
+        this.specification.easing = value;
         return this;
     }
 }

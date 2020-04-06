@@ -4,6 +4,7 @@ import { BaseParticleSystem } from "./base-particle-system";
 import { IParticleSystem } from "../models/particle-system";
 import { ParticleDirection, Particle } from "../models/particle";
 import { Vector3D } from "../models/vector3d";
+import { TransitionEasingFunction } from "./transition/transition-specification";
 
 export interface ITransitionParticleSystemParams {
     particles: {
@@ -107,7 +108,8 @@ export class TransitionParticleSystemBuilder {
                         particle.useTransition()
                             .from(new Vector3D({ x: width / 2, y: height / 2, z: 0 }))
                             .to(new Vector3D({ x, y, z }))
-                            .in(2000);
+                            .in(2000)
+                            .easing(TransitionEasingFunction.QUADRATIC_IN_OUT);
                         return new LiquidParticleWrapper(particle, this.manager);
                     });
             }
