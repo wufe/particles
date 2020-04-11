@@ -29,6 +29,8 @@ export class CameraEvents {
 	bind(
 		canvas: HTMLCanvasElement
 	) {
+		const camera = this._libraryInterface.configuration.webgl.camera;
+
 		canvas.addEventListener('mousedown', event => {
 			this._lastMouseX = event.x;
 			this._lastMouseY = event.y;
@@ -46,7 +48,7 @@ export class CameraEvents {
 				this._lastMouseX = this._currMouseX;
 				this._lastMouseY = this._currMouseY;
 
-				let { pitch, yaw } = this._libraryInterface.configuration.webgl.camera;
+				let { pitch, yaw } = camera;
 
 				pitch -= mouseMovX;
 				yaw -= mouseMovY;
@@ -57,8 +59,8 @@ export class CameraEvents {
 				yaw = Math.max(yaw, (-1 * (Math.PI / 2)) + .0001);
 				yaw = Math.min(yaw, Math.PI / 2);
 
-				this._libraryInterface.configuration.webgl.camera.pitch = pitch;
-				this._libraryInterface.configuration.webgl.camera.yaw = yaw;
+				camera.pitch = pitch;
+				camera.yaw = yaw;
 
 				if (this.onChange)
 					this.onChange();
@@ -66,13 +68,15 @@ export class CameraEvents {
 			}
 		});
 	
-		canvas.addEventListener('wheel', event => {
-			this._libraryInterface.configuration.webgl.camera.zoom += event.deltaY * this._zoomSensitivity;
-			this._libraryInterface.configuration.webgl.camera.zoom = Math.min(10, this._libraryInterface.configuration.webgl.camera.zoom);
-			this._libraryInterface.configuration.webgl.camera.zoom = Math.max(0.001, this._libraryInterface.configuration.webgl.camera.zoom);
-			if (this.onChange)
-				this.onChange();
-		});
+		if (!camera.zoom.locked) {
+			canvas.addEventListener('wheel', event => {
+				camera.zoom.value += event.deltaY * this._zoomSensitivity;
+				camera.zoom.value = Math.min(10, camera.zoom.value);
+				camera.zoom.value = Math.max(0.001, camera.zoom.value);
+				if (this.onChange)
+					this.onChange();
+			});
+		}
 
 		const KEY_W = 119;
 		const KEY_S = 115;
@@ -98,13 +102,17 @@ export class CameraEvents {
 					this.onLeft(this._mouseSensitivity);
 				}
 			} else if (KEY_PLUS === event.keyCode) {
-				this._libraryInterface.configuration.webgl.camera.zoom -= this._zoomSensitivity * 300;
-				if (this.onChange)
-					this.onChange();
+				if (!camera.zoom.locked) {
+					camera.zoom.value -= this._zoomSensitivity * 300;
+					if (this.onChange)
+						this.onChange();
+				}
 			} else if (KEY_MINUS === event.keyCode) {
-				this._libraryInterface.configuration.webgl.camera.zoom += this._zoomSensitivity * 300;
-				if (this.onChange)
-					this.onChange();
+				if (!camera.zoom.locked) {
+					camera.zoom.value += this._zoomSensitivity * 300;
+					if (this.onChange)
+						this.onChange();
+				}
 			}
 		});
 	}

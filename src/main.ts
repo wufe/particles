@@ -19,7 +19,10 @@ export const getDefaultParams = (): DefaultObject<Params> => ({
         enabled: true,
         pitch: 0,
         yaw: 0,
-        zoom: 2,
+        zoom: {
+            value: 2,
+            locked: false
+        },
         ortho: false,
         fov: Math.PI / 5
     },
@@ -181,7 +184,10 @@ export type Params = {
         enabled?: boolean;
         pitch?  : number;
         yaw?    : number;
-        zoom?   : number;
+        zoom?   : {
+            value?: number;
+            locked?: boolean;
+        };
         ortho?  : boolean;
         fov?    : number;
     };

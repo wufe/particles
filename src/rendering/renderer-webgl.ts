@@ -16,7 +16,10 @@ export type TWebGLConfiguration = {
         enabled: boolean;
         pitch  : number;
         yaw    : number;
-        zoom   : number;
+        zoom   : {
+            value: number;
+            locked: boolean;
+        };
         ortho  : boolean;
         fov    : number;
     };
@@ -73,7 +76,10 @@ export class RendererWebGL implements IRenderer {
                 enabled,
                 pitch,
                 yaw,
-                zoom,
+                zoom: {
+                    locked: zoom.locked,
+                    value: zoom.value
+                },
                 ortho,
                 fov,
             },

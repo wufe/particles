@@ -22,7 +22,7 @@ export class ViewBox {
 			//#region Camera matrix (view matrix)
 			const cameraMatrix = mat4.rotateY(mat4.create(), mat4.create(), pitch);
 			mat4.rotateX(cameraMatrix, cameraMatrix, yaw);
-			mat4.translate(cameraMatrix, cameraMatrix, [0, 0, zoom]);
+			mat4.translate(cameraMatrix, cameraMatrix, [0, 0, zoom.value]);
 
 			const target = [0, 0, 0];
 			const eye = [cameraMatrix[12], cameraMatrix[13], cameraMatrix[14]];

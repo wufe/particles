@@ -19,10 +19,10 @@ export interface ILiquidParticleSystemParams {
 const defaultLiquidParticleSystemParams: ILiquidParticleSystemParams = {
     particles: {
         environment: {
-            count: 100
+            count: 200
         },
         background: {
-            count: 10
+            count: 20
         }
     }
 }
@@ -67,8 +67,8 @@ export class LiquidParticleSystemBuilder {
                         particle.setVelocity(ParticleDirection.RIGHT, {
                             randomize: true,
                             boundary: {
-                                min: -.2,
-                                max: .2
+                                min: -.1,
+                                max: .1
                             }
                         });
                         particle.setVelocity(ParticleDirection.FRONT, {
