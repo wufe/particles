@@ -98,10 +98,10 @@ export class ParticlesProgram implements IProgram {
                     cx, cy, cz, Math.max(cw * particle.alpha, .001),
                     particle.size,
                     +transition.enabled,
-                    transition.from.x, transition.from.y, transition.from.z,
-                    transition.target.x, transition.target.y, transition.target.z,
+                    transition.start.x, transition.start.y, transition.start.z,
+                    transition.end.x, transition.end.y, transition.end.z,
                     0,
-                    transition.until,
+                    transition.endTime,
                     transition.easing
                 ]);
             }, []));

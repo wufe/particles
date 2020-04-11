@@ -10,41 +10,53 @@ export enum TransitionEasingFunction {
 
 export interface ITransitionSpecification {
     enabled: boolean;
-    from: IVector3D;
-    target: IVector3D;
-    until: number;
+    start: IVector3D;
+    end: IVector3D;
+    startTime: number;
+    endTime: number;
     easing: TransitionEasingFunction;
 }
 
 export class TransitionSpecificationBuilder {
     specification: ITransitionSpecification = {
         enabled: false,
-        from: new Vector3D(),
-        target: new Vector3D(),
-        until: 0,
+        start: new Vector3D(),
+        end: new Vector3D(),
+        startTime: 0,
+        endTime: 0,
         easing: TransitionEasingFunction.LINEAR,
     };
 
+    private _timeout: number | null = null;
+    private _transitionCallback: (() => any) | null = null;
+
     constructor(private _particle: Particle) {}
 
-    enable() {
+    enable(startTime: number) {
+        this.specification.startTime = startTime;
         this.specification.enabled = true;
         return this;
     }
 
     from(value: IVector3D) {
-        this.specification.from = value;
+        this.specification.start = value;
         return this;
     }
 
     to(value: IVector3D) {
-        this.specification.target = value;
+        this.specification.end = value;
         this._particle.coords = new Vector3D(value);
         return this;
     }
 
     in(value: number) {
-        this.specification.until = value;
+        this.specification.endTime = this.specification.startTime + value;
+        clearTimeout(this._timeout);
+        const modeSwitchDuration = 600; // TODO: Retrieve from real insights
+        this._timeout = setTimeout(() => {
+            if (this._transitionCallback)
+                this._transitionCallback();
+        }, value - modeSwitchDuration)
         return this;
     }
 
@@ -52,4 +64,10 @@ export class TransitionSpecificationBuilder {
         this.specification.easing = value;
         return this;
     }
+
+    then<T = unknown>(callback: () => T) {
+        this._transitionCallback = callback;
+    }
+
+
 }

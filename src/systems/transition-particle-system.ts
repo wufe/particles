@@ -37,6 +37,7 @@ export class TransitionParticleSystemBuilder {
         return class extends BaseParticleSystem implements IParticleSystem {
 
             private _particles: LiquidParticleWrapper[] = [];
+            private _lastTickTime = 0;
 
             attach() {
 
@@ -98,18 +99,20 @@ export class TransitionParticleSystemBuilder {
                         const particle = new Particle(new Vector3D({ x, y, z }), this.manager);
                         particle.setSize({ min: 50, max: 100 });
                         particle.color.w = Math.random() / 5 + .1;
-                        particle.setVelocity(ParticleDirection.UP, {
-                            randomize: true,
-                            boundary: {
-                                min: .1,
-                                max: .9
-                            }
-                        });
-                        particle.useTransition()
+                        particle.useTransition(this._lastTickTime)
                             .from(new Vector3D({ x: width / 2, y: height / 2, z: 0 }))
                             .to(new Vector3D({ x, y, z }))
                             .in(2000)
-                            .easing(TransitionEasingFunction.QUADRATIC_IN_OUT);
+                            .easing(TransitionEasingFunction.QUADRATIC_IN_OUT)
+                            .then(() => {
+                                particle.setVelocity(ParticleDirection.UP, {
+                                    randomize: true,
+                                    boundary: {
+                                        min: .1,
+                                        max: .9
+                                    }
+                                });
+                            });
                         return new LiquidParticleWrapper(particle, this.manager);
                     });
             }
@@ -118,7 +121,8 @@ export class TransitionParticleSystemBuilder {
                 return this._particles.map(x => x.particle);;
             }
 
-            tick() {
+            tick(delta: number, time: number) {
+                this._lastTickTime = time;
                 this._particles
                     .forEach(x => x.particle.update());
             }

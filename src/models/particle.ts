@@ -77,10 +77,10 @@ export class Particle extends BaseListenableParticle implements IParticle {
         return this._transitionSpecificationBuilder && this._transitionSpecificationBuilder.specification;
     }
 
-    useTransition() {
+    useTransition(currentTime: number) {
         const transitionSpecificationBuilder = new TransitionSpecificationBuilder(this);
         this._transitionSpecificationBuilder = transitionSpecificationBuilder;
-        return transitionSpecificationBuilder.enable();
+        return transitionSpecificationBuilder.enable(currentTime);
     }
 
     size     : number    = 2;
