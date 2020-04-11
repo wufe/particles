@@ -78,10 +78,10 @@ export class Particle extends BaseListenableParticle implements IParticle {
         return this._transitionSpecificationBuilder && this._transitionSpecificationBuilder.specification;
     }
 
-    useTransition(currentTime: number) {
+    useTransition() {
         const transitionSpecificationBuilder = new TransitionSpecificationBuilder(this);
         this._transitionSpecificationBuilder = transitionSpecificationBuilder;
-        return transitionSpecificationBuilder.enable(currentTime);
+        return transitionSpecificationBuilder.enable(this._lastTickTime);
     }
 
     size     : number    = 2;
@@ -186,7 +186,7 @@ export class Particle extends BaseListenableParticle implements IParticle {
         
         const transition = this._transitionSpecificationBuilder;
 
-        if (transition.enable) {
+        if (transition.specification.enabled) {
             if (time) {
                 if (time + 16 >= transition.specification.endTime)
                     transition.tryInvokeCallback();

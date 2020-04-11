@@ -55,7 +55,7 @@ export class LiquidParticleSystemBuilder {
                 const y = randomHeight ? (Math.random() * height) : 0;
                 const z = Math.random() * depth;
                 particle
-                    .useTransition(this._lastTickTime)
+                    .useTransition()
                     .from(new Vector3D({ x, z, y }))
                     .to(new Vector3D({ x, z, y: height }))
                     .in(Math.random() * 60000 + 20000)
