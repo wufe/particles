@@ -88,11 +88,13 @@ export class ParticlesProgram implements IProgram {
         this._emptyEventAttachedParticles();
         this._vertices = new Float32Array(particles
             .reduce((accumulator, particle, index) => {
-                this._attachParticleUpdateEventHandler(index, particle);
                 const [x, y, z] = (particle.coords as Vector3D).components;
                 const [r, g, b, a] = (particle.color as Vector4D).components;
                 const [cx, cy, cz, cw] = getColor(r, g, b, a);
                 const transition = particle.getTransitionSpecification();
+                if (transition.enabled && !transition.committed)
+                    throw new Error('Particle transition have not been commited.');
+                this._attachParticleUpdateEventHandler(index, particle);
                 return accumulator.concat([
                     x, y, z,
                     cx, cy, cz, Math.max(cw * particle.alpha, .001),
@@ -100,7 +102,7 @@ export class ParticlesProgram implements IProgram {
                     +transition.enabled,
                     transition.start.x, transition.start.y, transition.start.z,
                     transition.end.x, transition.end.y, transition.end.z,
-                    0,
+                    transition.startTime,
                     transition.endTime,
                     transition.easing
                 ]);
@@ -121,7 +123,8 @@ export class ParticlesProgram implements IProgram {
         const [cr, cg, cb, ca] = getColor(r, g, b, a);
         const {alpha, size} = particle;
         const transition = particle.getTransitionSpecification();
-        const useTransitions = (transition && transition.enabled) ? 1 : 0;
+        if (transition.enabled && !transition.committed)
+            throw new Error('Particle transition have not been commited.');
         this._vertices[startIndex] = x;
         this._vertices[startIndex+1] = y;
         this._vertices[startIndex+2] = z;
@@ -130,7 +133,16 @@ export class ParticlesProgram implements IProgram {
         this._vertices[startIndex+5] = cb;
         this._vertices[startIndex+6] = Math.max(ca * alpha, .001);
         this._vertices[startIndex+7] = size;
-        this._vertices[startIndex+8] = useTransitions;
+        this._vertices[startIndex+8] = +transition.enabled;
+        this._vertices[startIndex+9] = transition.start.x;
+        this._vertices[startIndex+10] = transition.start.y;
+        this._vertices[startIndex+11] = transition.start.z;
+        this._vertices[startIndex+12] = transition.end.x;
+        this._vertices[startIndex+13] = transition.end.y;
+        this._vertices[startIndex+14] = transition.end.z;
+        this._vertices[startIndex+15] = transition.startTime;
+        this._vertices[startIndex+16] = transition.endTime;
+        this._vertices[startIndex+17] = transition.easing;
     }
 
     private _emptyEventAttachedParticles() {

@@ -183,10 +183,21 @@ export class Particle extends BaseListenableParticle implements IParticle {
             this._lastTickDelta = delta;
         if (time !== undefined)
             this._lastTickTime = time;
-        this.updatePosition();
-        this.calculateSector();
-        this.call(ParticleEventType.POSITION_UPDATE, this);
-        this.call(ParticleEventType.UPDATE, this);
+        
+        const transition = this._transitionSpecificationBuilder;
+
+        if (transition.enable) {
+            if (time) {
+                if (time + 16 >= transition.specification.endTime)
+                    transition.tryInvokeCallback();
+            }
+        } else {
+            this.updatePosition();
+            this.calculateSector();
+            this.call(ParticleEventType.POSITION_UPDATE, this);
+            this.notifyUpdated();
+        }
+        
     }
 
     // Updates position according to velocity
@@ -198,5 +209,9 @@ export class Particle extends BaseListenableParticle implements IParticle {
 
     getAdjacentSectors(): IParticleSector[] {
         return this.sector.getAdjacentSectors();
+    }
+
+    notifyUpdated() {
+        this.call(ParticleEventType.UPDATE, this);
     }
 }

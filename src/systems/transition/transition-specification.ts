@@ -9,22 +9,24 @@ export enum TransitionEasingFunction {
 }
 
 export interface ITransitionSpecification {
-    enabled: boolean;
-    start: IVector3D;
-    end: IVector3D;
+    enabled  : boolean;
+    start    : IVector3D;
+    end      : IVector3D;
     startTime: number;
-    endTime: number;
-    easing: TransitionEasingFunction;
+    endTime  : number;
+    easing   : TransitionEasingFunction;
+    committed: boolean;
 }
 
 export class TransitionSpecificationBuilder {
     specification: ITransitionSpecification = {
-        enabled: false,
-        start: new Vector3D(),
-        end: new Vector3D(),
+        enabled  : false,
+        start    : new Vector3D(),
+        end      : new Vector3D(),
         startTime: 0,
-        endTime: 0,
-        easing: TransitionEasingFunction.LINEAR,
+        endTime  : 0,
+        easing   : TransitionEasingFunction.LINEAR,
+        committed: false,
     };
 
     private _timeout: number | null = null;
@@ -54,12 +56,9 @@ export class TransitionSpecificationBuilder {
 
     in(value: number) {
         this.specification.endTime = this.specification.startTime + value;
-        clearTimeout(this._timeout);
-        const modeSwitchDuration = 600; // TODO: Retrieve from real insights
-        this._timeout = setTimeout(() => {
-            if (this._transitionCallback)
-                this._transitionCallback();
-        }, value - modeSwitchDuration)
+        // clearTimeout(this._timeout);
+        // const modeSwitchDuration = 600; // TODO: Retrieve from real insights
+        // this._timeout = setTimeout(this.tryInvokeCallback, value - modeSwitchDuration)
         return this;
     }
 
@@ -70,6 +69,19 @@ export class TransitionSpecificationBuilder {
 
     then<T = unknown>(callback: () => T) {
         this._transitionCallback = callback;
+        return this;
+    }
+
+    commit() {
+        this.specification.committed = true;
+        this._particle.notifyUpdated();
+        return this;
+    }
+
+    tryInvokeCallback = () => {
+        if (this._transitionCallback)
+            this._transitionCallback();
+        this._transitionCallback = null;
     }
 
 

@@ -5,6 +5,8 @@ import { Vector3D } from "../models/vector3d";
 import { LiquidParticleWrapper } from "./liquid/liquid-particle-wrapper";
 import { RecursivePartial, getDefault } from "../utils/object-utils";
 import { TransitionEasingFunction } from "./transition/transition-specification";
+import { ParticleEventType } from "../models/base-particle";
+import { Vector4D } from "../models/vector4d";
 
 export interface ILiquidParticleSystemParams {
     particles: {
@@ -46,24 +48,32 @@ export class LiquidParticleSystemBuilder {
                     .concat(backgroundParticles);
             }
 
-            private _buildEnvironmentalParticles(): LiquidParticleWrapper[] {
+            private _setupParticlePositionTransition(particle: Particle, randomHeight: boolean) {
                 const { width, height, depth } = this.manager.configuration;
 
+                const x = Math.random() * width;
+                const y = randomHeight ? (Math.random() * height) : 0;
+                const z = Math.random() * depth;
+                particle
+                    .useTransition(this._lastTickTime)
+                    .from(new Vector3D({ x, z, y }))
+                    .to(new Vector3D({ x, z, y: height }))
+                    .in(Math.random() * 60000 + 20000)
+                    .easing(TransitionEasingFunction.LINEAR)
+                    .then(() => {
+                        this._setupParticlePositionTransition(particle, false);
+                    })
+                    .commit();
+            }
+
+            private _buildEnvironmentalParticles(): LiquidParticleWrapper[] {
                 return new Array(params.particles.environment.count)
                     .fill(null)
                     .map(_ => {
-                        const x = Math.random() * width;
-                        const y = Math.random() * height;
-                        const z = Math.random() * depth;
                         const particle = new Particle(new Vector3D({ x: 0, y: 0, z: 0 }), this.manager);
-                        particle.setSize({ min: 5, max: 15 });
+                        particle.setSize({ min: 1, max: 10 });
                         particle.color.w = Math.random() / 2 + .2;
-                        particle
-                            .useTransition(this._lastTickTime)
-                            .from(new Vector3D({ x, z, y }))
-                            .to(new Vector3D({ x, z, y: height }))
-                            .in(Math.random() * 10000 + 20000)
-                            .easing(TransitionEasingFunction.LINEAR);
+                        this._setupParticlePositionTransition(particle, true);
                         return new LiquidParticleWrapper(particle, this.manager);
                     });
             }
@@ -102,7 +112,7 @@ export class LiquidParticleSystemBuilder {
                 this._lastTickDelta = delta;
                 this._lastTickTime = time;
                 this._particles
-                    .forEach(x => x.particle.update());
+                    .forEach(x => x.particle.update(delta, time));
             }
         }
     }
