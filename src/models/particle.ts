@@ -32,6 +32,7 @@ export interface IDrawable {
 
 export interface IParticle extends IMoveable, IDrawable, IListenable<ParticleEventType> {
     update(): void;
+    update(delta: number, time: number): void;
 }
 
 type TRandomizeOptions = {
@@ -175,7 +176,13 @@ export class Particle extends BaseListenableParticle implements IParticle {
         }
     }
 
-    update() {
+    private _lastTickDelta: number = -1;
+    private _lastTickTime: number = -1;
+    update(delta?: number, time?: number) {
+        if (delta !== undefined)
+            this._lastTickDelta = delta;
+        if (time !== undefined)
+            this._lastTickTime = time;
         this.updatePosition();
         this.calculateSector();
         this.call(ParticleEventType.POSITION_UPDATE, this);

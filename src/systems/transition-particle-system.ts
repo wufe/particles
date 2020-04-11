@@ -124,7 +124,7 @@ export class TransitionParticleSystemBuilder {
             tick(delta: number, time: number) {
                 this._lastTickTime = time;
                 this._particles
-                    .forEach(x => x.particle.update());
+                    .forEach(x => x.particle.update(delta, time));
             }
         }
     }
