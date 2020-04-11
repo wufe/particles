@@ -45,7 +45,10 @@ export class TransitionSpecificationBuilder {
 
     to(value: IVector3D) {
         this.specification.end = value;
-        this._particle.coords = new Vector3D(value);
+        // TODO: Dunno what to do here.
+        // TODO: Cannot update coords when in transition, due to performances
+        // TODO: Cannot move to the end due to possible interactions (e.g. alpha when near borders)
+        // this._particle.coords = new Vector3D(value);
         return this;
     }
 

@@ -1,6 +1,9 @@
 precision highp float;
 
+#define BOUNDARY_MARGIN_PERCENTAGE 10.0
+
 #pragma glslify: vec3Easing = require(../utils/easing.glsl)
+#pragma glslify: alphaByPosition = require(../utils/boundary-transparency.glsl)
 
 attribute vec3 v_pos;
 attribute vec4 v_col;
@@ -26,7 +29,7 @@ vec3 vecToAbs(vec3 vec) {
 }
 
 void main() {
-    frag_col = v_col;
+    
     vec3 pos;
     if (t_position_enabled == 1.0 && f_t >= t_position_start_time && f_t <= t_position_end_time) {
 
@@ -39,6 +42,7 @@ void main() {
     } else {
         pos = v_pos;
     }
+    frag_col = vec4(v_col.xyz, v_col.w * alphaByPosition(pos, v_res, BOUNDARY_MARGIN_PERCENTAGE));
     pos = vecToAbs(pos);
     gl_Position = m_projection * m_view * m_world * vec4(pos, 1.0);
     gl_PointSize = f_size > 0.0 ? f_size : 2.0;
