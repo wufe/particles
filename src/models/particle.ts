@@ -35,9 +35,9 @@ export interface IParticle extends IMoveable, IDrawable, IListenable<ParticleEve
     update(delta: number, time: number): void;
 }
 
-type TRandomizeOptions = {
+export type TRandomizeOptions = {
     randomize            : boolean;
-    boundary             : {
+    boundary             ?: {
         min: number;
         max: number;
     };

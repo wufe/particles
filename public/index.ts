@@ -8,7 +8,7 @@ init({
     systems: [LiquidParticleSystemBuilder.build({
         particles: {
             background: {
-                count: 50
+                count: 20
             },
             environment: {
                 count: 500

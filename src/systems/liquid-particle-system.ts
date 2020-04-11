@@ -1,6 +1,6 @@
 import { BaseParticleSystem } from "./base-particle-system";
 import { IParticleSystem, IParticleSystemBuilder, TParticleSystemConfiguration, RendererHook } from "../models/particle-system";
-import { IParticle, Particle, ParticleDirection } from "../models/particle";
+import { IParticle, Particle, ParticleDirection, TRandomizeOptions } from "../models/particle";
 import { Vector3D } from "../models/vector3d";
 import { LiquidParticleWrapper } from "./liquid/liquid-particle-wrapper";
 import { RecursivePartial, getDefault } from "../utils/object-utils";
@@ -48,54 +48,79 @@ export class LiquidParticleSystemBuilder {
                     .concat(backgroundParticles);
             }
 
-            private _setupParticlePositionTransition(particle: Particle, randomHeight: boolean) {
+            // TODO: Move to "utils" file, with TRandomizeOptions
+            private _randomValueFromRandomizeOptions(randomizeOptions: TRandomizeOptions) {
+                const { min, max } = randomizeOptions.boundary;
+                const range = max - min;
+                return Math.random() * range + min;
+            }
+
+            private _setupParticlePositionTransition(particle: Particle, heightRandomizeOptions: TRandomizeOptions, durationRandomizeOptions: TRandomizeOptions) {
                 const { width, height, depth } = this.manager.configuration;
 
                 const x = Math.random() * width;
-                const y = randomHeight ? (Math.random() * height) : 0;
+                const y = heightRandomizeOptions.randomize ? this._randomValueFromRandomizeOptions(heightRandomizeOptions) : 0;
                 const z = Math.random() * depth;
                 particle
                     .useTransition()
                     .from(new Vector3D({ x, z, y }))
                     .to(new Vector3D({ x, z, y: height }))
-                    .in(Math.random() * 60000 + 20000)
+                    .in(this._randomValueFromRandomizeOptions(durationRandomizeOptions))
                     .easing(TransitionEasingFunction.LINEAR)
                     .then(() => {
-                        this._setupParticlePositionTransition(particle, false);
+                        this._setupParticlePositionTransition(particle, { randomize: false }, durationRandomizeOptions);
                     })
                     .commit();
             }
 
             private _buildEnvironmentalParticles(): LiquidParticleWrapper[] {
+                const { height } = this.manager.configuration;
                 return new Array(params.particles.environment.count)
                     .fill(null)
                     .map(_ => {
                         const particle = new Particle(new Vector3D({ x: 0, y: 0, z: 0 }), this.manager);
                         particle.setSize({ min: 1, max: 10 });
                         particle.color.w = Math.random() / 2 + .2;
-                        this._setupParticlePositionTransition(particle, true);
+                        this._setupParticlePositionTransition(particle,
+                            {
+                                randomize: true,
+                                boundary: {
+                                    min: 0,
+                                    max: height
+                                }
+                            }, {
+                                randomize: true,
+                                boundary: {
+                                    min: 20000,
+                                    max: 80000
+                                }
+                        });
                         return new LiquidParticleWrapper(particle, this.manager);
                     });
             }
 
             private _buildBackgroundParticles(): LiquidParticleWrapper[] {
-                const { width, height, depth } = this.manager.configuration;
+                const { height } = this.manager.configuration;
 
                 return new Array(params.particles.background.count)
                     .fill(null)
                     .map(_ => {
-                        const x = Math.random() * width;
-                        const y = Math.random() * height;
-                        const z = Math.random() * depth;
-                        const particle = new Particle(new Vector3D({ x, y, z }), this.manager);
+                        const particle = new Particle(new Vector3D({ x: 0, y: 0, z: 0 }), this.manager);
                         particle.setSize({ min: 50, max: 100 });
                         particle.color.w = Math.random() / 5 + .1;
-                        particle.setVelocity(ParticleDirection.UP, {
-                            randomize: true,
-                            boundary: {
-                                min: .1,
-                                max: .9
-                            }
+                        this._setupParticlePositionTransition(particle,
+                            {
+                                randomize: true,
+                                boundary: {
+                                    min: 0,
+                                    max: height
+                                }
+                            }, {
+                                randomize: true,
+                                boundary: {
+                                    min: 40000,
+                                    max: 100000
+                                }
                         });
                         return new LiquidParticleWrapper(particle, this.manager);
                     });
