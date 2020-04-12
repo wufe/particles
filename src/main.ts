@@ -147,9 +147,12 @@ export class Main extends DrawingInterface implements ILibraryInterface {
     private _lastPerf = 0;
     private _loop () {
         // #region Update
-        this.time = performance.now();
-        this.deltaTime = this.time - this._lastPerf;
-        this._lastPerf = this.time;
+
+        const currentPerf = performance.now();
+        this.deltaTime = Math.min(currentPerf - this._lastPerf, 30);
+        this.time += this.deltaTime;
+        this._lastPerf = currentPerf;
+
         this.systems.forEach(x => x.tick && x.tick(this.deltaTime, this.time));
         this._plugin.exec(HookType.UPDATE, this);
         // #endregion
