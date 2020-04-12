@@ -5,6 +5,7 @@ import { ILibraryInterface } from "../main";
 import { IListenable, ParticleEventType, BaseListenableParticle } from "./base-particle";
 import { RecursivePartial, getDefault } from "../utils/object-utils";
 import { ITransitionSpecification, TransitionSpecificationBuilder } from "../systems/transition/transition-specification";
+import { TRandomizeOptions, TRandomizeBoundary, TRandomizedValueOptions, randomValueFromBoundary, valueFromRandomOptions } from "../systems/utils/random";
 
 // Represents the parameter and the methods required by the particle
 // to move through the available space.
@@ -33,14 +34,6 @@ export interface IDrawable {
 export interface IParticle extends IMoveable, IDrawable, IListenable<ParticleEventType> {
     update(delta: number, time: number): void;
 }
-
-export type TRandomizeOptions = {
-    randomize            : boolean;
-    boundary             ?: {
-        min: number;
-        max: number;
-    };
-};
 
 //#region Movement
 export enum ParticleDirection {
@@ -157,15 +150,24 @@ export class Particle extends BaseListenableParticle implements IParticle {
     }
 
     setSize(value: number): void;
-    setSize(options: TRandomizeOptions['boundary']): void;
-    setSize(valueOrRandom: number | TRandomizeOptions['boundary']) {
+    setSize(options: TRandomizeBoundary): void;
+    setSize(options: TRandomizedValueOptions): void;
+    setSize(valueOrRandom: number | TRandomizeBoundary | TRandomizedValueOptions) {
         if (typeof valueOrRandom === 'number') {
             this.size = valueOrRandom;
         } else {
-            const { min, max } = valueOrRandom;
-            const range = max - min;
-            this.size = Math.random() * range + min;
+            if (this._randomOptionIsBoundary(valueOrRandom)) {
+                this.size = randomValueFromBoundary(valueOrRandom);
+            } else {
+                this.size = valueFromRandomOptions(valueOrRandom);
+            }
         }
+    }
+
+    private _randomOptionIsBoundary(randomOption: TRandomizeBoundary | TRandomizedValueOptions): randomOption is TRandomizeBoundary {
+        const option = <any>randomOption;
+        return option.min !== undefined && option.max !== undefined &&
+            option.boundary === undefined && option.value === undefined;
     }
 
     setAlpha(value: number): void {

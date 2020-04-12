@@ -24,6 +24,7 @@ export abstract class BaseParticleSystem implements IParticleSystem {
     updateInternalParameters(delta: number, time: number) {
         this._lastTickDelta = delta;
         this._lastTickTime = time;
+        this._systemTimer.check(time);
     }
 
     public static configuration?: RecursivePartial<TParticleSystemConfiguration>;

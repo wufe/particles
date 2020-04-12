@@ -24,6 +24,7 @@ export class SystemTimer {
                     timer.fired = true;
                 } else {
                     timer.when = currentTime + (timer.when - timer.since);
+                    timer.since = currentTime;
                 }
             }
         });

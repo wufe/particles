@@ -1,9 +1,9 @@
-import { IParticle } from "../../models/particle";
+import { IParticle, Particle } from "../../models/particle";
 import { ParticleEventType } from "../../models/base-particle";
 import { ILibraryInterface } from "../../main";
 
 export class LiquidParticleWrapper {
-    constructor(public particle: IParticle, private _manager: ILibraryInterface) {
+    constructor(public particle: Particle, private _manager: ILibraryInterface) {
         particle
             .on(ParticleEventType.POSITION_UPDATE, this.onParticlePositionUpdate);
     }

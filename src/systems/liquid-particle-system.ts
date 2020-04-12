@@ -1,12 +1,12 @@
 import { BaseParticleSystem } from "./base-particle-system";
-import { IParticleSystem, IParticleSystemBuilder, TParticleSystemConfiguration, RendererHook } from "../models/particle-system";
-import { IParticle, Particle, ParticleDirection, TRandomizeOptions } from "../models/particle";
+import { IParticleSystem } from "../models/particle-system";
+import { Particle } from "../models/particle";
 import { Vector3D } from "../models/vector3d";
 import { LiquidParticleWrapper } from "./liquid/liquid-particle-wrapper";
 import { RecursivePartial, getDefault } from "../utils/object-utils";
 import { TransitionEasingFunction } from "./transition/transition-specification";
-import { ParticleEventType } from "../models/base-particle";
-import { Vector4D } from "../models/vector4d";
+import { TRandomizeOptions, randomValueFromBoundary } from "./utils/random";
+import { LiquidParticlesCollection, TLiquidParticleSystemSquirt } from "./liquid/liquid-particles-collection";
 
 export interface ILiquidParticleSystemParams {
     particles: {
@@ -16,6 +16,7 @@ export interface ILiquidParticleSystemParams {
         background: {
             count: number;
         };
+        squirts: TLiquidParticleSystemSquirt[];
     }
 }
 
@@ -26,51 +27,135 @@ const defaultLiquidParticleSystemParams: ILiquidParticleSystemParams = {
         },
         background: {
             count: 20
-        }
+        },
+        squirts: [
+            {
+                count: 100,
+                opacity: {
+                    randomize: true,
+                    boundary: {
+                        min: .2,
+                        max: .8
+                    }
+                },
+                size: {
+                    randomize: true,
+                    boundary: {
+                        min: 1,
+                        max: 10
+                    }
+                },
+                spawnTimePerParticle: {
+                    randomize: true,
+                    boundary: {
+                        min: 25,
+                        max: 75
+                    }
+                },
+                transitionDuration: {
+                    randomize: true,
+                    boundary: {
+                        min: 10000,
+                        max: 20000
+                    }
+                },
+                from: (w, h, d) => ({
+                    x: { randomize: false, value: w * .3 },
+                    y: { randomize: false, value: 0 },
+                    z: { randomize: false, value: d * .5 }
+                }),
+                to: (w, h, d) => ({
+                    x: { randomize: true, boundary: { min: w * .27, max: w * .32 } },
+                    y: { randomize: false, value: h },
+                    z: { randomize: true, boundary: { min: d * .3 , max: d * .7 } }
+                })
+            },
+            {
+                count: 200,
+                opacity: {
+                    randomize: true,
+                    boundary: {
+                        min: .2,
+                        max: .8
+                    }
+                },
+                size: {
+                    randomize: true,
+                    boundary: {
+                        min: 1,
+                        max: 10
+                    }
+                },
+                spawnTimePerParticle: {
+                    randomize: true,
+                    boundary: {
+                        min: 540,
+                        max: 660
+                    }
+                },
+                transitionDuration: {
+                    randomize: true,
+                    boundary: {
+                        min: 80000,
+                        max: 90000
+                    }
+                },
+                from: (w, h, d) => ({
+                    x: { randomize: false, value: w * .75 },
+                    y: { randomize: false, value: 0 },
+                    z: { randomize: false, value: d * .5 }
+                }),
+                to: (w, h, d) => ({
+                    x: { randomize: true, boundary: { min: w * .70, max: w * .77 } },
+                    y: { randomize: false, value: h },
+                    z: { randomize: true, boundary: { min: d * .3 , max: d * .7 } }
+                })
+            }
+        ]
     }
 }
 
 export class LiquidParticleSystemBuilder {
 
-    public static build(params?: RecursivePartial<ILiquidParticleSystemParams>) {
+    public static build(partialParams?: RecursivePartial<ILiquidParticleSystemParams>) {
 
-        params = getDefault(params, defaultLiquidParticleSystemParams);
+        const params = getDefault<ILiquidParticleSystemParams>(partialParams, defaultLiquidParticleSystemParams);
 
         return class extends BaseParticleSystem implements IParticleSystem {
 
             private _particles: LiquidParticleWrapper[] = [];
 
             attach() {
+                const { width, height, depth } = this.manager.configuration;
+
                 const environmentalParticles = this._buildEnvironmentalParticles();
                 const backgroundParticles = this._buildBackgroundParticles();
 
-                const firstSquirtParticles = this._buildFirstSquirtParticles();
-                const secondSquirtParticles = this._buildSecondSquirtParticles();
+                const squirts = params.particles.squirts.map(config => {
+                    return new LiquidParticlesCollection(this)
+                        .build({ ...config, width, height, depth }, this.manager);
+                });
 
                 this._particles = environmentalParticles
-                    .concat(backgroundParticles)
-                    .concat(firstSquirtParticles)
-                    .concat(secondSquirtParticles);
-            }
+                    .concat(backgroundParticles);
 
-            // TODO: Move to "utils" file, with TRandomizeOptions
-            private _randomValueFromBoundary(boundary: TRandomizeOptions['boundary']) {
-                const { min, max } = boundary;
-                const range = max - min;
-                return Math.random() * range + min;
+                squirts.forEach(squirt => {
+                    this._particles = this._particles
+                        .concat(squirt.getParticles());
+                });
             }
 
             private _setupParticlePositionTransition(particle: Particle, heightRandomizeOptions: TRandomizeOptions, durationRandomizeOptions: TRandomizeOptions) {
                 const { width, height, depth } = this.manager.configuration;
 
                 const x = Math.random() * width;
-                const y = heightRandomizeOptions.randomize ? this._randomValueFromBoundary(heightRandomizeOptions.boundary) : 0;
+                const y = heightRandomizeOptions.randomize ? randomValueFromBoundary(heightRandomizeOptions.boundary) : 0;
                 const z = Math.random() * depth;
                 particle
                     .useTransition()
                     .from(new Vector3D({ x, z, y }))
                     .to(new Vector3D({ x, z, y: height }))
-                    .in(this._randomValueFromBoundary(durationRandomizeOptions.boundary))
+                    .in(randomValueFromBoundary(durationRandomizeOptions.boundary))
                     .easing(TransitionEasingFunction.LINEAR)
                     .then(() => {
                         this._setupParticlePositionTransition(particle, { randomize: false }, durationRandomizeOptions);
@@ -127,90 +212,6 @@ export class LiquidParticleSystemBuilder {
                                     max: 100000
                                 }
                         });
-                        return new LiquidParticleWrapper(particle, this.manager);
-                    });
-            }
-
-            private _buildFirstSquirtParticles(): LiquidParticleWrapper[] {
-                const { width, height, depth } = this.manager.configuration;
-
-                const squirtParticles = 1000;
-                const squirtSpawnTimePerParticle = 50;
-                const squirtSpawnTimeRandomness = .5;
-
-                return new Array(squirtParticles)
-                    .fill(null)
-                    .map((_, i) => {
-                        const particle = new Particle(new Vector3D({ x: 0, y: 0, z: 0 }), this.manager);
-                        particle.setSize({ min: 1, max: 10 });
-                        particle.color.x = 255;
-                        particle.color.w = this._randomValueFromBoundary({ min: .2, max: .8 });
-                        particle
-                            .useTransition()
-                            .within(this._randomValueFromBoundary({
-                                min: i * squirtSpawnTimePerParticle - squirtSpawnTimePerParticle * squirtSpawnTimeRandomness,
-                                max: i * squirtSpawnTimePerParticle + squirtSpawnTimePerParticle * squirtSpawnTimeRandomness
-                            }))
-                            .from({
-                                x: width * .2,
-                                y: 0,
-                                z: depth / 2
-                            })
-                            .to({
-                                x: this._randomValueFromBoundary({
-                                    min: width * .25,
-                                    max: width * .5
-                                }),
-                                y: height,
-                                z: this._randomValueFromBoundary({
-                                    min: depth * .3,
-                                    max: depth * .7
-                                })
-                            })
-                            .in(this._randomValueFromBoundary({ min: 10000, max: 20000 }))
-                            .commit();
-                        return new LiquidParticleWrapper(particle, this.manager);
-                    });
-            }
-
-            private _buildSecondSquirtParticles(): LiquidParticleWrapper[] {
-                const { width, height, depth } = this.manager.configuration;
-
-                const squirtParticles = 200;
-                const squirtSpawnTimePerParticle = 600;
-                const squirtSpawnTimeRandomness = .8;
-
-                return new Array(squirtParticles)
-                    .fill(null)
-                    .map((_, i) => {
-                        const particle = new Particle(new Vector3D({ x: 0, y: 0, z: 0 }), this.manager);
-                        particle.setSize({ min: 1, max: 10 });
-                        particle.color.x = 255;
-                        particle.color.w = this._randomValueFromBoundary({ min: .2, max: .86 });
-                        particle
-                            .useTransition()
-                            .within(this._randomValueFromBoundary({
-                                min: i * squirtSpawnTimePerParticle - squirtSpawnTimePerParticle * squirtSpawnTimeRandomness,
-                                max: i * squirtSpawnTimePerParticle + squirtSpawnTimePerParticle * squirtSpawnTimeRandomness
-                            }))
-                            .from({
-                                x: width * .8,
-                                y: 0,
-                                z: depth / 2
-                            })
-                            .to({
-                                x: this._randomValueFromBoundary({
-                                    min: width * .5,
-                                    max: width * .75
-                                }),
-                                y: height,
-                                z: this._randomValueFromBoundary({
-                                    min: depth * .3,
-                                    max: depth * .7
-                                })
-                            })
-                            .in(this._randomValueFromBoundary({ min: 40000, max: 90000 }))
-                            .commit();
                         return new LiquidParticleWrapper(particle, this.manager);
                     });
             }
