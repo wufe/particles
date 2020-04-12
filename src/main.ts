@@ -8,6 +8,7 @@ import { ISystemBridge, SystemBridgeEventNotification } from "./drawing/system-b
 import { IParticle } from "./models/particle";
 import { DefaultParticleSystem } from "./systems/default-particle-system";
 import { ParticleSectorManager } from "./models/particle-sector-manager";
+import { BaseParticleSystem } from "./systems/base-particle-system";
 
 export const getDefaultParams = (): DefaultObject<Params> => ({
     selectorOrCanvas: '#canvas',
@@ -153,7 +154,11 @@ export class Main extends DrawingInterface implements ILibraryInterface {
         this.time += this.deltaTime;
         this._lastPerf = currentPerf;
 
-        this.systems.forEach(x => x.tick && x.tick(this.deltaTime, this.time));
+        this.systems.forEach(system => {
+            (system as BaseParticleSystem).updateInternalParameters(this.deltaTime, this.time);
+            if (system.tick)
+                system.tick(this.deltaTime, this.time);
+        });
         this._plugin.exec(HookType.UPDATE, this);
         // #endregion
 

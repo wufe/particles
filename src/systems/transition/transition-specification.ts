@@ -40,6 +40,12 @@ export class TransitionSpecificationBuilder {
         return this;
     }
 
+    // within how many ms
+    within(value: number) {
+        this.specification.startTime = this.specification.startTime + value;
+        return this;
+    }
+
     from(value: IVector3D) {
         this.specification.start = value;
         return this;
