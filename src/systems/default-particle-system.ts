@@ -24,9 +24,9 @@ export class DefaultParticleSystem extends BaseParticleSystem implements IPartic
             });
     }
 
-    tick() {
+    tick(delta: number, time: number) {
         this._particles
-            .forEach(p => p.update())
+            .forEach(p => p.update(delta, time))
     }
 
     getParticles() {

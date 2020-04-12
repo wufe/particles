@@ -99,7 +99,7 @@ export class TransitionParticleSystemBuilder {
                         const particle = new Particle(new Vector3D({ x, y, z }), this.manager);
                         particle.setSize({ min: 50, max: 100 });
                         particle.color.w = Math.random() / 5 + .1;
-                        particle.useTransition(this._lastTickTime)
+                        particle.useTransition()
                             .from(new Vector3D({ x: width / 2, y: height / 2, z: 0 }))
                             .to(new Vector3D({ x, y, z }))
                             .in(2000)

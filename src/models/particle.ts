@@ -31,7 +31,6 @@ export interface IDrawable {
 }
 
 export interface IParticle extends IMoveable, IDrawable, IListenable<ParticleEventType> {
-    update(): void;
     update(delta: number, time: number): void;
 }
 
@@ -178,7 +177,7 @@ export class Particle extends BaseListenableParticle implements IParticle {
 
     private _lastTickDelta: number = -1;
     private _lastTickTime: number = -1;
-    update(delta?: number, time?: number) {
+    update(delta: number, time: number) {
         if (delta !== undefined)
             this._lastTickDelta = delta;
         if (time !== undefined)
