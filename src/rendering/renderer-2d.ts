@@ -4,11 +4,11 @@ import { IRenderer } from "./renderer";
 import { IParticleSystem } from "../models/particle-system";
 
 export class Renderer2D implements IRenderer {
-    constructor() {}
+    constructor(private _pluginAdapter: PluginAdapter) {}
 
-    register(pluginAdapter: PluginAdapter) {
-        pluginAdapter.addAfter(HookType.CONTEXT_INIT, this._initContext);
-        pluginAdapter.addAfter(HookType.DRAW, this._draw);
+    register() {
+        this._pluginAdapter.addAfter(HookType.CONTEXT_INIT, this._initContext);
+        this._pluginAdapter.addAfter(HookType.DRAW, this._draw);
     }
 
     private _initContext(drawingInterface: IDrawingInterface) {
