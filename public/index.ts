@@ -1,5 +1,6 @@
 import { init } from '../src/main';
 import { RendererWebGL } from '../src/rendering/renderer-webgl';
+import { IParticleSystemBuilder } from '../src/models/particle-system';
 import { LiquidParticleSystemBuilder } from '@wufe/liquid-particle-system';
 
 init({
@@ -14,7 +15,7 @@ init({
                 count: 500
             }
         }
-    })],
+    }) as any as IParticleSystemBuilder],
     camera: {
         enabled: true,
         zoom: {

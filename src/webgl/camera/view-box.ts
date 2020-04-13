@@ -1,4 +1,4 @@
-import { mat4 } from "gl-matrix";
+import { mat4, ReadonlyVec3 } from "gl-matrix";
 import { IWebGLLibraryInterface } from "../../rendering/renderer-webgl";
 
 export class ViewBox {
@@ -24,9 +24,9 @@ export class ViewBox {
 			mat4.rotateX(cameraMatrix, cameraMatrix, yaw);
 			mat4.translate(cameraMatrix, cameraMatrix, [0, 0, zoom.value]);
 
-			const target = [0, 0, 0];
-			const eye = [cameraMatrix[12], cameraMatrix[13], cameraMatrix[14]];
-			const up = [0, 1, 0];
+			const target = [0, 0, 0] as ReadonlyVec3;
+			const eye = [cameraMatrix[12], cameraMatrix[13], cameraMatrix[14]] as ReadonlyVec3;
+			const up = [0, 1, 0] as ReadonlyVec3;
 
 			mat4.lookAt(this.vMat, eye, target, up);
 
