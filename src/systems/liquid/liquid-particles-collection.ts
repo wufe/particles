@@ -1,4 +1,4 @@
-import { TRandomizedValueOptions, valueFromRandomOptions } from "../utils/random";
+import { TRandomizedValueOptions, valueFromRandomOptions } from "../../utils/random";
 import { LiquidParticleWrapper } from "./liquid-particle-wrapper";
 import { Particle } from "../../models/particle";
 import { ILibraryInterface } from "../../main";

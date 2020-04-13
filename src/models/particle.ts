@@ -5,7 +5,7 @@ import { ILibraryInterface } from "../main";
 import { IListenable, ParticleEventType, BaseListenableParticle } from "./base-particle";
 import { RecursivePartial, getDefault } from "../utils/object-utils";
 import { ITransitionSpecification, TransitionSpecificationBuilder } from "../systems/transition/transition-specification";
-import { TRandomizeOptions, TRandomizeBoundary, TRandomizedValueOptions, randomValueFromBoundary, valueFromRandomOptions } from "../systems/utils/random";
+import { TRandomizeOptions, TRandomizeBoundary, TRandomizedValueOptions, randomValueFromBoundary, valueFromRandomOptions } from "../utils/random";
 
 // Represents the parameter and the methods required by the particle
 // to move through the available space.

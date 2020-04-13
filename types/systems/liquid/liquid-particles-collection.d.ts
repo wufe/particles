@@ -1,4 +1,4 @@
-import { TRandomizedValueOptions } from "../utils/random";
+import { TRandomizedValueOptions } from "../../utils/random";
 import { LiquidParticleWrapper } from "./liquid-particle-wrapper";
 import { ILibraryInterface } from "../../main";
 import { BaseParticleSystem } from "../base-particle-system";

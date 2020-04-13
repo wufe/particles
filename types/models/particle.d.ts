@@ -5,7 +5,7 @@ import { ILibraryInterface } from "../main";
 import { IListenable, ParticleEventType, BaseListenableParticle } from "./base-particle";
 import { RecursivePartial } from "../utils/object-utils";
 import { ITransitionSpecification, TransitionSpecificationBuilder } from "../systems/transition/transition-specification";
-import { TRandomizeOptions, TRandomizeBoundary, TRandomizedValueOptions } from "../systems/utils/random";
+import { TRandomizeOptions, TRandomizeBoundary, TRandomizedValueOptions } from "../utils/random";
 export interface IMoveable {
     coords: IVector3D;
     velocity: IVector3D;

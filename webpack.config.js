@@ -94,7 +94,7 @@ const getConfig = (target = 'cjs') => {
         resolve: {
             extensions: [ ".ts", ".tsx", ".js", ".glsl", ".vs", ".fs", ".vert", ".frag" ]
         },
-        entry: "./src/main.ts",
+        entry: "./src/index.ts",
         output: getOutput(target),
         target: 'web',
         module: {

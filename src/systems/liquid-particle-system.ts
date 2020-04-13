@@ -5,7 +5,7 @@ import { Vector3D } from "../models/vector3d";
 import { LiquidParticleWrapper } from "./liquid/liquid-particle-wrapper";
 import { RecursivePartial, getDefault } from "../utils/object-utils";
 import { TransitionEasingFunction } from "./transition/transition-specification";
-import { TRandomizeOptions, randomValueFromBoundary } from "./utils/random";
+import { TRandomizeOptions, randomValueFromBoundary } from "../utils/random";
 import { LiquidParticlesCollection, TLiquidParticleSystemSquirt } from "./liquid/liquid-particles-collection";
 
 export interface ILiquidParticleSystemParams {
