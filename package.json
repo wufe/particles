@@ -1,6 +1,6 @@
 {
   "name": "@wufe/particles",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "main": "dist/cjs/index.js",
   "jsdelivr": "dist/umd/index.js",
   "license": "MIT",
