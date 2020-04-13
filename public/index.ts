@@ -1,5 +1,6 @@
 import { init } from '../src/main';
 import { RendererWebGL } from '../src/rendering/renderer-webgl';
+import { LiquidParticleSystemBuilder } from '@wufe/liquid-particle-system';
 
 init({
     selectorOrCanvas: '#canvas',

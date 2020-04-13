@@ -975,6 +975,20 @@
     "@webassemblyjs/wast-parser" "1.9.0"
     "@xtuc/long" "4.2.2"
 
+"@wufe/liquid-particle-system@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@wufe/liquid-particle-system/-/liquid-particle-system-1.0.0.tgz#bc7fd91766f7bccfcb24b252cef6a75611793483"
+  integrity sha512-YudOQMmAgVgLnCSVM3x1wF8/GaHhFF6PyBQAdsa8fOdCwfk//yBAy/qYpultfM58VG4StapR2mk6l6PPaUdpcA==
+  dependencies:
+    "@wufe/particles" "^1.0.0"
+
+"@wufe/particles@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@wufe/particles/-/particles-1.0.0.tgz#0c6c0637a230a94dcd3b09937e3dba1fe32e9274"
+  integrity sha512-qPzbofdGePbnG0aVZf6tA4kus9qCNFtkLel1y38oUjZcdMdB1dqOXVkI8phmpw6/WeaoTspRu1p2fF2EJy8x+Q==
+  dependencies:
+    gl-matrix "^3.1.0"
+
 "@xtuc/ieee754@^1.2.0":
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/@xtuc/ieee754/-/ieee754-1.2.0.tgz#eef014a3145ae477a1cbc00cd1e552336dceb790"

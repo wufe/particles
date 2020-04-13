@@ -2,3 +2,4 @@ src
 public
 webpack.config.js
 tsconfig.json
+demo-dist
