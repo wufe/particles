@@ -1,6 +1,8 @@
 precision highp float;
 
-attribute float f_test;
+attribute vec3 v_position;
+attribute vec4 v_color;
+attribute float f_distance;
 
 uniform vec3 v_res;
 uniform mat4 m_world;
@@ -15,8 +17,8 @@ vec3 vecToAbs(vec3 vec) {
 }
 
 void main() {
-    
-    frag_col = vec4(1.0, 1.0, 1.0, 1.0);
-    vec3 pos = vec3(0.0, 0.0, 0.0);
+    float distanceCoefficient = clamp(1.0 - (f_distance / 300.0), .05, 1.0);
+    frag_col = vec4(v_color.xyz * distanceCoefficient, distanceCoefficient);
+    vec3 pos = vecToAbs(v_position);
     gl_Position = m_projection * m_view * m_world * vec4(pos, 1.0);
 }

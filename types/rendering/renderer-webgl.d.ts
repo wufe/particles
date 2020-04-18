@@ -4,6 +4,7 @@ import { ILibraryInterface } from "../main";
 import { ParticlesProgram } from "../webgl/programs/webgl-particles-program";
 import { ViewBox } from "../webgl/camera/view-box";
 import { ParticlesSectorsProgram } from "../webgl/programs/webgl-particles-sectors-program";
+import { ParticlesLinesProgram } from "../webgl/programs/webgl-particles-lines-program";
 export declare type TWebGLConfiguration = {
     backgroundColor: number[];
     camera: {
@@ -24,6 +25,7 @@ export declare type TWebGLConfiguration = {
     programs: {
         particles: ParticlesProgram | null;
         sectors: ParticlesSectorsProgram | null;
+        lines: ParticlesLinesProgram | null;
     };
 };
 export interface IWebGLLibraryInterface extends ILibraryInterface {

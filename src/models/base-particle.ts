@@ -1,14 +1,5 @@
-import { IParticle } from "./particle";
-
-export type TParticleCallback = (particle: IParticle) => any;
-
-export interface IListenable<TEvent> {
-    // Adding the possibility to add more listeners
-    // in order to be used by the renderer and by a possible wrapper
-    // which would be responsible for the lifetime of the particle
-    on(type: TEvent, callback: TParticleCallback): void;
-    off(type: TEvent, callback?: TParticleCallback): void;
-}
+import { IParticle, Particle } from "./particle";
+import { IListenable, ListenableDispatcher } from "./listenable";
 
 export enum ParticleEventType {
     POSITION_UPDATE = 'positionUpdate',
@@ -16,42 +7,6 @@ export enum ParticleEventType {
     UPDATE = 'update',
 }
 
-type TEventListener<TEvent, TCallback> = {
-    type: TEvent;
-    callback: TCallback;
-}
+export interface IParticleBase extends IListenable<IParticle, ParticleEventType> {}
 
-export class BaseListenableParticle implements IListenable<ParticleEventType> {
-
-    protected _attachedEventListeners: TEventListener<ParticleEventType, TParticleCallback>[] = [];
-
-    on(type: ParticleEventType, callback: TParticleCallback): void {
-        this._attachedEventListeners.push({ type, callback });
-    }
-
-    off(type: ParticleEventType, callback?: TParticleCallback): void {
-
-        let eventIndex = -1;
-
-        if (callback !== undefined) {
-            eventIndex = this._attachedEventListeners.findIndex(e =>
-                e.type === type && e.callback === callback);
-        } else {
-            eventIndex = this._attachedEventListeners.findIndex(e =>
-                e.type === type);
-        }
-        
-        if (eventIndex > -1) {
-            this._attachedEventListeners =
-                this._attachedEventListeners.slice(0, eventIndex).concat(
-                    this._attachedEventListeners.slice(eventIndex +1)
-                );
-        }
-    }
-
-    protected call(type: ParticleEventType, particle: IParticle) {
-        this._attachedEventListeners
-            .filter(e => e.type === type)
-            .forEach(e => e.callback(particle));
-    }
-}
+export class BaseListenableParticle extends ListenableDispatcher<IParticle, ParticleEventType> {}

@@ -2,7 +2,7 @@ import { IVector3D, Vector3D } from "./vector3d";
 import { Vector4D, IVector4D } from "./vector4d";
 import { ParticleSector, IParticleSector } from "./particle-sector";
 import { ILibraryInterface } from "../main";
-import { IListenable, ParticleEventType, BaseListenableParticle } from "./base-particle";
+import { ParticleEventType, BaseListenableParticle, IParticleBase } from "./base-particle";
 import { RecursivePartial, getDefault } from "../utils/object-utils";
 import { ITransitionSpecification, TransitionSpecificationBuilder } from "../systems/transition/transition-specification";
 import { TRandomizeOptions, TRandomizeBoundary, TRandomizedValueOptions, randomValueFromBoundary, valueFromRandomOptions } from "../utils/random";
@@ -31,7 +31,7 @@ export interface IDrawable {
     setAlpha(value: number): void;
 }
 
-export interface IParticle extends IMoveable, IDrawable, IListenable<ParticleEventType> {
+export interface IParticle extends IMoveable, IDrawable, IParticleBase {
     update(delta: number, time: number): void;
 }
 

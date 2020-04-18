@@ -72,22 +72,12 @@ export class ParticlesProgram implements IProgram {
         );
 
         this._vectorsBuffer = this._gl.createBuffer();
-        this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.POSITION));
-		this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.COLOR));
-        this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.SIZE));
-        
-        this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.POSITION_TRANSITION_ENABLED));
-        this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.POSITION_TRANSITION_START));
-        this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.POSITION_TRANSITION_END));
-        this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.POSITION_TRANSITION_START_TIME));
-        this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.POSITION_TRANSITION_END_TIME));
-        this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.POSITION_TRANSITION_EASING_FUNCTION));
     }
 
     useParticles(particles: IParticle[]) {
         this._emptyEventAttachedParticles();
         this._vertices = new Float32Array(particles
-            .reduce((accumulator, particle, index) => {
+            .map((/*accumulator, */particle, index) => {
                 const [x, y, z] = (particle.coords as Vector3D).components;
                 const [r, g, b, a] = (particle.color as Vector4D).components;
                 const [cx, cy, cz, cw] = getColor(r, g, b, a);
@@ -95,7 +85,7 @@ export class ParticlesProgram implements IProgram {
                 if (transition.enabled && !transition.committed)
                     throw new Error('Particle transition have not been commited.');
                 this._attachParticleUpdateEventHandler(index, particle);
-                return accumulator.concat([
+                return /*accumulator.concat*/([
                     x, y, z,
                     cx, cy, cz, Math.max(cw * particle.alpha, .001),
                     particle.size,
@@ -106,7 +96,7 @@ export class ParticlesProgram implements IProgram {
                     transition.endTime,
                     transition.easing
                 ]);
-            }, []));
+            }/*, []*/).flat());
     }
 
     // #region Particles live update
@@ -172,6 +162,17 @@ export class ParticlesProgram implements IProgram {
     }
 
     draw() {
+        this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.POSITION));
+		this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.COLOR));
+        this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.SIZE));
+        
+        this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.POSITION_TRANSITION_ENABLED));
+        this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.POSITION_TRANSITION_START));
+        this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.POSITION_TRANSITION_END));
+        this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.POSITION_TRANSITION_START_TIME));
+        this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.POSITION_TRANSITION_END_TIME));
+        this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.POSITION_TRANSITION_EASING_FUNCTION));
+
         this._gl.useProgram(this._programContainer.program);
 
         this._gl.bindBuffer(this._gl.ARRAY_BUFFER, this._vectorsBuffer);
@@ -261,5 +262,16 @@ export class ParticlesProgram implements IProgram {
         this._gl.bindBuffer(this._gl.ARRAY_BUFFER, null);
 
         this._gl.drawArrays(this._gl.POINTS, 0, this._vertices.length / this._strideLength);
+
+        this._gl.disableVertexAttribArray(this._programContainer.attr(Attr.POSITION));
+		this._gl.disableVertexAttribArray(this._programContainer.attr(Attr.COLOR));
+        this._gl.disableVertexAttribArray(this._programContainer.attr(Attr.SIZE));
+        
+        this._gl.disableVertexAttribArray(this._programContainer.attr(Attr.POSITION_TRANSITION_ENABLED));
+        this._gl.disableVertexAttribArray(this._programContainer.attr(Attr.POSITION_TRANSITION_START));
+        this._gl.disableVertexAttribArray(this._programContainer.attr(Attr.POSITION_TRANSITION_END));
+        this._gl.disableVertexAttribArray(this._programContainer.attr(Attr.POSITION_TRANSITION_START_TIME));
+        this._gl.disableVertexAttribArray(this._programContainer.attr(Attr.POSITION_TRANSITION_END_TIME));
+        this._gl.disableVertexAttribArray(this._programContainer.attr(Attr.POSITION_TRANSITION_EASING_FUNCTION));
     }
 }

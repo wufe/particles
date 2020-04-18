@@ -63,7 +63,7 @@ export class ParticlesSectorsProgram implements IProgram {
         );
 
         this._vectorsBuffer = this._gl.createBuffer();
-        this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.POSITION));
+        
     }
 
     useSectors(sectorsManager: ParticleSectorManager) {
@@ -140,6 +140,8 @@ export class ParticlesSectorsProgram implements IProgram {
     }
 
     draw() {
+        this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.POSITION));
+
         this._gl.useProgram(this._programContainer.program);
 
         this._gl.bindBuffer(this._gl.ARRAY_BUFFER, this._vectorsBuffer);
@@ -157,5 +159,7 @@ export class ParticlesSectorsProgram implements IProgram {
         this._gl.bindBuffer(this._gl.ARRAY_BUFFER, null);
 
         this._gl.drawArrays(this._gl.LINES, 0, this._vertices.length / 3);
+
+        this._gl.disableVertexAttribArray(this._programContainer.attr(Attr.POSITION));
     }
 }

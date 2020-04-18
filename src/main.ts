@@ -9,11 +9,15 @@ import { IParticle } from "./models/particle";
 import { DefaultParticleSystem } from "./systems/default-particle-system";
 import { ParticleSectorManager } from "./models/particle-sector-manager";
 import { BaseParticleSystem } from "./systems/base-particle-system";
+import { IProximityDetectionSystemBuilder, IProximityDetectionSystem } from "./models/proximity-detection-system";
+import { NaiveProximityDetectionSystem, NaiveProximityDetectionSystemBuilder } from "./models/naive-proximity-detection-system";
+import { performanceMetricsHelper } from "./utils/performance-metrics";
 
 export const getDefaultParams = (): DefaultObject<Params> => ({
     selectorOrCanvas: '#canvas',
     renderer: new LazyFactory(() => Renderer2D),
     systems: [DefaultParticleSystem],
+    proximityDetectionSystem: NaiveProximityDetectionSystemBuilder.build(),
     backgroundColor: [0, 0, 0, 0],
     detectRetina: true,
     camera: {
@@ -41,7 +45,9 @@ export interface ILibraryInterface extends IDrawingInterface, ISystemBridge {
     time: number;
     deltaTime: number;
     particlesSectorManager: ParticleSectorManager;
-    getAllParticles: () => IParticle[]
+    getAllParticles: () => IParticle[];
+    feedProximityDetectionSystem(objects: IParticle[]): void;
+    getNeighbours(particle: IParticle, radius?: number | (() => number)): IParticle[];
 }
 
 export class Main extends DrawingInterface implements ILibraryInterface {
@@ -51,6 +57,7 @@ export class Main extends DrawingInterface implements ILibraryInterface {
     };
     public particlesSectorManager: ParticleSectorManager;
     public systems: IParticleSystem[] = [];
+    public proximityDetectionSystem: IProximityDetectionSystem | null = null;;
     public renderer: IRenderer = null;
 
     constructor(public params: Params) {
@@ -65,6 +72,7 @@ export class Main extends DrawingInterface implements ILibraryInterface {
         this._initCanvas();
         this._initResizeEventListeners();
         this._initSystems();
+        this._initProximityDetectionSystems();
         this._preStart();
         this._loop();
     }
@@ -72,6 +80,7 @@ export class Main extends DrawingInterface implements ILibraryInterface {
     private _initParams() {
         this.params = getDefault(this.params, getDefaultParams());
         this.systems = this.params.systems.map(builder => new builder(this));
+        this.proximityDetectionSystem = new this.params.proximityDetectionSystem(this);
         this.renderer = new this.params.renderer(this._plugin);
         let canvas = this.params.selectorOrCanvas;
         if (typeof canvas === 'string')
@@ -139,6 +148,10 @@ export class Main extends DrawingInterface implements ILibraryInterface {
         this.systems.forEach(x => x.attach());
     }
 
+    private _initProximityDetectionSystems() {
+        this.proximityDetectionSystem.init();
+    }
+
     private _preStart() {
         this._plugin.exec(HookType.PRE_START, this);
     }
@@ -150,9 +163,15 @@ export class Main extends DrawingInterface implements ILibraryInterface {
         // #region Update
 
         const currentPerf = performance.now();
+
+        const realDelta = currentPerf - this._lastPerf;
+
         this.deltaTime = Math.min(currentPerf - this._lastPerf, 30);
+        
         this.time += this.deltaTime;
         this._lastPerf = currentPerf;
+
+        performanceMetricsHelper.set('fps', 1000 / realDelta);
 
         this.systems.forEach(system => {
             (system as BaseParticleSystem).updateInternalParameters(this.deltaTime, this.time);
@@ -178,16 +197,25 @@ export class Main extends DrawingInterface implements ILibraryInterface {
     }
 
     getAllParticles() {
-        return this.systems.reduce((accumulator, system) => accumulator.concat(system.getParticles()), []);
+        return this.systems.map(system => system.getParticles()).flat();
+    }
+
+    feedProximityDetectionSystem(objects: IParticle[]) {
+        this.proximityDetectionSystem.update(objects);
+    }
+
+    getNeighbours(particle: IParticle, radius?: number | (() => number)) {
+        return this.proximityDetectionSystem.getNeighbours(particle);
     }
 }
 
 export type Params = {
-    selectorOrCanvas    : string | HTMLCanvasElement;
-    renderer?           : IRendererBuilder;
-    systems?            : IParticleSystemBuilder[];
-    backgroundColor?    : number[];
-    detectRetina?       : boolean;
+    selectorOrCanvas         : string | HTMLCanvasElement;
+    renderer?                : IRendererBuilder;
+    systems?                 : IParticleSystemBuilder[];
+    proximityDetectionSystem?: IProximityDetectionSystemBuilder;
+    backgroundColor?         : number[];
+    detectRetina?            : boolean;
     camera?: {
         enabled?: boolean;
         pitch?  : number;

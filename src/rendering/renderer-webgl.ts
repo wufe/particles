@@ -9,6 +9,9 @@ import { ParticlesSectorsProgram, UpdateableSectorsProgramParam } from "../webgl
 import { getDefault } from "../utils/object-utils";
 import { TParticleSystemConfiguration, RendererHook, TWebGLRendererHooksConfiguration } from "../models/particle-system";
 import { ParticleSectorManager } from "../models/particle-sector-manager";
+import { ParticlesLinesProgram } from "../webgl/programs/webgl-particles-lines-program";
+import { DirectionsProgram, UpdateableDirectionsProgramParam } from "../webgl/programs/webgl-directions-program";
+import { performanceMetricsHelper } from "../utils/performance-metrics";
 
 export type TWebGLConfiguration = {
     backgroundColor: number[];
@@ -26,10 +29,15 @@ export type TWebGLConfiguration = {
     sectors: {
         enabled: boolean;
     };
+    directions: {
+        enabled: boolean;
+    };
     viewBox: ViewBox | null;
     programs: {
-        particles   : ParticlesProgram | null;
-        sectors     : ParticlesSectorsProgram | null;
+        particles : ParticlesProgram | null;
+        sectors   : ParticlesSectorsProgram | null;
+        lines     : ParticlesLinesProgram | null;
+        directions: DirectionsProgram | null;
     };
 }
 
@@ -68,8 +76,10 @@ export class RendererWebGL implements IRenderer {
         const webglConfiguration: TWebGLConfiguration = {
             backgroundColor,
             programs: {
-                particles   : null,
-                sectors     : null,
+                particles : null,
+                sectors   : null,
+                lines     : null,
+                directions: null,
             },
             viewBox: null,
             camera: {
@@ -85,6 +95,9 @@ export class RendererWebGL implements IRenderer {
             },
             sectors: {
                 enabled: false
+            },
+            directions: {
+                enabled: true
             }
         };
         libraryInterface.configuration.webgl = webglConfiguration;
@@ -123,10 +136,11 @@ export class RendererWebGL implements IRenderer {
     private _preStart(libraryInterface: IWebGLLibraryInterface) {
         const { width, height, depth } = libraryInterface.configuration;
         const context = libraryInterface.context;
+        const webgl = libraryInterface.configuration.webgl;
 
         // #region ViewBox
         const viewBox = new ViewBox(libraryInterface);
-        libraryInterface.configuration.webgl.viewBox = viewBox;
+        webgl.viewBox = viewBox;
         // #endregion
 
         // #region CameraEvents
@@ -137,19 +151,34 @@ export class RendererWebGL implements IRenderer {
         // #endregion
 
         // #region Sectors program
-        if (libraryInterface.configuration.webgl.sectors.enabled) {
+        if (webgl.sectors.enabled) {
             const particlesSectorsProgram = new ParticlesSectorsProgram(context, viewBox, libraryInterface);
             particlesSectorsProgram.init(libraryInterface.particlesSectorManager);
-            libraryInterface.configuration.webgl.programs.sectors = particlesSectorsProgram;
+            webgl.programs.sectors = particlesSectorsProgram;
         }
         // #endregion
 
+        if (webgl.directions.enabled) {
+            const directionsProgram = new DirectionsProgram(context, viewBox);
+            directionsProgram.init();
+            webgl.programs.directions = directionsProgram;
+        }
+
+        const particles = libraryInterface.getAllParticles();
+
         // #region Particles program
         const particlesProgram = new ParticlesProgram(context, viewBox, libraryInterface);
-        const particles = libraryInterface.getAllParticles();
         particlesProgram.init(particles);
-        
-        libraryInterface.configuration.webgl.programs.particles = particlesProgram;
+        webgl.programs.particles = particlesProgram;
+        // #endregion
+
+        // Create lines
+        libraryInterface.feedProximityDetectionSystem(particles);
+
+        // #region Lines program
+        const linesProgram = new ParticlesLinesProgram(context, viewBox, libraryInterface);
+        linesProgram.init(particles);
+        webgl.programs.lines = linesProgram;
         // #endregion
 
         // #region Particles change events
@@ -166,27 +195,44 @@ export class RendererWebGL implements IRenderer {
     }
 
     private _draw(libraryInterface: IWebGLLibraryInterface) {
-        if (libraryInterface.configuration.webgl.programs.sectors)
-            libraryInterface.configuration.webgl.programs.sectors.draw();
-        libraryInterface.configuration.webgl.programs.particles.draw();
+        const programs = libraryInterface.configuration.webgl.programs;
+        if (programs.sectors)
+            programs.sectors.draw();
+        if (programs.directions)
+            programs.directions.draw();
+        programs.particles.draw();
+        programs.lines.draw();
     }
 
     private _update(libraryInterface: IWebGLLibraryInterface) {
-        if (libraryInterface.configuration.webgl.programs.sectors)
-            libraryInterface.configuration.webgl.programs.sectors.update(libraryInterface.deltaTime, libraryInterface.time);
-        libraryInterface.configuration.webgl.programs.particles.update(libraryInterface.deltaTime, libraryInterface.time);
+        const programs = libraryInterface.configuration.webgl.programs;
+        if (programs.sectors)
+            programs.sectors.update(libraryInterface.deltaTime, libraryInterface.time);
+        if (programs.directions)
+            programs.directions.update(libraryInterface.deltaTime, libraryInterface.time);
+        programs.particles.update(libraryInterface.deltaTime, libraryInterface.time);
+
+        const particles = libraryInterface.getAllParticles();
+
+        performanceMetricsHelper.set('particles', particles);
+
+        programs.lines.useParticles(particles);
+
+        programs.lines.update(libraryInterface.deltaTime, libraryInterface.time);
     }
 
     private _onResize(libraryInterface: IWebGLLibraryInterface) {
         const {width, height, depth} = libraryInterface.configuration;
         if (libraryInterface.configuration.webgl.sectors.enabled) {
-            
             // TODO: Update existing particle sector manager instead of creating a new one
             libraryInterface.particlesSectorManager = new ParticleSectorManager(width, height, depth);
             libraryInterface.configuration.webgl.programs.sectors.useSectors(libraryInterface.particlesSectorManager);
             libraryInterface.configuration.webgl.programs.sectors.notifyParamChange(UpdateableSectorsProgramParam.RESOLUTION);
         }
+        if (libraryInterface.configuration.webgl.programs.directions)
+            libraryInterface.configuration.webgl.programs.directions.notifyParamChange(UpdateableDirectionsProgramParam.RESOLUTION);
         libraryInterface.configuration.webgl.programs.particles.notifyParamChange(UpdateableParticlesProgramParam.RESOLUTION);
+        libraryInterface.configuration.webgl.programs.lines.notifyParamChange(UpdateableParticlesProgramParam.RESOLUTION);
         this._onCameraChange(libraryInterface);
         libraryInterface.context.viewport(0, 0, width, height);
     }
@@ -196,7 +242,10 @@ export class RendererWebGL implements IRenderer {
             libraryInterface.configuration.webgl.viewBox.recalculate();
             if (libraryInterface.configuration.webgl.programs.sectors)
                 libraryInterface.configuration.webgl.programs.sectors.notifyParamChange(UpdateableSectorsProgramParam.CAMERA);
+            if (libraryInterface.configuration.webgl.programs.directions)
+                libraryInterface.configuration.webgl.programs.directions.notifyParamChange(UpdateableDirectionsProgramParam.CAMERA);
             libraryInterface.configuration.webgl.programs.particles.notifyParamChange(UpdateableParticlesProgramParam.CAMERA);
+            libraryInterface.configuration.webgl.programs.lines.notifyParamChange(UpdateableParticlesProgramParam.CAMERA);
         };
     }
 
