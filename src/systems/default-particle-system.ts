@@ -12,16 +12,17 @@ export class DefaultParticleSystem extends BaseParticleSystem implements IPartic
     attach() {
         const { width, height, depth } = this.manager.configuration;
 
-        this._particles = new Array(300)
+        this._particles = new Array(100)
             .fill(null)
             .map(_ => {
                 const x = Math.random() * width;
                 const y = Math.random() * height;
                 const z = Math.random() * depth;
                 const particle = new Particle(new Vector3D({ x, y, z }), this.manager);
-                // particle.setColor(Math.random() * 255, Math.random() * 255, Math.random() * 255, Math.random() / 2 + .3)
+                // particle.setColor(Math.random() * 255, Math.random() * 255, Math.random() * 255, Math.random() / 3 + .66)
+                // particle.setColor(255, 255, 255, Math.random() / 3 + .66);
                 particle.setColor(255, 255, 255, 1);
-                particle.setSize({ randomize: true, boundary: { min: 2, max: 10 }})
+                particle.setSize({ randomize: true, boundary: { min: 1, max: 5 }})
                 particle.setVelocity(ParticleDirection.UP, {
                     randomize: true,
                     boundary: {

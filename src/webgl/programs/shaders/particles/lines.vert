@@ -18,8 +18,8 @@ void main() {
     float distanceCoefficient = clamp(1.0 - (f_distance / 300.0), .05, 1.0);
     frag_col = vec4(v_color.xyz * distanceCoefficient, distanceCoefficient);
     vec3 pos = vecToAbs(v_position, v_res);
-    if (pos.x > .9 || pos.x < -.9 || pos.y > .9 || pos.y < -.9 || pos.z > .9 || pos.z < -.9) {
-        frag_col = vec4(1.0, 0.0, 0.0, 1.0);
-    }
+    // if (pos.x > .9 || pos.x < -.9 || pos.y > .9 || pos.y < -.9 || pos.z > .9 || pos.z < -.9) {
+    //     frag_col = vec4(1.0, 0.0, 0.0, 1.0);
+    // }
     gl_Position = m_projection * m_view * m_world * vec4(pos, 1.0);
 }

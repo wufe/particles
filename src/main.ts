@@ -8,8 +8,8 @@ import { ISystemBridge, SystemBridgeEventNotification } from "./drawing/system-b
 import { IParticle } from "./models/particle";
 import { DefaultParticleSystem } from "./systems/default-particle-system";
 import { BaseParticleSystem } from "./systems/base-particle-system";
-import { IProximityDetectionSystemBuilder, IProximityDetectionSystem } from "./models/proximity-detection-system";
-import { NaiveProximityDetectionSystem, NaiveProximityDetectionSystemBuilder } from "./models/naive-proximity-detection-system";
+import { IProximityDetectionSystemBuilder, IProximityDetectionSystem } from "./models/proximity-detection/proximity-detection-system";
+import { NaiveProximityDetectionSystem, NaiveProximityDetectionSystemBuilder } from "./models/proximity-detection/naive-proximity-detection-system";
 import { performanceMetricsHelper } from "./utils/performance-metrics";
 
 export const getDefaultParams = (): DefaultObject<Params> => ({
@@ -47,6 +47,7 @@ export interface ILibraryInterface extends IDrawingInterface, ISystemBridge {
     getAllParticles: () => IParticle[];
     feedProximityDetectionSystem(objects: IParticle[]): void;
     getNeighbours(particle: IParticle, radius: number): IParticle[];
+    getProximityDetectionSystem(): IProximityDetectionSystem;
 }
 
 export class Main extends DrawingInterface implements ILibraryInterface {
@@ -203,6 +204,10 @@ export class Main extends DrawingInterface implements ILibraryInterface {
 
     getNeighbours(particle: IParticle, radius: number) {
         return this.proximityDetectionSystem.getNeighbours(particle, radius);
+    }
+
+    getProximityDetectionSystem() {
+        return this.proximityDetectionSystem;
     }
 }
 

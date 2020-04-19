@@ -89,9 +89,10 @@ export class ParticlesLinesProgram implements IProgram {
     }
 
     useParticles(particles: IParticle[]) {
+        
         const linkPoints: ParticleLinkPoint[] = [];
         for (const particle of particles) {
-            const neighbours = this._libraryInterface.getNeighbours(particle, 200);
+            const neighbours = this._libraryInterface.getNeighbours(particle, 300);
             for (const neighbour of neighbours) {
 
                 const distance = Math.hypot(
