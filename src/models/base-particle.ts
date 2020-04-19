@@ -3,8 +3,8 @@ import { IListenable, ListenableDispatcher } from "./listenable";
 
 export enum ParticleEventType {
     POSITION_UPDATE = 'positionUpdate',
-    ALPHA_UPDATE = 'alphaUpdate',
-    UPDATE = 'update',
+    COLOR_UPDATE    = 'colorUpdate',
+    UPDATE          = 'update',
 }
 
 export interface IParticleBase extends IListenable<IParticle, ParticleEventType> {}

@@ -1,7 +1,5 @@
 export * from './main';
 export * from './models/base-particle';
-export * from './models/particle-sector-manager';
-export * from './models/particle-sector';
 export * from './models/particle';
 export * from './models/particle-system';
 export * from './models/vector3d';

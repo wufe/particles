@@ -2,8 +2,6 @@ import { IParticleSystem, TParticleSystemConfiguration } from "../models/particl
 import { ILibraryInterface } from "../main";
 import { IParticle, Particle, ParticleDirection } from "../models/particle";
 import { Vector3D } from "../models/vector3d";
-import { SystemBridgeEventNotification, ISystemBridge } from "../drawing/system-bridge";
-import { ParticleSectorManager } from "../models/particle-sector-manager";
 import { BaseParticleSystem } from "./base-particle-system";
 import { Vector4D } from "../models/vector4d";
 
@@ -21,7 +19,8 @@ export class DefaultParticleSystem extends BaseParticleSystem implements IPartic
                 const y = Math.random() * height;
                 const z = Math.random() * depth;
                 const particle = new Particle(new Vector3D({ x, y, z }), this.manager);
-                particle.color = new Vector4D({ x: 0, y: 0, z: 0, w: Math.random() / 2 + .5 });
+                // particle.setColor(Math.random() * 255, Math.random() * 255, Math.random() * 255, Math.random() / 2 + .3)
+                particle.setColor(255, 255, 255, 1);
                 particle.setSize({ randomize: true, boundary: { min: 2, max: 10 }})
                 particle.setVelocity(ParticleDirection.UP, {
                     randomize: true,
@@ -31,6 +30,13 @@ export class DefaultParticleSystem extends BaseParticleSystem implements IPartic
                     }
                 });
                 particle.setVelocity(ParticleDirection.RIGHT, {
+                    randomize: true,
+                    boundary: {
+                        min: -3,
+                        max: 3
+                    }
+                });
+                particle.setVelocity(ParticleDirection.FRONT, {
                     randomize: true,
                     boundary: {
                         min: -3,

@@ -12,7 +12,7 @@ init({
         enabled: true,
         zoom: {
             value: 2,
-            locked: true
+            locked: false
         }
     },
     events: {

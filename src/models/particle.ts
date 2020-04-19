@@ -1,11 +1,11 @@
 import { IVector3D, Vector3D } from "./vector3d";
 import { Vector4D, IVector4D } from "./vector4d";
-import { ParticleSector, IParticleSector } from "./particle-sector";
 import { ILibraryInterface } from "../main";
 import { ParticleEventType, BaseListenableParticle, IParticleBase } from "./base-particle";
 import { RecursivePartial, getDefault } from "../utils/object-utils";
 import { ITransitionSpecification, TransitionSpecificationBuilder } from "../systems/transition/transition-specification";
 import { TRandomizeOptions, TRandomizeBoundary, TRandomizedValueOptions, randomValueFromBoundary, valueFromRandomOptions } from "../utils/random";
+import { getColor } from "../rendering/renderer-webgl";
 
 // Represents the parameter and the methods required by the particle
 // to move through the available space.
@@ -14,11 +14,9 @@ import { TRandomizeOptions, TRandomizeBoundary, TRandomizedValueOptions, randomV
 export interface IMoveable {
     coords    : IVector3D;
     velocity  : IVector3D; // Change in position in one unit of time (*i.e.* 16ms)
-    sector    : IVector3D;
 
     updatePosition(): void;
     getTransitionSpecification(): ITransitionSpecification | null;
-    getAdjacentSectors(): IParticleSector[];
 }
 
 // Contains the properties required by the particle
@@ -61,7 +59,6 @@ export class Particle extends BaseListenableParticle implements IParticle {
     
     constructor(public coords: Vector3D = new Vector3D(), private _manager: ILibraryInterface) {
         super();
-        this.calculateSector();
     }
 
     private _transitionSpecificationBuilder = new TransitionSpecificationBuilder(this);
@@ -85,20 +82,6 @@ export class Particle extends BaseListenableParticle implements IParticle {
         w: 1
     });
     alpha: number = 1;
-
-    sector: IParticleSector;
-
-    calculateSector() {
-        const sectorLength = this._manager
-            .particlesSectorManager
-            .sectorLength;
-        const sectorX = Math.floor(this.coords.x / sectorLength);
-        const sectorY = Math.floor(this.coords.y / sectorLength);
-        const sectorZ = Math.floor(this.coords.z / sectorLength);
-        this.sector = this._manager
-            .particlesSectorManager
-            .getSectorByIndex(sectorX, sectorY, sectorZ);
-    }
 
     setVelocity(direction: ParticleDirection, options: RecursivePartial<TVelocityConfigurationOptions> | null ) {
 
@@ -144,9 +127,15 @@ export class Particle extends BaseListenableParticle implements IParticle {
         this.velocity = velocity;
     }
 
-    private _randomizeVectorComponent(vector: IVector3D, component: keyof IVector3D, range: number, min: number) {
+    private _randomizeVectorComponent(vector: IVector3D, component: keyof Pick<IVector3D, 'x' | 'y' | 'z'>, range: number, min: number) {
         if (vector[component])
             vector[component] = vector[component] * Math.random() * range + min;
+    }
+
+    setColor(r: number, g: number, b: number, a?: number) {
+        const [x, y, z, w] = getColor(r, g, b, a);
+        this.color = new Vector4D({ x, y, z, w });
+        this.call(ParticleEventType.COLOR_UPDATE, this);
     }
 
     setSize(value: number): void;
@@ -171,19 +160,13 @@ export class Particle extends BaseListenableParticle implements IParticle {
     }
 
     setAlpha(value: number): void {
-        if (value !== this.alpha) {
-            this.alpha = value;
-            this.call(ParticleEventType.ALPHA_UPDATE, this);
-        }
+        this.color.w = value;
+        this.call(ParticleEventType.COLOR_UPDATE, this);
     }
 
     private _lastTickDelta: number = -1;
     private _lastTickTime: number = -1;
     update(delta: number, time: number) {
-        if (delta !== undefined)
-            this._lastTickDelta = delta;
-        if (time !== undefined)
-            this._lastTickTime = time;
         
         const transition = this._transitionSpecificationBuilder;
 
@@ -194,7 +177,6 @@ export class Particle extends BaseListenableParticle implements IParticle {
             }
         } else {
             this.updatePosition();
-            this.calculateSector();
             this.call(ParticleEventType.POSITION_UPDATE, this);
             this.notifyUpdated();
         }
@@ -206,10 +188,6 @@ export class Particle extends BaseListenableParticle implements IParticle {
         if (this.velocity) {
             this.coords.add(this.velocity);
         }
-    }
-
-    getAdjacentSectors(): IParticleSector[] {
-        return this.sector.getAdjacentSectors();
     }
 
     notifyUpdated() {

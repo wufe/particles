@@ -4,21 +4,18 @@ import { DefaultObject } from "./utils/object-utils";
 import { IParticleSystem, IParticleSystemBuilder } from "./models/particle-system";
 import { ISystemBridge, SystemBridgeEventNotification } from "./drawing/system-bridge";
 import { IParticle } from "./models/particle";
-import { ParticleSectorManager } from "./models/particle-sector-manager";
 export declare const getDefaultParams: () => DefaultObject<Params>;
 export interface ILibraryInterface extends IDrawingInterface, ISystemBridge {
     params: Params;
     configuration: TConfiguration;
     time: number;
     deltaTime: number;
-    particlesSectorManager: ParticleSectorManager;
     getAllParticles: () => IParticle[];
 }
 export declare class Main extends DrawingInterface implements ILibraryInterface {
     params: Params;
     private _plugin;
     configuration: TConfiguration;
-    particlesSectorManager: ParticleSectorManager;
     systems: IParticleSystem[];
     renderer: IRenderer;
     constructor(params: Params);

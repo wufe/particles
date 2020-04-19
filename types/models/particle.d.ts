@@ -1,6 +1,5 @@
 import { IVector3D, Vector3D } from "./vector3d";
 import { IVector4D } from "./vector4d";
-import { IParticleSector } from "./particle-sector";
 import { ILibraryInterface } from "../main";
 import { BaseListenableParticle, IParticleBase } from "./base-particle";
 import { RecursivePartial } from "../utils/object-utils";
@@ -9,10 +8,8 @@ import { TRandomizeOptions, TRandomizeBoundary, TRandomizedValueOptions } from "
 export interface IMoveable {
     coords: IVector3D;
     velocity: IVector3D;
-    sector: IVector3D;
     updatePosition(): void;
     getTransitionSpecification(): ITransitionSpecification | null;
-    getAdjacentSectors(): IParticleSector[];
 }
 export interface IDrawable {
     size: number;
@@ -44,8 +41,6 @@ export declare class Particle extends BaseListenableParticle implements IParticl
     velocity: Vector3D;
     color: IVector4D;
     alpha: number;
-    sector: IParticleSector;
-    calculateSector(): void;
     setVelocity(direction: ParticleDirection, options: RecursivePartial<TVelocityConfigurationOptions> | null): void;
     private _randomizeVectorComponent;
     setSize(value: number): void;
@@ -57,7 +52,6 @@ export declare class Particle extends BaseListenableParticle implements IParticl
     private _lastTickTime;
     update(delta: number, time: number): void;
     updatePosition(): void;
-    getAdjacentSectors(): IParticleSector[];
     notifyUpdated(): void;
 }
 export {};

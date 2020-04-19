@@ -12,9 +12,9 @@ export class Vector4D extends Vector3D {
 
     public w: number;
 
-	constructor(_vec: IVector4D = { ...ZeroVector4D }) {
-		super(_vec);
-		this.w = _vec.w;
+	constructor(vec: Pick<IVector4D, 'x' | 'y' | 'z' | 'w'> = { ...ZeroVector4D }) {
+		super(vec);
+		this.w = vec.w;
 	}
 
 	get components() {

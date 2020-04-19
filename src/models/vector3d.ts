@@ -3,7 +3,8 @@ import { VectorNorm } from "./vector-norm";
 export interface IVector3D {
     x: number;
     y: number;
-    z: number;
+	z: number;
+	components: number[];
 }
 
 export const ZeroVector3D = { x: 0, y: 0, z: 0 };
@@ -15,11 +16,11 @@ export class Vector3D {
 	public z: number;
 	protected norm: VectorNorm;
 
-	constructor(_vec: IVector3D = { ...ZeroVector3D }) {
-		this.x = _vec.x;
-		this.y = _vec.y;
-		this.z = _vec.z;
-		this.norm = new VectorNorm(_vec);
+	constructor({x, y, z}: Pick<IVector3D, 'x' | 'y' | 'z'> = { ...ZeroVector3D }) {
+		this.x = x;
+		this.y = y;
+		this.z = z;
+		this.norm = new VectorNorm(this);
 	}
 
 	get components() {

@@ -8,5 +8,5 @@ export interface IProximityDetectionSystemBuilder {
 export interface IProximityDetectionSystem {
     init(): void;
     update(objects: IParticle[]): void;
-    getNeighbours(object: IParticle, radius?: number | (() => number)): IParticle[];
+    getNeighbours(object: IParticle, radius?: number): IParticle[];
 }

@@ -3,7 +3,6 @@ import { IRenderer } from "./renderer";
 import { ILibraryInterface } from "../main";
 import { ParticlesProgram } from "../webgl/programs/webgl-particles-program";
 import { ViewBox } from "../webgl/camera/view-box";
-import { ParticlesSectorsProgram } from "../webgl/programs/webgl-particles-sectors-program";
 import { ParticlesLinesProgram } from "../webgl/programs/webgl-particles-lines-program";
 export declare type TWebGLConfiguration = {
     backgroundColor: number[];
@@ -18,13 +17,9 @@ export declare type TWebGLConfiguration = {
         ortho: boolean;
         fov: number;
     };
-    sectors: {
-        enabled: boolean;
-    };
     viewBox: ViewBox | null;
     programs: {
         particles: ParticlesProgram | null;
-        sectors: ParticlesSectorsProgram | null;
         lines: ParticlesLinesProgram | null;
     };
 };

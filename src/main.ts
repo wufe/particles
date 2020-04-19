@@ -7,7 +7,6 @@ import { IParticleSystem, IParticleSystemBuilder } from "./models/particle-syste
 import { ISystemBridge, SystemBridgeEventNotification } from "./drawing/system-bridge";
 import { IParticle } from "./models/particle";
 import { DefaultParticleSystem } from "./systems/default-particle-system";
-import { ParticleSectorManager } from "./models/particle-sector-manager";
 import { BaseParticleSystem } from "./systems/base-particle-system";
 import { IProximityDetectionSystemBuilder, IProximityDetectionSystem } from "./models/proximity-detection-system";
 import { NaiveProximityDetectionSystem, NaiveProximityDetectionSystemBuilder } from "./models/naive-proximity-detection-system";
@@ -20,6 +19,7 @@ export const getDefaultParams = (): DefaultObject<Params> => ({
     proximityDetectionSystem: NaiveProximityDetectionSystemBuilder.build(),
     backgroundColor: [0, 0, 0, 0],
     detectRetina: true,
+    features: [],
     camera: {
         enabled: true,
         pitch: 0,
@@ -44,10 +44,9 @@ export interface ILibraryInterface extends IDrawingInterface, ISystemBridge {
     configuration: TConfiguration;
     time: number;
     deltaTime: number;
-    particlesSectorManager: ParticleSectorManager;
     getAllParticles: () => IParticle[];
     feedProximityDetectionSystem(objects: IParticle[]): void;
-    getNeighbours(particle: IParticle, radius?: number | (() => number)): IParticle[];
+    getNeighbours(particle: IParticle, radius: number): IParticle[];
 }
 
 export class Main extends DrawingInterface implements ILibraryInterface {
@@ -55,7 +54,6 @@ export class Main extends DrawingInterface implements ILibraryInterface {
     public configuration: TConfiguration = {
         initialized: false,
     };
-    public particlesSectorManager: ParticleSectorManager;
     public systems: IParticleSystem[] = [];
     public proximityDetectionSystem: IProximityDetectionSystem | null = null;;
     public renderer: IRenderer = null;
@@ -144,7 +142,6 @@ export class Main extends DrawingInterface implements ILibraryInterface {
 
     private _initSystems() {
         const {width, height, depth} = this.configuration;
-        this.particlesSectorManager = new ParticleSectorManager(width, height, depth);
         this.systems.forEach(x => x.attach());
     }
 
@@ -204,9 +201,13 @@ export class Main extends DrawingInterface implements ILibraryInterface {
         this.proximityDetectionSystem.update(objects);
     }
 
-    getNeighbours(particle: IParticle, radius?: number | (() => number)) {
-        return this.proximityDetectionSystem.getNeighbours(particle);
+    getNeighbours(particle: IParticle, radius: number) {
+        return this.proximityDetectionSystem.getNeighbours(particle, radius);
     }
+}
+
+export enum Feature {
+    LINKS = 'links',
 }
 
 export type Params = {
@@ -216,6 +217,7 @@ export type Params = {
     proximityDetectionSystem?: IProximityDetectionSystemBuilder;
     backgroundColor?         : number[];
     detectRetina?            : boolean;
+    features?                : Feature[];
     camera?: {
         enabled?: boolean;
         pitch?  : number;

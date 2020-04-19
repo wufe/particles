@@ -21,8 +21,7 @@ export class NaiveProximityDetectionSystem implements IProximityDetectionSystem 
         this._objects = objects;
     }
 
-    getNeighbours(a: IParticle, radiusOrFunction = NaiveProximityDetectionSystem.params.radius): IParticle[] {
-        const radius = typeof radiusOrFunction === 'function' ? radiusOrFunction() : radiusOrFunction;
+    getNeighbours(a: IParticle, radius = NaiveProximityDetectionSystem.params.radius) {
         return this._objects
             .filter(b =>
                 a !== b && this.getDistance(a, b) < radius);

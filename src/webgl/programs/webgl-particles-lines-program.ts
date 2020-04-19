@@ -80,10 +80,18 @@ export class ParticlesLinesProgram implements IProgram {
         this.useParticles(particles);
     }
 
+    useLinks(linkPoints: IParticleLinkPoint[]) {
+        this._vertices = new Float32Array(linkPoints.map(linkPoint => [
+            linkPoint.position.x, linkPoint.position.y, linkPoint.position.z,
+            linkPoint.color.x, linkPoint.color.y, linkPoint.color.z, linkPoint.color.w,
+            linkPoint.distance
+        ]).flat());
+    }
+
     useParticles(particles: IParticle[]) {
         const linkPoints: ParticleLinkPoint[] = [];
         for (const particle of particles) {
-            const neighbours = this._libraryInterface.getNeighbours(particle, 400);
+            const neighbours = this._libraryInterface.getNeighbours(particle, 200);
             for (const neighbour of neighbours) {
 
                 const distance = Math.hypot(
@@ -99,11 +107,7 @@ export class ParticlesLinesProgram implements IProgram {
 
         performanceMetricsHelper.set('links', linkPoints);
 
-        this._vertices = new Float32Array(linkPoints.map(linkPoint => [
-            linkPoint.position.x, linkPoint.position.y, linkPoint.position.z,
-            linkPoint.color.x, linkPoint.color.y, linkPoint.color.z, linkPoint.color.w,
-            linkPoint.distance
-        ]).flat());
+        this.useLinks(linkPoints);
     }
 
     update(deltaT: number, T: number): void {

@@ -77,17 +77,16 @@ export class ParticlesProgram implements IProgram {
     useParticles(particles: IParticle[]) {
         this._emptyEventAttachedParticles();
         this._vertices = new Float32Array(particles
-            .map((/*accumulator, */particle, index) => {
-                const [x, y, z] = (particle.coords as Vector3D).components;
-                const [r, g, b, a] = (particle.color as Vector4D).components;
-                const [cx, cy, cz, cw] = getColor(r, g, b, a);
+            .map((particle, index) => {
+                const [x, y, z] = particle.coords.components;
+                const [r, g, b, a] = particle.color.components;
                 const transition = particle.getTransitionSpecification();
                 if (transition.enabled && !transition.committed)
                     throw new Error('Particle transition have not been commited.');
                 this._attachParticleUpdateEventHandler(index, particle);
-                return /*accumulator.concat*/([
+                return [
                     x, y, z,
-                    cx, cy, cz, Math.max(cw * particle.alpha, .001),
+                    r, g, b, a,
                     particle.size,
                     +transition.enabled,
                     transition.start.x, transition.start.y, transition.start.z,
@@ -95,8 +94,8 @@ export class ParticlesProgram implements IProgram {
                     transition.startTime,
                     transition.endTime,
                     transition.easing
-                ]);
-            }/*, []*/).flat());
+                ];
+            }).flat());
     }
 
     // #region Particles live update
@@ -108,21 +107,19 @@ export class ParticlesProgram implements IProgram {
 
     private _onParticleUpdate = (particleIndex: number) => (particle: IParticle) => {
         const startIndex = particleIndex * this._strideLength;
-        const [x, y, z] = (particle.coords as Vector3D).components;
-        const [r, g, b, a] = (particle.color as Vector4D).components;
-        const [cr, cg, cb, ca] = getColor(r, g, b, a);
-        const {alpha, size} = particle;
+        const [x, y, z] = particle.coords.components;
+        const [r, g, b, a] = particle.color.components;
         const transition = particle.getTransitionSpecification();
         if (transition.enabled && !transition.committed)
             throw new Error('Particle transition have not been commited.');
         this._vertices[startIndex] = x;
         this._vertices[startIndex+1] = y;
         this._vertices[startIndex+2] = z;
-        this._vertices[startIndex+3] = cr;
-        this._vertices[startIndex+4] = cg;
-        this._vertices[startIndex+5] = cb;
-        this._vertices[startIndex+6] = Math.max(ca * alpha, .001);
-        this._vertices[startIndex+7] = size;
+        this._vertices[startIndex+3] = r;
+        this._vertices[startIndex+4] = g;
+        this._vertices[startIndex+5] = b;
+        this._vertices[startIndex+6] = a;
+        this._vertices[startIndex+7] = particle.size;
         this._vertices[startIndex+8] = +transition.enabled;
         this._vertices[startIndex+9] = transition.start.x;
         this._vertices[startIndex+10] = transition.start.y;
