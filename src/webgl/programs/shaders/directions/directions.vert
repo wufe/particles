@@ -14,4 +14,5 @@ varying vec4 frag_col;
 void main() {
     frag_col = v_col;
     gl_Position = m_projection * m_view * m_world * vec4(v_pos, 1.0);
+    gl_PointSize = 20.0;
 }

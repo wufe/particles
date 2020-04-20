@@ -1,6 +1,6 @@
 import { PluginAdapter, HookType } from "../plugin/plugin-adapter";
 import { IRenderer } from "./renderer";
-import { ILibraryInterface } from "../main";
+import { ILibraryInterface, Feature } from "../main";
 import { IVector4D } from "../models/vector4d";
 import { ParticlesProgram, UpdateableParticlesProgramParam } from "../webgl/programs/webgl-particles-program";
 import { ViewBox } from "../webgl/camera/view-box";
@@ -33,9 +33,6 @@ export type TWebGLConfiguration = {
         };
         ortho  : boolean;
         fov    : number;
-    };
-    directions: {
-        enabled: boolean;
     };
     viewBox: ViewBox | null;
     programs: {
@@ -97,9 +94,6 @@ export class RendererWebGL implements IRenderer {
                 },
                 ortho,
                 fov,
-            },
-            directions: {
-                enabled: true
             }
         };
         libraryInterface.configuration.webgl = webglConfiguration;
@@ -124,8 +118,7 @@ export class RendererWebGL implements IRenderer {
         context.viewport(0, 0, width, height);
 
         context.enable(context.BLEND);
-        context.blendFunc(context.SRC_ALPHA, context.ONE_MINUS_SRC_ALPHA);
-        // context.enable(context.DEPTH_TEST);
+        context.blendFunc(context.SRC_ALPHA, context.ONE);
 		context.enable(context.CULL_FACE);
 		context.cullFace(context.BACK);
         context.frontFace(context.CW);
@@ -138,6 +131,7 @@ export class RendererWebGL implements IRenderer {
     private _preStart(libraryInterface: IWebGLLibraryInterface) {
         const { width, height, depth } = libraryInterface.configuration;
         const context = libraryInterface.context;
+        const features = libraryInterface.params.features
         const webgl = libraryInterface.configuration.webgl;
 
         // #region ViewBox
@@ -152,7 +146,7 @@ export class RendererWebGL implements IRenderer {
         cameraEvents.onChange = this._onCameraChange.bind(this)(libraryInterface);
         // #endregion
 
-        if (webgl.directions.enabled) {
+        if (features.includes(Feature.DIRECTIONS)) {
             const directionsProgram = new DirectionsProgram(context, viewBox);
             directionsProgram.init();
             webgl.programs.directions = directionsProgram;
@@ -169,7 +163,7 @@ export class RendererWebGL implements IRenderer {
         libraryInterface.feedProximityDetectionSystem(particles);
 
         // #region QuadTree program
-        if (libraryInterface.params.proximityDetectionSystem === QuadTreeProximityDetectionSystem) {
+        if (libraryInterface.params.proximityDetectionSystem === QuadTreeProximityDetectionSystem && features.includes(Feature.QUAD_TREE)) {
             const quadTreeProgram = new QuadTreeProgram(context, viewBox, libraryInterface);
             quadTreeProgram.init((libraryInterface.getProximityDetectionSystem() as QuadTreeProximityDetectionSystem).quadTree)
             webgl.programs.quadtree = quadTreeProgram;
@@ -177,9 +171,11 @@ export class RendererWebGL implements IRenderer {
         // #endregion
 
         // #region Lines program
-        const linesProgram = new ParticlesLinesProgram(context, viewBox, libraryInterface);
-        linesProgram.init(particles);
-        webgl.programs.lines = linesProgram;
+        if (features.includes(Feature.LINKS)) {
+            const linesProgram = new ParticlesLinesProgram(context, viewBox, libraryInterface);
+            linesProgram.init(particles);
+            webgl.programs.lines = linesProgram;
+        }
         // #endregion
 
         // #region Particles change events
@@ -199,10 +195,12 @@ export class RendererWebGL implements IRenderer {
         const programs = libraryInterface.configuration.webgl.programs;
         if (programs.directions)
             programs.directions.draw();
+        // programs.eye.draw();
         if (programs.quadtree)
             programs.quadtree.draw();
         programs.particles.draw();
-        programs.lines.draw();
+        if (programs.lines)
+            programs.lines.draw();
     }
 
     private _update(libraryInterface: IWebGLLibraryInterface) {
@@ -221,11 +219,11 @@ export class RendererWebGL implements IRenderer {
 
         libraryInterface.feedProximityDetectionSystem(particles);
 
-        performanceMetricsHelper.set('particles', particles);
-
-        programs.lines.useParticles(particles);
-
-        programs.lines.update(libraryInterface.deltaTime, libraryInterface.time);
+        if (programs.lines) {
+            programs.lines.useParticles(particles);
+            programs.lines.update(libraryInterface.deltaTime, libraryInterface.time);
+        }
+        
     }
 
     private _onResize(libraryInterface: IWebGLLibraryInterface) {
@@ -236,8 +234,9 @@ export class RendererWebGL implements IRenderer {
         if (programs.quadtree)
             programs.quadtree.notifyParamChange(UpdateableQuadTreeProgramParam.RESOLUTION);
         programs.particles.notifyParamChange(UpdateableParticlesProgramParam.RESOLUTION);
-        programs.lines.notifyParamChange(UpdateableParticlesProgramParam.RESOLUTION);
-        this._onCameraChange(libraryInterface);
+        if (programs.lines)
+            programs.lines.notifyParamChange(UpdateableParticlesProgramParam.RESOLUTION);
+        this._onCameraChange(libraryInterface)();
         libraryInterface.context.viewport(0, 0, width, height);
     }
 
@@ -250,7 +249,8 @@ export class RendererWebGL implements IRenderer {
             if (webgl.programs.quadtree)
                 webgl.programs.quadtree.notifyParamChange(UpdateableQuadTreeProgramParam.CAMERA);
             webgl.programs.particles.notifyParamChange(UpdateableParticlesProgramParam.CAMERA);
-            webgl.programs.lines.notifyParamChange(UpdateableParticlesProgramParam.CAMERA);
+            if (webgl.programs.lines)
+                webgl.programs.lines.notifyParamChange(UpdateableParticlesProgramParam.CAMERA);
         };
     }
 

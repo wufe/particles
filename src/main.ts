@@ -19,7 +19,10 @@ export const getDefaultParams = (): DefaultObject<Params> => ({
     proximityDetectionSystem: NaiveProximityDetectionSystemBuilder.build(),
     backgroundColor: [0, 0, 0, 0],
     detectRetina: true,
-    features: [],
+    fpsLimit: 0,
+    features: [
+        Feature.LINKS,
+    ],
     camera: {
         enabled: true,
         pitch: 0,
@@ -29,7 +32,8 @@ export const getDefaultParams = (): DefaultObject<Params> => ({
             locked: false
         },
         ortho: false,
-        fov: Math.PI / 5
+        fov: Math.PI / 5,
+        depthOfField: false
     },
     events: {
         resize: {
@@ -158,34 +162,47 @@ export class Main extends DrawingInterface implements ILibraryInterface {
     public deltaTime = 0;
     private _lastPerf = 0;
     private _loop () {
+
+        const fpsLimit = this.params.fpsLimit;
+
         // #region Update
 
         const currentPerf = performance.now();
 
-        const realDelta = currentPerf - this._lastPerf;
-
-        this.deltaTime = Math.min(currentPerf - this._lastPerf, 30);
         
-        this.time += this.deltaTime;
-        this._lastPerf = currentPerf;
+        let delta = currentPerf - this._lastPerf;
+        const fps = 1000 / delta;
 
-        performanceMetricsHelper.set('fps', 1000 / realDelta);
+        if (fpsLimit > 0 && delta < (1000 / fpsLimit) +1) {
+            requestAnimationFrame(this._loop);
+        } else {
+            delta = Math.min(delta, 30);
 
-        this.systems.forEach(system => {
-            (system as BaseParticleSystem).updateInternalParameters(this.deltaTime, this.time);
-            if (system.tick)
-                system.tick(this.deltaTime, this.time);
-        });
-        this._plugin.exec(HookType.UPDATE, this);
-        // #endregion
+            this.deltaTime = delta;
+            
+            this.time += this.deltaTime;
+            this._lastPerf = currentPerf;
+    
+            performanceMetricsHelper.set('fps', fps);
+    
+            this.systems.forEach(system => {
+                (system as BaseParticleSystem).updateInternalParameters(this.deltaTime, this.time);
+                if (system.tick)
+                    system.tick(this.deltaTime, this.time);
+            });
+            this._plugin.exec(HookType.UPDATE, this);
+            // #endregion
+    
+            // #region Draw
+            this._plugin.exec(HookType.CANVAS_CLEAR, this);
+            this._plugin.exec(HookType.DRAW, this);
+            // #endregion
+    
+            // Loop
+            requestAnimationFrame(this._loop);
+        }
 
-        // #region Draw
-        this._plugin.exec(HookType.CANVAS_CLEAR, this);
-        this._plugin.exec(HookType.DRAW, this);
-        // #endregion
-
-        // Loop
-        requestAnimationFrame(this._loop);
+        
     }
 
     notify(type: SystemBridgeEventNotification, system: IParticleSystem) {
@@ -212,7 +229,9 @@ export class Main extends DrawingInterface implements ILibraryInterface {
 }
 
 export enum Feature {
-    LINKS = 'links',
+    LINKS      = 'links',
+    DIRECTIONS = 'directions',
+    QUAD_TREE  = 'quadTree',
 }
 
 export type Params = {
@@ -223,16 +242,18 @@ export type Params = {
     backgroundColor?         : number[];
     detectRetina?            : boolean;
     features?                : Feature[];
+    fpsLimit?                : number;
     camera?: {
         enabled?: boolean;
         pitch?  : number;
         yaw?    : number;
         zoom?   : {
-            value?: number;
+            value? : number;
             locked?: boolean;
         };
-        ortho?  : boolean;
-        fov?    : number;
+        ortho?       : boolean;
+        fov?         : number;
+        depthOfField?: boolean;
     };
     events?: {
         resize?: {

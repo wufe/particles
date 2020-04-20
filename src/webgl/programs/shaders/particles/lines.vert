@@ -1,6 +1,9 @@
 precision highp float;
 
+#define BOUNDARY_MARGIN_PERCENTAGE 10.0
+
 #pragma glslify: vecToAbs = require(../utils/positioning.glsl)
+#pragma glslify: getParticleColor = require(../shared/particle-color.glsl)
 
 attribute vec3 v_position;
 attribute vec4 v_color;
@@ -16,7 +19,8 @@ varying vec4 frag_col;
 
 void main() {
     float distanceCoefficient = clamp(1.0 - (f_distance / 300.0), .05, 1.0);
-    frag_col = vec4(v_color.xyz * distanceCoefficient, distanceCoefficient);
+    float alpha = min(getParticleColor(v_color, v_position, v_res, BOUNDARY_MARGIN_PERCENTAGE).w, distanceCoefficient);
+    frag_col = vec4(v_color.xyz * alpha, alpha);
     vec3 pos = vecToAbs(v_position, v_res);
     // if (pos.x > .9 || pos.x < -.9 || pos.y > .9 || pos.y < -.9 || pos.z > .9 || pos.z < -.9) {
     //     frag_col = vec4(1.0, 0.0, 0.0, 1.0);

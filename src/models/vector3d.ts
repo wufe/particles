@@ -96,6 +96,11 @@ export class Vector3D {
 		this.z = x * vector.y - y * vector.x;
 		return this;
 	}
+
+	static fromArray(components: number[]) {
+		const [x, y, z] = components;
+		return new Vector3D({ x, y, z });
+	}
 }
 
 function checkVector(vector: Vector3D) {

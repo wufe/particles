@@ -106,8 +106,6 @@ export class ParticlesLinesProgram implements IProgram {
             }
         }
 
-        performanceMetricsHelper.set('links', linkPoints);
-
         this.useLinks(linkPoints);
     }
 

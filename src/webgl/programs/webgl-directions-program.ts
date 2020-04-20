@@ -78,24 +78,24 @@ export class DirectionsProgram implements IProgram {
             .3, .3, 1, .2,
 
             -1, -1, -1,
-            1, .3, .3, 1,
+            1, .3, .3, .3,
             1, -1, -1,
-            1, .3, .3, 1,
+            1, .3, .3, .3,
 
             -1, -1, 1,
-            1, .3, .3, 1,
+            1, .3, .3, .3,
             1, -1, 1,
-            1, .3, .3, 1,
+            1, .3, .3, .3,
 
             -1, 1, -1,
-            1, .3, .3, 1,
+            1, .3, .3, .3,
             1, 1, -1,
-            1, .3, .3, 1,
+            1, .3, .3, .3,
 
             -1, 1, 1,
-            1, .3, .3, 1,
+            1, .3, .3, .3,
             1, 1, 1,
-            1, .3, .3, 1,
+            1, .3, .3, .3,
         ]);
     }
 
@@ -115,7 +115,7 @@ export class DirectionsProgram implements IProgram {
 			this._gl.uniformMatrix4fv(this._programContainer.uni(Uni.VIEW), false, this._viewBox.vMat);
             this._gl.uniformMatrix4fv(this._programContainer.uni(Uni.PROJECTION), false, this._viewBox.pMat);
             this._willUpdateParams[UpdateableDirectionsProgramParam.CAMERA] = false;
-        }        
+        }
     }
 
     draw() {
@@ -149,7 +149,9 @@ export class DirectionsProgram implements IProgram {
 
         this._gl.drawArrays(this._gl.LINES, 0, this._vertices.length / this._strideLength);
 
+
         this._gl.disableVertexAttribArray(this._programContainer.attr(Attr.POSITION));
-		this._gl.disableVertexAttribArray(this._programContainer.attr(Attr.COLOR));
+        this._gl.disableVertexAttribArray(this._programContainer.attr(Attr.COLOR));
+
     }
 }

@@ -24,11 +24,13 @@ enum Attr {
 }
 
 enum Uni {
-	RESOLUTION      = 'v_res',
-	WORLD           = 'm_world',
-	VIEW            = 'm_view',
-	PROJECTION      = 'm_projection',
-	T               = 'f_t',
+	RESOLUTION     = 'v_res',
+	WORLD          = 'm_world',
+	VIEW           = 'm_view',
+	PROJECTION     = 'm_projection',
+	EYE            = 'v_eye',
+	T              = 'f_t',
+	DEPTH_OF_FIELD = 'f_dof',
 }
 
 export enum UpdateableParticlesProgramParam {
@@ -154,6 +156,8 @@ export class ParticlesProgram implements IProgram {
             this._gl.uniformMatrix4fv(this._programContainer.uni(Uni.WORLD), false, this._viewBox.wMat);
 			this._gl.uniformMatrix4fv(this._programContainer.uni(Uni.VIEW), false, this._viewBox.vMat);
             this._gl.uniformMatrix4fv(this._programContainer.uni(Uni.PROJECTION), false, this._viewBox.pMat);
+            this._gl.uniform3fv(this._programContainer.uni(Uni.EYE), new Float32Array(this._viewBox.eye.components));
+            this._gl.uniform1f(this._programContainer.uni(Uni.DEPTH_OF_FIELD), +this._libraryInterface.params.camera.depthOfField);
             this._willUpdateParams[UpdateableParticlesProgramParam.CAMERA] = false;
         }        
     }

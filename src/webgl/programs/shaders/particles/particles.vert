@@ -4,6 +4,7 @@ precision highp float;
 
 #pragma glslify: getParticlePosition = require(../shared/particle-position.glsl)
 #pragma glslify: getParticleColor = require(../shared/particle-color.glsl)
+#pragma glslify: getParticleBlur = require(../shared/particle-blur.glsl)
 #pragma glslify: vecToAbs = require(../utils/positioning.glsl)
 
 attribute vec3 v_pos;
@@ -21,9 +22,12 @@ uniform vec3 v_res;
 uniform mat4 m_world;
 uniform mat4 m_view;
 uniform mat4 m_projection;
+uniform vec3 v_eye;
 uniform float f_t;
+uniform float f_dof;
 
 varying vec4 frag_col;
+varying float f_blur;
 
 void main() {
 
@@ -39,8 +43,14 @@ void main() {
     );
     
     frag_col = getParticleColor(v_col, pos, v_res, BOUNDARY_MARGIN_PERCENTAGE);
+    float size = f_size > 0.0 ? f_size: 2.0;
+
+    if (f_dof == 1.0) {
+        f_blur = getParticleBlur(v_pos, v_res, v_eye);
+        size = size * (f_blur / 2.0 + 1.0);
+    }
     
     pos = vecToAbs(pos, v_res);
     gl_Position = m_projection * m_view * m_world * vec4(pos, 1.0);
-    gl_PointSize = f_size > 0.0 ? f_size : 2.0;
+    gl_PointSize = size;
 }

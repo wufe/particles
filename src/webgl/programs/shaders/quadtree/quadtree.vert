@@ -21,6 +21,6 @@ vec3 getPosition(vec3 pos, vec3 res) {
 }
 
 void main() {
-    frag_col = vec4(1.0, 0.9, 0.41, .3);
+    frag_col = vec4(1.0, 0.9, 0.41, .2);
     gl_Position = m_projection * m_view * m_world * vec4(getPosition(v_pos, v_res), 1.0);
 }
