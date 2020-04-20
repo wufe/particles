@@ -19,11 +19,12 @@ enum Attr {
 }
 
 enum Uni {
-	RESOLUTION = 'v_res',
-	WORLD      = 'm_world',
-	VIEW       = 'm_view',
-	PROJECTION = 'm_projection',
-	T          = 'f_t',
+	RESOLUTION   = 'v_res',
+	WORLD        = 'm_world',
+	VIEW         = 'm_view',
+	PROJECTION   = 'm_projection',
+	T            = 'f_t',
+	MAX_DISTANCE = 'f_maxDistance',
 }
 
 export enum UpdateableParticlesProgramParam {
@@ -42,6 +43,7 @@ export class ParticlesLinesProgram implements IProgram {
     private _mapper: ICommittedAttributeMapper<IParticleLinkPoint> | null = null;
     private _lines: IParticleLinkPoint[] = [];
     private _links: ParticleLinkPoint[] = [];
+    private _maxParticleDistance = 300;
     // private _strideLength = 18;
 
     constructor(
@@ -92,7 +94,7 @@ export class ParticlesLinesProgram implements IProgram {
         
         const linkPoints: ParticleLinkPoint[] = [];
         for (const particle of particles) {
-            const neighbours = this._libraryInterface.getNeighbours(particle, 300);
+            const neighbours = this._libraryInterface.getNeighbours(particle, this._maxParticleDistance);
             for (const neighbour of neighbours) {
 
                 const distance = Math.hypot(
@@ -126,6 +128,8 @@ export class ParticlesLinesProgram implements IProgram {
             this._gl.uniformMatrix4fv(this._programContainer.uni(Uni.PROJECTION), false, this._viewBox.pMat);
             this._willUpdateParams[UpdateableParticlesProgramParam.CAMERA] = false;
         }
+
+        this._gl.uniform1f(this._programContainer.uni(Uni.MAX_DISTANCE), this._maxParticleDistance);
     }
 
     draw() {

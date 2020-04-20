@@ -14,7 +14,7 @@ void main() {
     if (f_dof == 1.0) {
         max = max * f_blur;
         if (f_blur > 0.2) {
-            v_color = v_color * (1.0 - (f_blur));
+            // v_color = v_color * (1.0 - (f_blur));
         }
     }
     
