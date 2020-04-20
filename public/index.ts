@@ -11,7 +11,7 @@ init({
     systems: [/*LiquidParticleSystemBuilder.build() as any*/DefaultParticleSystem],
     features: [
         Feature.LINKS,
-        Feature.QUAD_TREE
+        // Feature.QUAD_TREE
     ],
     camera: {
         enabled: true,

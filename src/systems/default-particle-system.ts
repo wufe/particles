@@ -18,8 +18,8 @@ export class DefaultParticleSystem extends BaseParticleSystem implements IPartic
                 const z = Math.random() * depth;
                 const particle = new Particle(new Vector3D({ x, y, z }), this.manager);
                 particle.setColor(153, 255, 153, 1);
-                // particle.setColor(0, 0, 0, 1);
-                particle.setSize({ randomize: true, boundary: { min: 20, max: 30 }})
+                particle.setColor(0, 0, 0, 1);
+                particle.setSize({ randomize: true, boundary: { min: 10, max: 20 }})
                 particle.setVelocity(ParticleDirection.UP, {
                     randomize: true,
                     boundary: {
