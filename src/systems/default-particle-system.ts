@@ -11,7 +11,7 @@ export class DefaultParticleSystem extends BaseParticleSystem implements IPartic
     attach() {
         const { width, height, depth } = this.manager.configuration;
 
-        this.useLinks(30, Unit.VMIN);
+        this.useLinks(20, Unit.VMIN);
 
         this._particles = new Array(300)
             .fill(null)
