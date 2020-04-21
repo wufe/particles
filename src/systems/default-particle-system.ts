@@ -22,26 +22,26 @@ export class DefaultParticleSystem extends BaseParticleSystem implements IPartic
                 const particle = new Particle(new Vector3D({ x, y, z }), this.manager);
                 particle.setColor(153, 255, 153, 1);
                 // particle.setColor(0, 0, 0, 1);
-                particle.setSize({ randomize: true, boundary: { min: 10, max: 20 }})
+                particle.setSize({ randomize: true, boundary: { min: 5, max: 10 }})
                 particle.setVelocity(ParticleDirection.UP, {
                     randomize: true,
                     boundary: {
-                        min: -5,
-                        max: 5
+                        min: -2,
+                        max: 2
                     }
                 });
                 particle.setVelocity(ParticleDirection.RIGHT, {
                     randomize: true,
                     boundary: {
-                        min: -5,
-                        max: 5
+                        min: -2,
+                        max: 2
                     }
                 });
                 particle.setVelocity(ParticleDirection.FRONT, {
                     randomize: true,
                     boundary: {
-                        min: -5,
-                        max: 5
+                        min: -2,
+                        max: 2
                     }
                 });
                 return particle;

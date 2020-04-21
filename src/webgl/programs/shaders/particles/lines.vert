@@ -7,7 +7,7 @@ precision highp float;
 
 attribute vec3 v_position;
 attribute vec4 v_color;
-attribute float f_distance;
+attribute vec3 v_positionOther;
 
 uniform vec3 v_res;
 uniform mat4 m_world;
@@ -19,6 +19,7 @@ uniform float f_maxDistance;
 varying vec4 frag_col;
 
 void main() {
+    float f_distance = distance(v_position, v_positionOther);
     float distanceCoefficient = clamp(1.0 - (f_distance / f_maxDistance), .05, 1.0);
     float alpha = min(getParticleColor(v_color, v_position, v_res, BOUNDARY_MARGIN_PERCENTAGE).w, distanceCoefficient);
     frag_col = vec4(v_color.xyz * alpha, alpha);

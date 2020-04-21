@@ -15,9 +15,9 @@ import { SystemLinksConfiguration } from "../../models/particle-system";
 import { getPxFromUnit } from "../../utils/units";
 
 enum Attr {
-    POSITION = 'v_position',
-    COLOR    = 'v_color',
-    DISTANCE = 'f_distance',
+    POSITION       = 'v_position',
+    COLOR          = 'v_color',
+    POSITION_OTHER = 'v_positionOther',
 }
 
 enum Uni {
@@ -46,7 +46,6 @@ export class ParticlesLinesProgram implements IProgram {
     private _lines: IParticleLinkPoint[] = [];
     private _links: ParticleLinkPoint[] = [];
     private _maxParticleDistance = 300;
-    // private _strideLength = 18;
 
     constructor(
         private _gl: WebGLRenderingContext,
@@ -76,18 +75,10 @@ export class ParticlesLinesProgram implements IProgram {
             .bringYourOwnVertices()
             .addMap(this._programContainer.attr(Attr.POSITION), 3, this._gl.FLOAT, p => p.position)
             .addMap(this._programContainer.attr(Attr.COLOR), 4, this._gl.FLOAT, p => p.color)
-            .addMap(this._programContainer.attr(Attr.DISTANCE), 1, this._gl.FLOAT, p => p.distance)
+            .addMap(this._programContainer.attr(Attr.POSITION_OTHER), 3, this._gl.FLOAT, p => p.positionNeighbour)
             .commit();
 
         this._vectorsBuffer = this._gl.createBuffer();
-    }
-
-    useLinks(linkPoints: IParticleLinkPoint[]) {
-        this._vertices = new Float32Array(linkPoints.map(linkPoint => [
-            linkPoint.position.x, linkPoint.position.y, linkPoint.position.z,
-            linkPoint.color.x, linkPoint.color.y, linkPoint.color.z, linkPoint.color.w,
-            linkPoint.distance
-        ]).flat());
     }
 
     useParticles(particles: IParticle[], linksConfiguration: SystemLinksConfiguration) {
@@ -101,24 +92,26 @@ export class ParticlesLinesProgram implements IProgram {
             height,
             depth
         );
+
+        const vertices: number[] = [];
         
-        const linkPoints: ParticleLinkPoint[] = [];
         for (const particle of particles) {
             const neighbours = this._libraryInterface.getNeighbours(particle, this._maxParticleDistance);
             for (const neighbour of neighbours) {
 
-                const distance = Math.hypot(
-                    neighbour.coords.x - particle.coords.x,
-                    neighbour.coords.y - particle.coords.y,
-                    neighbour.coords.z - particle.coords.z
-                );
+                vertices.push(
+                    particle.coords.x, particle.coords.y, particle.coords.z,
+                    particle.color.x, particle.color.y, particle.color.z, particle.color.w,
+                    neighbour.coords.x, neighbour.coords.y, neighbour.coords.z,
 
-                linkPoints.push(new ParticleLinkPoint(particle.coords, particle.color, distance));
-                linkPoints.push(new ParticleLinkPoint(neighbour.coords, neighbour.color, distance));
+                    neighbour.coords.x, neighbour.coords.y, neighbour.coords.z,
+                    neighbour.color.x, neighbour.color.y, neighbour.color.z, neighbour.color.w,
+                    particle.coords.x, particle.coords.y, particle.coords.z,
+                );
             }
         }
 
-        this.useLinks(linkPoints);
+        this._vertices = new Float32Array(vertices);
     }
 
     update(deltaT: number, T: number): void {

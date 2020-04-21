@@ -11,11 +11,11 @@ export enum ParticleLineEventType {
 export interface IParticleLinkPoint extends IListenable<IParticleLinkPoint, ParticleLineEventType> {
     position: IVector3D;
     color: IVector4D;
-    distance: number;
+    positionNeighbour: IVector3D;
 }
 
 export class ParticleLinkPoint extends ListenableDispatcher<IParticleLinkPoint, ParticleLineEventType> implements IParticleLinkPoint {
-    constructor(public position: IVector3D, public color: IVector4D, public distance: number) {
+    constructor(public position: IVector3D, public color: IVector4D, public positionNeighbour: IVector3D) {
         super();
     }
 
