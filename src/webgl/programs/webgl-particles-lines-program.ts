@@ -11,6 +11,8 @@ import { ParticleEventType } from "../../models/base-particle";
 import { AttributeMapper, ICommittedAttributeMapper } from "./webgl-attribute-mapper";
 import { ParticleLinkPoint, ParticleLineEventType, IParticleLinkPoint } from "../../models/particle-link-point";
 import { performanceMetricsHelper } from "../../utils/performance-metrics";
+import { SystemLinksConfiguration } from "../../models/particle-system";
+import { getPxFromUnit } from "../../utils/units";
 
 enum Attr {
     POSITION = 'v_position',
@@ -60,7 +62,7 @@ export class ParticlesLinesProgram implements IProgram {
         return this._viewBox.getResolutionVector();
     }
 
-    init(particles: IParticle[]) {
+    init() {
 
         this._programContainer = new ProgramContainer<Attr, Uni>(
             this._gl,
@@ -78,8 +80,6 @@ export class ParticlesLinesProgram implements IProgram {
             .commit();
 
         this._vectorsBuffer = this._gl.createBuffer();
-
-        this.useParticles(particles);
     }
 
     useLinks(linkPoints: IParticleLinkPoint[]) {
@@ -90,7 +90,17 @@ export class ParticlesLinesProgram implements IProgram {
         ]).flat());
     }
 
-    useParticles(particles: IParticle[]) {
+    useParticles(particles: IParticle[], linksConfiguration: SystemLinksConfiguration) {
+
+        const { width, height, depth } = this._libraryInterface.configuration;
+
+        this._maxParticleDistance = getPxFromUnit(
+            linksConfiguration.distance,
+            linksConfiguration.unit,
+            width,
+            height,
+            depth
+        );
         
         const linkPoints: ParticleLinkPoint[] = [];
         for (const particle of particles) {

@@ -3,7 +3,7 @@ import { DrawingInterface, IDrawingInterface } from "./drawing/drawing-interface
 import { IRenderer, IRendererBuilder } from "./rendering/renderer";
 import { Renderer2D } from "./rendering/renderer-2d";
 import { getDefault, LazyFactory, DefaultObject } from "./utils/object-utils";
-import { IParticleSystem, IParticleSystemBuilder } from "./models/particle-system";
+import { IParticleSystem, IParticleSystemBuilder, SystemLinksConfiguration } from "./models/particle-system";
 import { ISystemBridge, SystemBridgeEventNotification } from "./drawing/system-bridge";
 import { IParticle } from "./models/particle";
 import { DefaultParticleSystem } from "./systems/default-particle-system";
@@ -49,6 +49,7 @@ export interface ILibraryInterface extends IDrawingInterface, ISystemBridge {
     time: number;
     deltaTime: number;
     getAllParticles: () => IParticle[];
+    getAllLinkableParticles: () => [IParticle[], SystemLinksConfiguration];
     feedProximityDetectionSystem(objects: IParticle[]): void;
     getNeighbours(particle: IParticle, radius: number): IParticle[];
     getProximityDetectionSystem(): IProximityDetectionSystem;
@@ -213,6 +214,19 @@ export class Main extends DrawingInterface implements ILibraryInterface {
 
     getAllParticles() {
         return this.systems.map(system => system.getParticles()).flat();
+    }
+
+    getAllLinkableParticles(): [IParticle[], SystemLinksConfiguration] {
+        let linesConfiguration: SystemLinksConfiguration = { required: false };
+        let particles: IParticle[][] = [];
+        this.systems
+            .forEach(system => {
+                if (system.links.required) {
+                    linesConfiguration = system.links;
+                    particles.push(system.getParticles());
+                }
+            });
+        return [particles.flat(), linesConfiguration];
     }
 
     feedProximityDetectionSystem(objects: IParticle[]) {

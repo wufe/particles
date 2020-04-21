@@ -2,6 +2,7 @@ import { IParticleSystem } from "../models/particle-system";
 import { IParticle, Particle, ParticleDirection } from "../models/particle";
 import { Vector3D } from "../models/vector3d";
 import { BaseParticleSystem } from "./base-particle-system";
+import { Unit } from "../utils/units";
 
 export class DefaultParticleSystem extends BaseParticleSystem implements IParticleSystem {
 
@@ -10,7 +11,9 @@ export class DefaultParticleSystem extends BaseParticleSystem implements IPartic
     attach() {
         const { width, height, depth } = this.manager.configuration;
 
-        this._particles = new Array(100)
+        this.useLinks(30, Unit.VMIN);
+
+        this._particles = new Array(300)
             .fill(null)
             .map(_ => {
                 const x = Math.random() * width;
@@ -18,7 +21,7 @@ export class DefaultParticleSystem extends BaseParticleSystem implements IPartic
                 const z = Math.random() * depth;
                 const particle = new Particle(new Vector3D({ x, y, z }), this.manager);
                 particle.setColor(153, 255, 153, 1);
-                particle.setColor(0, 0, 0, 1);
+                // particle.setColor(0, 0, 0, 1);
                 particle.setSize({ randomize: true, boundary: { min: 10, max: 20 }})
                 particle.setVelocity(ParticleDirection.UP, {
                     randomize: true,

@@ -173,7 +173,7 @@ export class RendererWebGL implements IRenderer {
         // #region Lines program
         if (features.includes(Feature.LINKS)) {
             const linesProgram = new ParticlesLinesProgram(context, viewBox, libraryInterface);
-            linesProgram.init(particles);
+            linesProgram.init();
             webgl.programs.lines = linesProgram;
         }
         // #endregion
@@ -215,13 +215,15 @@ export class RendererWebGL implements IRenderer {
 
         programs.particles.update(libraryInterface.deltaTime, libraryInterface.time);
 
-        const particles = libraryInterface.getAllParticles();
+        const [linkableParticles, linksConfiguration] = libraryInterface.getAllLinkableParticles();
 
-        libraryInterface.feedProximityDetectionSystem(particles);
+        if (linksConfiguration.required) {
+            libraryInterface.feedProximityDetectionSystem(linkableParticles);
 
-        if (programs.lines) {
-            programs.lines.useParticles(particles);
-            programs.lines.update(libraryInterface.deltaTime, libraryInterface.time);
+            if (programs.lines) {
+                programs.lines.useParticles(linkableParticles, linksConfiguration);
+                programs.lines.update(libraryInterface.deltaTime, libraryInterface.time);
+            }
         }
         
     }
