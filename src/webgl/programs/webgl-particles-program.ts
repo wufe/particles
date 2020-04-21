@@ -159,7 +159,7 @@ export class ParticlesProgram implements IProgram {
             this._gl.uniform3fv(this._programContainer.uni(Uni.EYE), new Float32Array(this._viewBox.eye.components));
             this._gl.uniform1f(this._programContainer.uni(Uni.DEPTH_OF_FIELD), +this._libraryInterface.params.camera.depthOfField);
             this._willUpdateParams[UpdateableParticlesProgramParam.CAMERA] = false;
-        }        
+        }
     }
 
     draw() {

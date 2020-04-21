@@ -3,7 +3,7 @@ import { ProgramContainer } from "./webgl-program-container";
 import { ViewBox } from "../camera/view-box";
 import quadTreeVertexShader from "./shaders/quadtree/quadtree.vert";
 import quadTreeFragmentShader from "./shaders/quadtree/quadtree.frag";
-import { IWebGLLibraryInterface } from "../../rendering/renderer-webgl";
+import { IWebGLLibraryInterface, getColor } from "../../rendering/renderer-webgl";
 import { QuadTree, IBoundaryObject } from "../../models/proximity-detection/quad-tree/quad-tree";
 
 enum Attr {
@@ -11,11 +11,12 @@ enum Attr {
 }
 
 enum Uni {
-	RESOLUTION      = 'v_res',
-	WORLD           = 'm_world',
-	VIEW            = 'm_view',
-	PROJECTION      = 'm_projection',
-	T               = 'f_t',
+	RESOLUTION = 'v_res',
+	WORLD      = 'm_world',
+	VIEW       = 'm_view',
+	PROJECTION = 'm_projection',
+	T          = 'f_t',
+	COLOR      = 'v_col',
 }
 
 export enum UpdateableQuadTreeProgramParam {
@@ -33,6 +34,7 @@ export class QuadTreeProgram implements IProgram {
     private _vertices: Float32Array;
     private _quadTree: QuadTree | null;
     private _strideLength = 3;
+    private _color: Float32Array;
 
     constructor(
         private _gl: WebGLRenderingContext,
@@ -57,7 +59,8 @@ export class QuadTreeProgram implements IProgram {
             Object.values(Attr),
             Object.values(Uni),
         );
-
+        const [r, g, b, a] = this._libraryInterface.params.quadtree.color;
+        this._color = new Float32Array(getColor(r, g, b, a));
         this._vectorsBuffer = this._gl.createBuffer();
         this.useQuadTree(quadTree);
     }
@@ -138,6 +141,7 @@ export class QuadTreeProgram implements IProgram {
 
         this._gl.useProgram(this._programContainer.program);
         this._gl.uniform1f(this._programContainer.uni(Uni.T), T);
+        this._gl.uniform4fv(this._programContainer.uni(Uni.COLOR), this._color)
 
         if (this._willUpdateParams[UpdateableQuadTreeProgramParam.RESOLUTION]) {
             this._gl.uniform3fv(this._programContainer.uni(Uni.RESOLUTION), new Float32Array(this.getResolutionVector()));

@@ -78,6 +78,11 @@ export class Vector4D extends Vector3D {
 		// return this;
 		return super.cross(vector);
 	}
+
+	static fromArray(components: number[]) {
+		const [x, y, z, w] = components;
+		return new Vector4D({ x, y, z, w });
+	}
 }
 
 function checkVector(vector: Vector4D) {

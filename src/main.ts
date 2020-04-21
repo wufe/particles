@@ -11,6 +11,7 @@ import { BaseParticleSystem } from "./systems/base-particle-system";
 import { IProximityDetectionSystemBuilder, IProximityDetectionSystem } from "./models/proximity-detection/proximity-detection-system";
 import { NaiveProximityDetectionSystem, NaiveProximityDetectionSystemBuilder } from "./models/proximity-detection/naive-proximity-detection-system";
 import { performanceMetricsHelper } from "./utils/performance-metrics";
+import { IVector4D, Vector4D } from "./models/vector4d";
 
 export const getDefaultParams = (): DefaultObject<Params> => ({
     selectorOrCanvas: '#canvas',
@@ -40,6 +41,10 @@ export const getDefaultParams = (): DefaultObject<Params> => ({
             enabled: true,
             debounce: -1
         }
+    },
+    quadtree: {
+        capacity: 4,
+        color   : [255, 229, 104, .21]
     }
 });
 
@@ -274,6 +279,10 @@ export type Params = {
             enabled?: boolean;
             debounce?: number;
         }
+    };
+    quadtree?: {
+        capacity?: number;
+        color   ?: number[];
     };
     // This parameter should be set by the system, and not by the library
     //particles?          : RecursivePartial<ParticlesProps>;

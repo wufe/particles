@@ -8,6 +8,7 @@ uniform vec3 v_res;
 uniform mat4 m_world;
 uniform mat4 m_view;
 uniform mat4 m_projection;
+uniform vec4 v_col;
 uniform float f_t;
 
 varying vec4 frag_col;
@@ -18,6 +19,6 @@ vec3 getPosition(vec3 pos, vec3 res) {
 }
 
 void main() {
-    frag_col = vec4(1.0, 0.9, 0.41, .21);
+    frag_col = v_col;
     gl_Position = m_projection * m_view * m_world * vec4(getPosition(v_pos, v_res), 1.0);
 }

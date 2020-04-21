@@ -4,6 +4,7 @@ import { IParticleSystemBuilder } from '../src/models/particle-system';
 import { LiquidParticleSystemBuilder, LiquidParticleSystem } from '@wufe/liquid-particle-system';
 import { DefaultParticleSystem } from '../src/systems/default-particle-system';
 import { QuadTreeProximityDetectionSystem } from '../src/models/proximity-detection/quad-tree/quad-tree-proximity-detection-system';
+import { Vector4D } from '../src/models/vector4d';
 
 init({
     selectorOrCanvas: '#canvas',
@@ -31,4 +32,7 @@ init({
             debounce: -1
         }
     },
+    quadtree: {
+        color: [255, 0, 0, .3]
+    }
 })
