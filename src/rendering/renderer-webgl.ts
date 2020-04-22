@@ -194,39 +194,33 @@ export class RendererWebGL implements IRenderer {
 
     private _draw(libraryInterface: IWebGLLibraryInterface) {
         const programs = libraryInterface.configuration.webgl.programs;
-        if (programs.directions)
-            programs.directions.draw();
-        if (programs.quadtree)
-            programs.quadtree.draw();
-        programs.particles.draw();
-        if (programs.lines)
-            programs.lines.draw();
-    }
-
-    private _update(libraryInterface: IWebGLLibraryInterface) {
-        const programs = libraryInterface.configuration.webgl.programs;
-        if (programs.directions)
+        if (programs.directions) {
             programs.directions.update(libraryInterface.deltaTime, libraryInterface.time);
-
+            programs.directions.draw();
+        }
         if (programs.quadtree) {
             programs.quadtree.update(libraryInterface.deltaTime, libraryInterface.time);
             programs.quadtree.useQuadTree((libraryInterface.getProximityDetectionSystem() as QuadTreeProximityDetectionSystem).quadTree);
+            programs.quadtree.draw();
         }
-
         programs.particles.update(libraryInterface.deltaTime, libraryInterface.time);
+        programs.particles.draw();
+        if (programs.lines) {
+            const [linkableParticles, linksConfiguration] = libraryInterface.getAllLinkableParticles();
 
-        const [linkableParticles, linksConfiguration] = libraryInterface.getAllLinkableParticles();
-
-        if (linksConfiguration.required) {
-            libraryInterface.feedProximityDetectionSystem(linkableParticles);
-
-            if (programs.lines) {
-                programs.lines.useParticles(linkableParticles, linksConfiguration);
-                programs.lines.update(libraryInterface.deltaTime, libraryInterface.time);
+            if (linksConfiguration.required) {
+                libraryInterface.feedProximityDetectionSystem(linkableParticles);
+    
+                if (programs.lines) {
+                    programs.lines.useParticles(linkableParticles, linksConfiguration);
+                    programs.lines.update(libraryInterface.deltaTime, libraryInterface.time);
+                }
             }
+            programs.lines.draw();
         }
-        
     }
+
+    private _update(libraryInterface: IWebGLLibraryInterface) {}
 
     private _onResize(libraryInterface: IWebGLLibraryInterface) {
         const {width, height, depth} = libraryInterface.configuration;
