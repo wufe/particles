@@ -138,8 +138,6 @@ export class ParticlesProgram extends BaseProgram<Attr, Uni> implements IProgram
         this._gl.enableVertexAttribArray(this.attr(Attr.POSITION_TRANSITION_END_TIME));
         this._gl.enableVertexAttribArray(this.attr(Attr.POSITION_TRANSITION_EASING_FUNCTION));
 
-        this._gl.useProgram(this.program);
-
         this._gl.bindBuffer(this._gl.ARRAY_BUFFER, this._vectorsBuffer);
         this._gl.bufferData(this._gl.ARRAY_BUFFER, this._vertices, this._gl.STATIC_DRAW);
 

@@ -3,18 +3,12 @@ import { ProgramContainer } from "./webgl-program-container";
 import { ViewBox } from "../camera/view-box";
 import directionsVertexShader from "./shaders/directions/directions.vert";
 import directionsFragmentShader from "./shaders/directions/directions.frag";
+import { BaseProgram } from "./base-webgl-program";
+import { IWebGLLibraryInterface } from "../../rendering/renderer-webgl";
 
 enum Attr {
     POSITION = 'v_pos',
     COLOR    = 'v_col'
-}
-
-enum Uni {
-	RESOLUTION      = 'v_res',
-	WORLD           = 'm_world',
-	VIEW            = 'm_view',
-	PROJECTION      = 'm_projection',
-	T               = 'f_t',
 }
 
 export enum UpdateableDirectionsProgramParam {
@@ -22,23 +16,25 @@ export enum UpdateableDirectionsProgramParam {
     RESOLUTION = 'res',
 }
 
-export class DirectionsProgram implements IProgram {
+export class DirectionsProgram extends BaseProgram<Attr> implements IProgram {
     private _vectorsBuffer: WebGLBuffer;
-    private _programContainer: ProgramContainer;
-    private _willUpdateParams: {[k in UpdateableDirectionsProgramParam]?: boolean} = {
-        cam   : true,
-        res   : true,
-    };
     private _vertices: Float32Array;
     private _strideLength = 7;
 
     constructor(
-        private _gl: WebGLRenderingContext,
-        private _viewBox: ViewBox,
-    ) {}
-
-    notifyParamChange(param: UpdateableDirectionsProgramParam) {
-        this._willUpdateParams[param] = true;
+        gl: WebGLRenderingContext,
+        viewBox: ViewBox,
+        libraryInterface: IWebGLLibraryInterface,
+    ) {
+        super(
+            gl,
+            directionsVertexShader,
+            directionsFragmentShader,
+            Object.values(Attr),
+            Object.values({}),
+            viewBox,
+            libraryInterface
+        );
     }
 
     getResolutionVector() {
@@ -47,14 +43,6 @@ export class DirectionsProgram implements IProgram {
 
     init() {
         this._buildVertices();
-
-        this._programContainer = new ProgramContainer<Attr, Uni>(
-            this._gl,
-            directionsVertexShader,
-            directionsFragmentShader,
-            Object.values(Attr),
-            Object.values(Uni),
-        );
 
         this._vectorsBuffer = this._gl.createBuffer();
     }
@@ -99,36 +87,17 @@ export class DirectionsProgram implements IProgram {
         ]);
     }
 
-    update(deltaT: number, T: number): void {
-        this._willUpdateParams[UpdateableDirectionsProgramParam.CAMERA] = true;
+    draw(deltaT: number, T: number) {
+        super.draw(deltaT, T);
 
-        this._gl.useProgram(this._programContainer.program);
-        this._gl.uniform1f(this._programContainer.uni(Uni.T), T);
-
-        if (this._willUpdateParams[UpdateableDirectionsProgramParam.RESOLUTION]) {
-            this._gl.uniform3fv(this._programContainer.uni(Uni.RESOLUTION), new Float32Array(this.getResolutionVector()));
-            this._willUpdateParams[UpdateableDirectionsProgramParam.RESOLUTION] = false;
-        }
-
-        if (this._willUpdateParams[UpdateableDirectionsProgramParam.CAMERA]) {
-            this._gl.uniformMatrix4fv(this._programContainer.uni(Uni.WORLD), false, this._viewBox.wMat);
-			this._gl.uniformMatrix4fv(this._programContainer.uni(Uni.VIEW), false, this._viewBox.vMat);
-            this._gl.uniformMatrix4fv(this._programContainer.uni(Uni.PROJECTION), false, this._viewBox.pMat);
-            this._willUpdateParams[UpdateableDirectionsProgramParam.CAMERA] = false;
-        }
-    }
-
-    draw() {
-        this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.POSITION));
-		this._gl.enableVertexAttribArray(this._programContainer.attr(Attr.COLOR));
-
-        this._gl.useProgram(this._programContainer.program);
+        this._gl.enableVertexAttribArray(this.attr(Attr.POSITION));
+		this._gl.enableVertexAttribArray(this.attr(Attr.COLOR));
 
         this._gl.bindBuffer(this._gl.ARRAY_BUFFER, this._vectorsBuffer);
         this._gl.bufferData(this._gl.ARRAY_BUFFER, this._vertices, this._gl.STATIC_DRAW);
 
         this._gl.vertexAttribPointer(
-            this._programContainer.attr(Attr.POSITION),
+            this.attr(Attr.POSITION),
             3,
             this._gl.FLOAT,
             false,
@@ -137,7 +106,7 @@ export class DirectionsProgram implements IProgram {
         );
 
         this._gl.vertexAttribPointer(
-			this._programContainer.attr(Attr.COLOR),
+			this.attr(Attr.COLOR),
 			4,
 			this._gl.FLOAT,
 			false,
@@ -150,8 +119,8 @@ export class DirectionsProgram implements IProgram {
         this._gl.drawArrays(this._gl.LINES, 0, this._vertices.length / this._strideLength);
 
 
-        this._gl.disableVertexAttribArray(this._programContainer.attr(Attr.POSITION));
-        this._gl.disableVertexAttribArray(this._programContainer.attr(Attr.COLOR));
+        this._gl.disableVertexAttribArray(this.attr(Attr.POSITION));
+        this._gl.disableVertexAttribArray(this.attr(Attr.COLOR));
 
     }
 }
