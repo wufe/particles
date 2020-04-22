@@ -13,6 +13,7 @@ import { ParticleLinkPoint, ParticleLineEventType, IParticleLinkPoint } from "..
 import { performanceMetricsHelper } from "../../utils/performance-metrics";
 import { SystemLinksConfiguration } from "../../models/particle-system";
 import { getPxFromUnit } from "../../utils/units";
+import { BaseProgram } from "./base-webgl-program";
 
 enum Attr {
     POSITION       = 'v_position',
@@ -21,26 +22,11 @@ enum Attr {
 }
 
 enum Uni {
-	RESOLUTION   = 'v_res',
-	WORLD        = 'm_world',
-	VIEW         = 'm_view',
-	PROJECTION   = 'm_projection',
-	T            = 'f_t',
 	MAX_DISTANCE = 'f_maxDistance',
 }
 
-export enum UpdateableLinesProgramParam {
-    CAMERA = 'cam',
-    RESOLUTION = 'res',
-}
-
-export class ParticlesLinesProgram implements IProgram {
+export class ParticlesLinesProgram extends BaseProgram<Attr, Uni> implements IProgram {
     private _vectorsBuffer: WebGLBuffer;
-    private _programContainer: ProgramContainer;
-    private _willUpdateParams: {[k in UpdateableLinesProgramParam]?: boolean} = {
-        cam   : true,
-        res   : true,
-    };
     private _vertices: Float32Array = new Float32Array([]);
     private _mapper: ICommittedAttributeMapper<IParticleLinkPoint> | null = null;
     private _lines: IParticleLinkPoint[] = [];
@@ -48,34 +34,27 @@ export class ParticlesLinesProgram implements IProgram {
     private _maxParticleDistance = 300;
 
     constructor(
-        private _gl: WebGLRenderingContext,
-        private _viewBox: ViewBox,
-        private _libraryInterface: IWebGLLibraryInterface,
-    ) {}
-
-    notifyParamChange(param: UpdateableLinesProgramParam) {
-        this._willUpdateParams[param] = true;
-    }
-
-    getResolutionVector() {
-        return this._viewBox.getResolutionVector();
-    }
-
-    init() {
-
-        this._programContainer = new ProgramContainer<Attr, Uni>(
-            this._gl,
+        gl: WebGLRenderingContext,
+        viewBox: ViewBox,
+        libraryInterface: IWebGLLibraryInterface,
+    ) {
+        super(
+            gl,
             linesVertexShader,
             linesFragmentShader,
             Object.values(Attr),
             Object.values(Uni),
+            viewBox,
+            libraryInterface
         );
+    }
 
+    init() {
         this._mapper = AttributeMapper.build<IParticleLinkPoint>()
             .bringYourOwnVertices()
-            .addMap(this._programContainer.attr(Attr.POSITION), 3, this._gl.FLOAT, p => p.position)
-            .addMap(this._programContainer.attr(Attr.COLOR), 4, this._gl.FLOAT, p => p.color)
-            .addMap(this._programContainer.attr(Attr.POSITION_OTHER), 3, this._gl.FLOAT, p => p.positionNeighbour)
+            .addMap(this.attr(Attr.POSITION), 3, this._gl.FLOAT, p => p.position)
+            .addMap(this.attr(Attr.COLOR), 4, this._gl.FLOAT, p => p.color)
+            .addMap(this.attr(Attr.POSITION_OTHER), 3, this._gl.FLOAT, p => p.positionNeighbour)
             .commit();
 
         this._vectorsBuffer = this._gl.createBuffer();
@@ -115,33 +94,12 @@ export class ParticlesLinesProgram implements IProgram {
         this._vertices = new Float32Array(vertices);
     }
 
-    update(deltaT: number, T: number): void {
-        this._willUpdateParams[UpdateableLinesProgramParam.CAMERA] = true;
-
-        this._gl.useProgram(this._programContainer.program);
-        this._gl.uniform1f(this._programContainer.uni(Uni.T), T);
-
-        if (this._willUpdateParams[UpdateableLinesProgramParam.RESOLUTION]) {
-            this._gl.uniform3fv(this._programContainer.uni(Uni.RESOLUTION), new Float32Array(this.getResolutionVector()));
-            this._willUpdateParams[UpdateableLinesProgramParam.RESOLUTION] = false;
-        }
-
-        if (this._willUpdateParams[UpdateableLinesProgramParam.CAMERA]) {
-            this._gl.uniformMatrix4fv(this._programContainer.uni(Uni.WORLD), false, this._viewBox.wMat);
-			this._gl.uniformMatrix4fv(this._programContainer.uni(Uni.VIEW), false, this._viewBox.vMat);
-            this._gl.uniformMatrix4fv(this._programContainer.uni(Uni.PROJECTION), false, this._viewBox.pMat);
-            this._willUpdateParams[UpdateableLinesProgramParam.CAMERA] = false;
-        }
-
-        this._gl.uniform1f(this._programContainer.uni(Uni.MAX_DISTANCE), this._maxParticleDistance);
-    }
-
-    draw() {
+    draw(deltaT: number, T: number) {
+        super.draw(deltaT, T);
+        this._gl.uniform1f(this.uni(Uni.MAX_DISTANCE), this._maxParticleDistance);
 
         if (this._vertices.length) {
             this._mapper.enableAttributes(this._gl);
-
-            this._gl.useProgram(this._programContainer.program);
     
             this._gl.bindBuffer(this._gl.ARRAY_BUFFER, this._vectorsBuffer);
             this._gl.bufferData(this._gl.ARRAY_BUFFER, this._vertices, this._gl.STATIC_DRAW);

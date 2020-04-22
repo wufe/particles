@@ -7,8 +7,8 @@ import { ViewBox } from "../webgl/camera/view-box";
 import { CameraEvents } from "../webgl/camera/camera-events";
 import { getDefault } from "../utils/object-utils";
 import { TParticleSystemConfiguration, RendererHook, TWebGLRendererHooksConfiguration } from "../models/particle-system";
-import { ParticlesLinesProgram, UpdateableLinesProgramParam } from "../webgl/programs/webgl-particles-lines-program";
-import { DirectionsProgram, UpdateableDirectionsProgramParam } from "../webgl/programs/webgl-directions-program";
+import { ParticlesLinesProgram } from "../webgl/programs/webgl-particles-lines-program";
+import { DirectionsProgram } from "../webgl/programs/webgl-directions-program";
 import { performanceMetricsHelper } from "../utils/performance-metrics";
 import { QuadTree } from "../models/proximity-detection/quad-tree/quad-tree";
 import { QuadTreeProximityDetectionSystem } from "../models/proximity-detection/quad-tree/quad-tree-proximity-detection-system";
@@ -196,6 +196,9 @@ export class RendererWebGL implements IRenderer {
         if (programs.directions) {
             programs.directions.update(libraryInterface.deltaTime, libraryInterface.time);
         }
+        if (programs.lines) {
+            programs.lines.update(libraryInterface.deltaTime, libraryInterface.time);
+        }
     }
 
     private _draw(libraryInterface: IWebGLLibraryInterface) {
@@ -204,14 +207,6 @@ export class RendererWebGL implements IRenderer {
         if (programs.directions) {
             programs.directions.draw(libraryInterface.deltaTime, libraryInterface.time);
         }
-        
-        if (programs.quadtree) {
-            programs.quadtree.update(libraryInterface.deltaTime, libraryInterface.time);
-            programs.quadtree.useQuadTree((libraryInterface.getProximityDetectionSystem() as QuadTreeProximityDetectionSystem).quadTree);
-            programs.quadtree.draw();
-        }
-        
-        
         if (programs.lines) {
             const [linkableParticles, linksConfiguration] = libraryInterface.getAllLinkableParticles();
 
@@ -223,7 +218,13 @@ export class RendererWebGL implements IRenderer {
                     programs.lines.update(libraryInterface.deltaTime, libraryInterface.time);
                 }
             }
-            programs.lines.draw();
+            programs.lines.draw(libraryInterface.deltaTime, libraryInterface.time);
+        }
+        
+        if (programs.quadtree) {
+            programs.quadtree.update(libraryInterface.deltaTime, libraryInterface.time);
+            programs.quadtree.useQuadTree((libraryInterface.getProximityDetectionSystem() as QuadTreeProximityDetectionSystem).quadTree);
+            programs.quadtree.draw();
         }
     }
 
@@ -236,7 +237,7 @@ export class RendererWebGL implements IRenderer {
             programs.quadtree.notifyParamChange(UpdateableQuadTreeProgramParam.RESOLUTION);
         programs.particles.uniformChanged(BaseUniformAggregationType.RESOLUTION);
         if (programs.lines)
-            programs.lines.notifyParamChange(UpdateableLinesProgramParam.RESOLUTION);
+            programs.lines.uniformChanged(BaseUniformAggregationType.RESOLUTION);
         this._onCameraChange(libraryInterface)();
         libraryInterface.context.viewport(0, 0, width, height);
     }
@@ -251,7 +252,7 @@ export class RendererWebGL implements IRenderer {
                 webgl.programs.quadtree.notifyParamChange(UpdateableQuadTreeProgramParam.CAMERA);
             webgl.programs.particles.uniformChanged(BaseUniformAggregationType.CAMERA);
             if (webgl.programs.lines)
-                webgl.programs.lines.notifyParamChange(UpdateableLinesProgramParam.CAMERA);
+                webgl.programs.lines.uniformChanged(BaseUniformAggregationType.CAMERA);
         };
     }
 

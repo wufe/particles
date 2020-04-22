@@ -11,11 +11,6 @@ enum Attr {
     COLOR    = 'v_col'
 }
 
-export enum UpdateableDirectionsProgramParam {
-    CAMERA = 'cam',
-    RESOLUTION = 'res',
-}
-
 export class DirectionsProgram extends BaseProgram<Attr> implements IProgram {
     private _vectorsBuffer: WebGLBuffer;
     private _vertices: Float32Array;
@@ -35,10 +30,6 @@ export class DirectionsProgram extends BaseProgram<Attr> implements IProgram {
             viewBox,
             libraryInterface
         );
-    }
-
-    getResolutionVector() {
-        return this._viewBox.getResolutionVector();
     }
 
     init() {
