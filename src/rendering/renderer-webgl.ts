@@ -192,6 +192,11 @@ export class RendererWebGL implements IRenderer {
         context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
     }
 
+    private _update(libraryInterface: IWebGLLibraryInterface) {
+        const programs = libraryInterface.configuration.webgl.programs;
+        programs.particles.update(libraryInterface.deltaTime, libraryInterface.time);
+    }
+
     private _draw(libraryInterface: IWebGLLibraryInterface) {
         const programs = libraryInterface.configuration.webgl.programs;
         if (programs.directions) {
@@ -203,8 +208,8 @@ export class RendererWebGL implements IRenderer {
             programs.quadtree.useQuadTree((libraryInterface.getProximityDetectionSystem() as QuadTreeProximityDetectionSystem).quadTree);
             programs.quadtree.draw();
         }
-        programs.particles.update(libraryInterface.deltaTime, libraryInterface.time);
-        programs.particles.draw();
+        
+        programs.particles.draw(libraryInterface.deltaTime, libraryInterface.time);
         if (programs.lines) {
             const [linkableParticles, linksConfiguration] = libraryInterface.getAllLinkableParticles();
 
@@ -219,8 +224,6 @@ export class RendererWebGL implements IRenderer {
             programs.lines.draw();
         }
     }
-
-    private _update(libraryInterface: IWebGLLibraryInterface) {}
 
     private _onResize(libraryInterface: IWebGLLibraryInterface) {
         const {width, height, depth} = libraryInterface.configuration;

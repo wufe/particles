@@ -40,8 +40,10 @@ export class BaseProgram<TAttribs extends string = string, TUniforms extends str
         this._uniformsToUpdate[uniform] = true;
     }
 
-    update(deltaT: number, T: number) {
-        this._gl.useProgram(this.program);
+	update(deltaT: number, T: number) {}
+	
+	draw (deltaT: number, T: number) {
+		this._gl.useProgram(this.program);
         this._gl.uniform1f(this.uni(BaseUniforms.T), T);
         
         if (this._uniformsToUpdate[BaseUniformAggregationType.RESOLUTION]) {
@@ -52,9 +54,7 @@ export class BaseProgram<TAttribs extends string = string, TUniforms extends str
         this._gl.uniformMatrix4fv(this.uni(BaseUniforms.WORLD), false, this._viewBox.wMat);
         this._gl.uniformMatrix4fv(this.uni(BaseUniforms.VIEW), false, this._viewBox.vMat);
 		this._gl.uniformMatrix4fv(this.uni(BaseUniforms.PROJECTION), false, this._viewBox.pMat);
-		const zoom = this._libraryInterface.configuration.webgl.camera.zoom.value;
-		this._gl.uniform1f(this.uni(BaseUniforms.ZOOM), zoom);
-    }
+	}
 
     getResolutionVector() {
         return this._viewBox.getResolutionVector();
