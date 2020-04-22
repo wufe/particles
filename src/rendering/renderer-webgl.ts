@@ -12,7 +12,7 @@ import { DirectionsProgram } from "../webgl/programs/webgl-directions-program";
 import { performanceMetricsHelper } from "../utils/performance-metrics";
 import { QuadTree } from "../models/proximity-detection/quad-tree/quad-tree";
 import { QuadTreeProximityDetectionSystem } from "../models/proximity-detection/quad-tree/quad-tree-proximity-detection-system";
-import { QuadTreeProgram, UpdateableQuadTreeProgramParam } from "../webgl/programs/webgl-quadtree-program";
+import { QuadTreeProgram } from "../webgl/programs/webgl-quadtree-program";
 import { BaseUniformAggregationType } from "../webgl/programs/base-webgl-program";
 
 export enum WebGLProgram {
@@ -193,38 +193,36 @@ export class RendererWebGL implements IRenderer {
     private _update(libraryInterface: IWebGLLibraryInterface) {
         const programs = libraryInterface.configuration.webgl.programs;
         programs.particles.update(libraryInterface.deltaTime, libraryInterface.time);
-        if (programs.directions) {
+        if (programs.directions)
             programs.directions.update(libraryInterface.deltaTime, libraryInterface.time);
-        }
-        if (programs.lines) {
+        if (programs.lines)
             programs.lines.update(libraryInterface.deltaTime, libraryInterface.time);
-        }
+        if (programs.quadtree)
+            programs.quadtree.update(libraryInterface.deltaTime, libraryInterface.time);
     }
 
     private _draw(libraryInterface: IWebGLLibraryInterface) {
         const programs = libraryInterface.configuration.webgl.programs;
+
         programs.particles.draw(libraryInterface.deltaTime, libraryInterface.time);
-        if (programs.directions) {
+
+        if (programs.directions)
             programs.directions.draw(libraryInterface.deltaTime, libraryInterface.time);
-        }
+
         if (programs.lines) {
             const [linkableParticles, linksConfiguration] = libraryInterface.getAllLinkableParticles();
 
             if (linksConfiguration.required) {
                 libraryInterface.feedProximityDetectionSystem(linkableParticles);
     
-                if (programs.lines) {
-                    programs.lines.useParticles(linkableParticles, linksConfiguration);
-                    programs.lines.update(libraryInterface.deltaTime, libraryInterface.time);
-                }
+                programs.lines.useParticles(linkableParticles, linksConfiguration);
             }
             programs.lines.draw(libraryInterface.deltaTime, libraryInterface.time);
         }
         
         if (programs.quadtree) {
-            programs.quadtree.update(libraryInterface.deltaTime, libraryInterface.time);
             programs.quadtree.useQuadTree((libraryInterface.getProximityDetectionSystem() as QuadTreeProximityDetectionSystem).quadTree);
-            programs.quadtree.draw();
+            programs.quadtree.draw(libraryInterface.deltaTime, libraryInterface.time);
         }
     }
 
@@ -234,7 +232,7 @@ export class RendererWebGL implements IRenderer {
         if (programs.directions)
             programs.directions.uniformChanged(BaseUniformAggregationType.RESOLUTION);
         if (programs.quadtree)
-            programs.quadtree.notifyParamChange(UpdateableQuadTreeProgramParam.RESOLUTION);
+            programs.quadtree.uniformChanged(BaseUniformAggregationType.RESOLUTION);
         programs.particles.uniformChanged(BaseUniformAggregationType.RESOLUTION);
         if (programs.lines)
             programs.lines.uniformChanged(BaseUniformAggregationType.RESOLUTION);
@@ -249,7 +247,7 @@ export class RendererWebGL implements IRenderer {
             if (webgl.programs.directions)
                 webgl.programs.directions.uniformChanged(BaseUniformAggregationType.CAMERA);
             if (webgl.programs.quadtree)
-                webgl.programs.quadtree.notifyParamChange(UpdateableQuadTreeProgramParam.CAMERA);
+                webgl.programs.quadtree.uniformChanged(BaseUniformAggregationType.CAMERA);
             webgl.programs.particles.uniformChanged(BaseUniformAggregationType.CAMERA);
             if (webgl.programs.lines)
                 webgl.programs.lines.uniformChanged(BaseUniformAggregationType.CAMERA);

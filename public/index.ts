@@ -11,8 +11,8 @@ init({
     renderer: RendererWebGL,
     systems: [/*LiquidParticleSystemBuilder.build() as any*/DefaultParticleSystem],
     features: [
-        // Feature.LINKS,
-        // Feature.QUAD_TREE
+        Feature.LINKS,
+        Feature.QUAD_TREE
         // Feature.DIRECTIONS,
     ],
     camera: {
