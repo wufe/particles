@@ -29,7 +29,7 @@ enum Uni {
 	MAX_DISTANCE = 'f_maxDistance',
 }
 
-export enum UpdateableParticlesProgramParam {
+export enum UpdateableLinesProgramParam {
     CAMERA = 'cam',
     RESOLUTION = 'res',
 }
@@ -37,7 +37,7 @@ export enum UpdateableParticlesProgramParam {
 export class ParticlesLinesProgram implements IProgram {
     private _vectorsBuffer: WebGLBuffer;
     private _programContainer: ProgramContainer;
-    private _willUpdateParams: {[k in UpdateableParticlesProgramParam]?: boolean} = {
+    private _willUpdateParams: {[k in UpdateableLinesProgramParam]?: boolean} = {
         cam   : true,
         res   : true,
     };
@@ -53,7 +53,7 @@ export class ParticlesLinesProgram implements IProgram {
         private _libraryInterface: IWebGLLibraryInterface,
     ) {}
 
-    notifyParamChange(param: UpdateableParticlesProgramParam) {
+    notifyParamChange(param: UpdateableLinesProgramParam) {
         this._willUpdateParams[param] = true;
     }
 
@@ -115,21 +115,21 @@ export class ParticlesLinesProgram implements IProgram {
     }
 
     update(deltaT: number, T: number): void {
-        this._willUpdateParams[UpdateableParticlesProgramParam.CAMERA] = true;
+        this._willUpdateParams[UpdateableLinesProgramParam.CAMERA] = true;
 
         this._gl.useProgram(this._programContainer.program);
         this._gl.uniform1f(this._programContainer.uni(Uni.T), T);
 
-        if (this._willUpdateParams[UpdateableParticlesProgramParam.RESOLUTION]) {
+        if (this._willUpdateParams[UpdateableLinesProgramParam.RESOLUTION]) {
             this._gl.uniform3fv(this._programContainer.uni(Uni.RESOLUTION), new Float32Array(this.getResolutionVector()));
-            this._willUpdateParams[UpdateableParticlesProgramParam.RESOLUTION] = false;
+            this._willUpdateParams[UpdateableLinesProgramParam.RESOLUTION] = false;
         }
 
-        if (this._willUpdateParams[UpdateableParticlesProgramParam.CAMERA]) {
+        if (this._willUpdateParams[UpdateableLinesProgramParam.CAMERA]) {
             this._gl.uniformMatrix4fv(this._programContainer.uni(Uni.WORLD), false, this._viewBox.wMat);
 			this._gl.uniformMatrix4fv(this._programContainer.uni(Uni.VIEW), false, this._viewBox.vMat);
             this._gl.uniformMatrix4fv(this._programContainer.uni(Uni.PROJECTION), false, this._viewBox.pMat);
-            this._willUpdateParams[UpdateableParticlesProgramParam.CAMERA] = false;
+            this._willUpdateParams[UpdateableLinesProgramParam.CAMERA] = false;
         }
 
         this._gl.uniform1f(this._programContainer.uni(Uni.MAX_DISTANCE), this._maxParticleDistance);

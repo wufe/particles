@@ -6,7 +6,6 @@ export enum BaseUniforms {
 	WORLD          = 'm_world',
 	VIEW           = 'm_view',
 	PROJECTION     = 'm_projection',
-	EYE            = 'v_eye',
 	T              = 'f_t',
 }
 
@@ -17,19 +16,19 @@ export enum BaseUniformAggregationType {
 
 export class BaseProgram<TAttribs extends string = string, TUniforms extends string = string> {
 
-    private _uniformsToUpdate: {[k in (BaseUniformAggregationType | TUniforms)]?: boolean} = {
-        camera    : false,
-        resolution: false,
+    protected _uniformsToUpdate: {[k in (BaseUniformAggregationType | TUniforms)]?: boolean} = {
+        camera    : true,
+        resolution: true,
     };
 
 	constructor(
-		private _gl: WebGLRenderingContext,
-		private _vertexShaderText: string,
-		private _fragmentShaderText: string,
-		private _attributes: TAttribs[],
-        private _uniforms: TUniforms[] = [],
-        private _viewBox: ViewBox,
-        private _libraryInterface: IWebGLLibraryInterface,
+		protected _gl: WebGLRenderingContext,
+		protected _vertexShaderText: string,
+		protected _fragmentShaderText: string,
+		protected _attributes: TAttribs[],
+        protected _uniforms: (TUniforms | BaseUniforms)[] = [],
+        protected _viewBox: ViewBox,
+        protected _libraryInterface: IWebGLLibraryInterface,
 	) {
 		this.compileShaders();
 		this.createProgram();
@@ -41,25 +40,17 @@ export class BaseProgram<TAttribs extends string = string, TUniforms extends str
     }
 
     update(deltaT: number, T: number) {
-        this._uniformsToUpdate[BaseUniformAggregationType.CAMERA] = true;
-
         this._gl.useProgram(this.program);
         this._gl.uniform1f(this.uni(BaseUniforms.T), T);
-
+        
         if (this._uniformsToUpdate[BaseUniformAggregationType.RESOLUTION]) {
             this._gl.uniform3fv(this.uni(BaseUniforms.RESOLUTION), new Float32Array(this.getResolutionVector()));
             this._uniformsToUpdate[BaseUniformAggregationType.RESOLUTION] = false;
         }
-
-        if (this._uniformsToUpdate[BaseUniformAggregationType.CAMERA]) {
-            this._gl.uniformMatrix4fv(this.uni(BaseUniforms.WORLD), false, this._viewBox.wMat);
-			this._gl.uniformMatrix4fv(this.uni(BaseUniforms.VIEW), false, this._viewBox.vMat);
-            this._gl.uniformMatrix4fv(this.uni(BaseUniforms.PROJECTION), false, this._viewBox.pMat);
-            // TODO: Move into child class
-            // this._gl.uniform3fv(this.uni(BaseUniforms.EYE), new Float32Array(this._viewBox.eye.components));
-            // this._gl.uniform1f(this.uni(BaseUniforms.DEPTH_OF_FIELD), +this._libraryInterface.params.camera.depthOfField);
-            this._uniformsToUpdate[BaseUniformAggregationType.CAMERA] = false;
-        }
+        
+        this._gl.uniformMatrix4fv(this.uni(BaseUniforms.WORLD), false, this._viewBox.wMat);
+        this._gl.uniformMatrix4fv(this.uni(BaseUniforms.VIEW), false, this._viewBox.vMat);
+        this._gl.uniformMatrix4fv(this.uni(BaseUniforms.PROJECTION), false, this._viewBox.pMat);
     }
 
     getResolutionVector() {
@@ -101,6 +92,7 @@ export class BaseProgram<TAttribs extends string = string, TUniforms extends str
 	private _attributesLocations: Dictionary<number>;
 	private _uniformsLocations  : Dictionary<WebGLUniformLocation>;
 	private findLocations() {
+        this._uniforms = this._uniforms.concat(Object.values(BaseUniforms));
 		this._attributesLocations =
 			this._attributes
 				.reduce<Dictionary<number>>((acc, att) => {
@@ -118,7 +110,8 @@ export class BaseProgram<TAttribs extends string = string, TUniforms extends str
 						console.warn(`Cannot find uniform ${uni}`);
 					acc[uni] = uniformLocation;
 					return acc;
-				}, {});
+                }, {});
+        console.log(this._uniformsLocations)
 	}
 
 	getAttributeLocation = this.attr;
