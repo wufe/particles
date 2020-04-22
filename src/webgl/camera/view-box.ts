@@ -1,4 +1,4 @@
-import { mat4, ReadonlyVec3 } from "gl-matrix";
+import { mat4, ReadonlyVec3, vec4 } from "gl-matrix";
 import { IWebGLLibraryInterface } from "../../rendering/renderer-webgl";
 import { IVector3D, Vector3D } from "../../models/vector3d";
 

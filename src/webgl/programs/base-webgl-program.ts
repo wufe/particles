@@ -2,11 +2,12 @@ import { ViewBox } from "../camera/view-box";
 import { IWebGLLibraryInterface } from "../../rendering/renderer-webgl";
 
 export enum BaseUniforms {
-    RESOLUTION     = 'v_res',
-	WORLD          = 'm_world',
-	VIEW           = 'm_view',
-	PROJECTION     = 'm_projection',
-	T              = 'f_t',
+    RESOLUTION = 'v_res',
+    WORLD      = 'm_world',
+    VIEW       = 'm_view',
+    PROJECTION = 'm_projection',
+    T          = 'f_t',
+    ZOOM       = 'f_zoom',
 }
 
 export enum BaseUniformAggregationType {
@@ -50,7 +51,9 @@ export class BaseProgram<TAttribs extends string = string, TUniforms extends str
         
         this._gl.uniformMatrix4fv(this.uni(BaseUniforms.WORLD), false, this._viewBox.wMat);
         this._gl.uniformMatrix4fv(this.uni(BaseUniforms.VIEW), false, this._viewBox.vMat);
-        this._gl.uniformMatrix4fv(this.uni(BaseUniforms.PROJECTION), false, this._viewBox.pMat);
+		this._gl.uniformMatrix4fv(this.uni(BaseUniforms.PROJECTION), false, this._viewBox.pMat);
+		const zoom = this._libraryInterface.configuration.webgl.camera.zoom.value;
+		this._gl.uniform1f(this.uni(BaseUniforms.ZOOM), zoom);
     }
 
     getResolutionVector() {
@@ -111,7 +114,6 @@ export class BaseProgram<TAttribs extends string = string, TUniforms extends str
 					acc[uni] = uniformLocation;
 					return acc;
                 }, {});
-        console.log(this._uniformsLocations)
 	}
 
 	getAttributeLocation = this.attr;

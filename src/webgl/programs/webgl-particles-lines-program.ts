@@ -90,7 +90,8 @@ export class ParticlesLinesProgram implements IProgram {
             linksConfiguration.unit,
             width,
             height,
-            depth
+            depth,
+            this._libraryInterface.configuration.pixelRatio
         );
 
         const vertices: number[] = [];

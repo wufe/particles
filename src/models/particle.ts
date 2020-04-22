@@ -151,6 +151,7 @@ export class Particle extends BaseListenableParticle implements IParticle {
                 this.size = valueFromRandomOptions(valueOrRandom);
             }
         }
+        this.size = this.size * this._manager.configuration.pixelRatio;
     }
 
     private _randomOptionIsBoundary(randomOption: TRandomizeBoundary | TRandomizedValueOptions): randomOption is TRandomizeBoundary {

@@ -8,9 +8,9 @@ export enum Unit {
     ABS  = 'abs' // [-1, 1]
 }
 
-export const getPxFromUnit = (length: number, unit: Unit, width: number, height: number, depth: number) => {
+export const getPxFromUnit = (length: number, unit: Unit, width: number, height: number, depth: number, pixelRatio: number) => {
     if (unit === Unit.PX)
-        return length;
+        return length * pixelRatio;
     if (unit === Unit.VW)
         return (length / 100) * width;
     if (unit === Unit.VH)

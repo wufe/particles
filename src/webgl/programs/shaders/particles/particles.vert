@@ -22,12 +22,14 @@ uniform vec3 v_res;
 uniform mat4 m_world;
 uniform mat4 m_view;
 uniform mat4 m_projection;
-uniform vec3 v_eye;
 uniform float f_t;
+uniform float f_zoom;
+uniform vec3 v_eye;
 uniform float f_dof;
 
 varying vec4 frag_col;
 varying float f_blur;
+varying float f_dist;
 
 void main() {
 
@@ -49,8 +51,18 @@ void main() {
         f_blur = getParticleBlur(v_pos, v_res, v_eye);
         size = size * (f_blur / 2.0 + 1.0);
     }
+
+    float minPointScale = 1.1;
+    float maxPointScale = 2.0;
+    float maxZoom = 14.0;
+
+    float pointScale = (1.0 - ((f_zoom - 1.0) / (maxZoom - 1.0))) + 1.0;
+    pointScale = max(pointScale, minPointScale);
+    pointScale = min(pointScale, maxPointScale);
+    pointScale = pointScale / 2.0;
+    gl_PointSize = pow(pointScale, 4.0) * size;
+
     
     pos = vecToAbs(pos, v_res);
-    gl_Position = m_projection * m_view * m_world * vec4(pos, 1.0);
-    gl_PointSize = size;
+    gl_Position = m_projection * m_world * m_view * vec4(pos, 1.0);
 }

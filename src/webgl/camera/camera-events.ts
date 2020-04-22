@@ -103,13 +103,17 @@ export class CameraEvents {
 				}
 			} else if (KEY_PLUS === event.keyCode) {
 				if (!camera.zoom.locked) {
-					camera.zoom.value -= this._zoomSensitivity * 1000;
+					camera.zoom.value -= this._zoomSensitivity * 10000;
+					camera.zoom.value = Math.max(camera.zoom.value, 1);
+					
 					if (this.onChange)
 						this.onChange();
 				}
 			} else if (KEY_MINUS === event.keyCode) {
 				if (!camera.zoom.locked) {
-					camera.zoom.value += this._zoomSensitivity * 1000;
+					camera.zoom.value += this._zoomSensitivity * 10000;
+					
+					camera.zoom.value = Math.min(camera.zoom.value, 14);
 					if (this.onChange)
 						this.onChange();
 				}
