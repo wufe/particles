@@ -18,7 +18,7 @@ export class CameraEvents {
 	private _currMouseY: number;
 	private _isMouseDown = false;
 	private _mouseSensitivity = .01;
-	private _zoomSensitivity = .00005;
+	private _zoomSensitivity = .005;
 
 	public onChange    : () => any;
 	public onForward   : ((sensitivity: number) => any) | null;
@@ -70,6 +70,7 @@ export class CameraEvents {
 	
 		if (!camera.zoom.locked) {
 			canvas.addEventListener('wheel', event => {
+				event.preventDefault();
 				camera.zoom.value += event.deltaY * this._zoomSensitivity;
 				camera.zoom.value = Math.min(10, camera.zoom.value);
 				camera.zoom.value = Math.max(0.001, camera.zoom.value);
@@ -103,7 +104,7 @@ export class CameraEvents {
 				}
 			} else if (KEY_PLUS === event.keyCode) {
 				if (!camera.zoom.locked) {
-					camera.zoom.value -= this._zoomSensitivity * 10000;
+					camera.zoom.value -= this._zoomSensitivity * 100;
 					camera.zoom.value = Math.max(camera.zoom.value, 1);
 					
 					if (this.onChange)
@@ -111,7 +112,7 @@ export class CameraEvents {
 				}
 			} else if (KEY_MINUS === event.keyCode) {
 				if (!camera.zoom.locked) {
-					camera.zoom.value += this._zoomSensitivity * 10000;
+					camera.zoom.value += this._zoomSensitivity * 100;
 					
 					camera.zoom.value = Math.min(camera.zoom.value, 14);
 					if (this.onChange)
