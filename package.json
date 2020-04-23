@@ -7,6 +7,7 @@
   "types": "index.d.ts",
   "scripts": {
     "demo": "run-p watch:client",
+    "demo:build:production": "parcel build -t browser public/index.html -d demo-dist --no-cache",
     "dev": "run-s build:watch",
     "watch:client": "parcel serve -t browser public/index.html -d demo-dist -p 2345 --hmr-port 44412 --no-cache --open",
     "compile": "webpack",
@@ -16,7 +17,8 @@
     "generate:declaration:watch": "rm -rf types && tsc --declaration --emitDeclarationOnly --outDir ./types --watch",
     "build": "run-s generate:declaration compile",
     "build:production": "run-s generate:declaration compile:production",
-    "build:watch": "run-p generate:declaration:watch compile:watch"
+    "build:watch": "run-p generate:declaration:watch compile:watch",
+    "deploy": "pwsh ./scripts/deploy.ps1"
   },
   "devDependencies": {
     "@types/gl-matrix": "^2.4.5",
