@@ -1,11 +1,11 @@
-import { IFeature, TFeatureBuilder } from "./feature";
-import { ILibraryInterface } from "../../main";
-import { RecursivePartial, getDefault } from "../../utils/object-utils";
-import { IProgramBuilder } from "../programs/webgl-program";
-import { QuadTreeProgram } from "../programs/webgl-quadtree-program";
-import { QuadTreeProximityDetectionSystem } from "../../models/proximity-detection/quad-tree/quad-tree-proximity-detection-system";
-import { ViewBox } from "../camera/view-box";
-import { IWebGLLibraryInterface } from "../../rendering/renderer-webgl";
+import { IFeature, TFeatureBuilder } from "../feature";
+import { ILibraryInterface } from "../../../main";
+import { RecursivePartial, getDefault } from "../../../utils/object-utils";
+import { IProgramBuilder } from "../../programs/webgl-program";
+import { QuadTreeProgram } from "./webgl-quadtree-program";
+import { QuadTreeProximityDetectionSystem } from "../../../models/proximity-detection/quad-tree/quad-tree-proximity-detection-system";
+import { ViewBox } from "../../camera/view-box";
+import { IWebGLLibraryInterface } from "../../../rendering/renderer-webgl";
 
 export type TQuadTreeFeatureParams = {
     color: number[];

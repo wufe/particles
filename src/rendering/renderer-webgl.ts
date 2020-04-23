@@ -12,7 +12,7 @@ import { DirectionsProgram } from "../webgl/programs/webgl-directions-program";
 import { performanceMetricsHelper } from "../utils/performance-metrics";
 import { QuadTree } from "../models/proximity-detection/quad-tree/quad-tree";
 import { QuadTreeProximityDetectionSystem } from "../models/proximity-detection/quad-tree/quad-tree-proximity-detection-system";
-import { QuadTreeProgram } from "../webgl/programs/webgl-quadtree-program";
+import { QuadTreeProgram } from "../webgl/features/quadtree/webgl-quadtree-program";
 import { BaseUniformAggregationType } from "../webgl/programs/base-webgl-program";
 import { IFeature } from "../webgl/features/feature";
 import { IProgram } from "../webgl/programs/webgl-program";

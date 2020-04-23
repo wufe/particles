@@ -1,13 +1,13 @@
-import { IProgram } from "./webgl-program";
-import { ProgramContainer } from "./webgl-program-container";
-import { ViewBox } from "../camera/view-box";
-import quadTreeVertexShader from "./shaders/quadtree/quadtree.vert";
-import quadTreeFragmentShader from "./shaders/quadtree/quadtree.frag";
-import { IWebGLLibraryInterface, getColor } from "../../rendering/renderer-webgl";
-import { QuadTree, IBoundaryObject } from "../../models/proximity-detection/quad-tree/quad-tree";
-import { BaseProgram } from "./base-webgl-program";
-import { RecursivePartial, getDefault } from "../../utils/object-utils";
-import { QuadTreeProximityDetectionSystem } from "../../models/proximity-detection/quad-tree/quad-tree-proximity-detection-system";
+import { IProgram } from "../../programs/webgl-program";
+import { ProgramContainer } from "../../programs/webgl-program-container";
+import { ViewBox } from "../../camera/view-box";
+import quadTreeVertexShader from "../../programs/shaders/quadtree/quadtree.vert";
+import quadTreeFragmentShader from "../../programs/shaders/quadtree/quadtree.frag";
+import { IWebGLLibraryInterface, getColor } from "../../../rendering/renderer-webgl";
+import { QuadTree, IBoundaryObject } from "../../../models/proximity-detection/quad-tree/quad-tree";
+import { BaseProgram } from "../../programs/base-webgl-program";
+import { RecursivePartial, getDefault } from "../../../utils/object-utils";
+import { QuadTreeProximityDetectionSystem } from "../../../models/proximity-detection/quad-tree/quad-tree-proximity-detection-system";
 
 enum Attr {
     POSITION = 'v_pos',
