@@ -5,3 +5,4 @@ if (Test-Path -Path $demoDistPath) {
 yarn demo:build:production
 ssh do 'rm -rf /home/particles/*'
 scp -r $demoDistPath/* do:/home/particles
+ssh do 'chmod -R 777 /home/particles'
