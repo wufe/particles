@@ -5,18 +5,17 @@ import { LiquidParticleSystemBuilder, LiquidParticleSystem } from '@wufe/liquid
 import { DefaultParticleSystem } from '../src/systems/default-particle-system';
 import { QuadTreeProximityDetectionSystem } from '../src/models/proximity-detection/quad-tree/quad-tree-proximity-detection-system';
 import { QuadTreeFeatureBuilder } from '../src/webgl/features/quadtree/quadtree-feature';
+import { DirectionsFeatureBuilder } from '../src/webgl/features/directions/directions-feature';
+import { LinksFeatureBuilder } from '../src/webgl/features/links/links-feature';
 
 init({
     selectorOrCanvas: '#canvas',
     renderer: RendererWebGL,
     systems: [/*LiquidParticleSystemBuilder.build() as any*/DefaultParticleSystem],
-    featuresOld: [
-        Feature.LINKS,
-        Feature.QUAD_TREE
-        // Feature.DIRECTIONS,
-    ],
     features: [
-        QuadTreeFeatureBuilder.build({ color: [255, 0, 0, .22] })
+        QuadTreeFeatureBuilder.build({ color: [255, 0, 0, .22] }),
+        DirectionsFeatureBuilder.build(),
+        LinksFeatureBuilder.build(),
     ],
     camera: {
         enabled: true,

@@ -1,19 +1,19 @@
-import { IProgram } from "./webgl-program";
-import { ProgramContainer } from "./webgl-program-container";
-import { ViewBox } from "../camera/view-box";
-import { IParticle, Particle } from "../../models/particle";
-import linesVertexShader from "./shaders/particles/lines.vert";
-import linesFragmentShader from "./shaders/particles/lines.frag";
-import { Vector3D } from "../../models/vector3d";
-import { Vector4D } from "../../models/vector4d";
-import { getColor, IWebGLLibraryInterface } from "../../rendering/renderer-webgl";
-import { ParticleEventType } from "../../models/base-particle";
-import { AttributeMapper, ICommittedAttributeMapper } from "./webgl-attribute-mapper";
-import { ParticleLinkPoint, ParticleLineEventType, IParticleLinkPoint } from "../../models/particle-link-point";
-import { performanceMetricsHelper } from "../../utils/performance-metrics";
-import { SystemLinksConfiguration } from "../../models/particle-system";
-import { getPxFromUnit } from "../../utils/units";
-import { BaseProgram } from "./base-webgl-program";
+import { IProgram } from "../../programs/webgl-program";
+import { ProgramContainer } from "../../programs/webgl-program-container";
+import { ViewBox } from "../../camera/view-box";
+import { IParticle, Particle } from "../../../models/particle";
+import linesVertexShader from "../../programs/shaders/particles/lines.vert";
+import linesFragmentShader from "../../programs/shaders/particles/lines.frag";
+import { Vector3D } from "../../../models/vector3d";
+import { Vector4D } from "../../../models/vector4d";
+import { getColor, IWebGLLibraryInterface } from "../../../rendering/renderer-webgl";
+import { ParticleEventType } from "../../../models/base-particle";
+import { AttributeMapper, ICommittedAttributeMapper } from "../../programs/webgl-attribute-mapper";
+import { ParticleLinkPoint, ParticleLineEventType, IParticleLinkPoint } from "../../../models/particle-link-point";
+import { performanceMetricsHelper } from "../../../utils/performance-metrics";
+import { SystemLinksConfiguration } from "../../../models/particle-system";
+import { getPxFromUnit } from "../../../utils/units";
+import { BaseProgram } from "../../programs/base-webgl-program";
 
 enum Attr {
     POSITION       = 'v_position',
@@ -25,7 +25,7 @@ enum Uni {
 	MAX_DISTANCE = 'f_maxDistance',
 }
 
-export class ParticlesLinesProgram extends BaseProgram<Attr, Uni> implements IProgram {
+export class LinksProgram extends BaseProgram<Attr, Uni> implements IProgram {
     private _vectorsBuffer: WebGLBuffer;
     private _vertices: Float32Array = new Float32Array([]);
     private _mapper: ICommittedAttributeMapper<IParticleLinkPoint> | null = null;
@@ -60,7 +60,7 @@ export class ParticlesLinesProgram extends BaseProgram<Attr, Uni> implements IPr
         this._vectorsBuffer = this._gl.createBuffer();
     }
 
-    useParticles(particles: IParticle[], linksConfiguration: SystemLinksConfiguration) {
+    _useParticles(particles: IParticle[], linksConfiguration: SystemLinksConfiguration) {
 
         const { width, height, depth } = this._libraryInterface.configuration;
 
@@ -92,6 +92,16 @@ export class ParticlesLinesProgram extends BaseProgram<Attr, Uni> implements IPr
         }
 
         this._vertices = new Float32Array(vertices);
+    }
+
+    update(deltaT: number, T: number) {
+        super.update(deltaT, T);
+        const [linkableParticles, linksConfiguration] = this._libraryInterface.getAllLinkableParticles();
+        if (linksConfiguration.required) {
+            this._libraryInterface.feedProximityDetectionSystem(linkableParticles);
+
+            this._useParticles(linkableParticles, linksConfiguration);
+        }
     }
 
     draw(deltaT: number, T: number) {

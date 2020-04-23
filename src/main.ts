@@ -9,9 +9,8 @@ import { IParticle } from "./models/particle";
 import { DefaultParticleSystem } from "./systems/default-particle-system";
 import { BaseParticleSystem } from "./systems/base-particle-system";
 import { IProximityDetectionSystemBuilder, IProximityDetectionSystem } from "./models/proximity-detection/proximity-detection-system";
-import { NaiveProximityDetectionSystem, NaiveProximityDetectionSystemBuilder } from "./models/proximity-detection/naive-proximity-detection-system";
+import { NaiveProximityDetectionSystemBuilder } from "./models/proximity-detection/naive-proximity-detection-system";
 import { performanceMetricsHelper } from "./utils/performance-metrics";
-import { IVector4D, Vector4D } from "./models/vector4d";
 import { TFeatureBuilder } from "./webgl/features/feature";
 
 export const getDefaultParams = (): DefaultObject<Params> => ({
@@ -22,9 +21,6 @@ export const getDefaultParams = (): DefaultObject<Params> => ({
     backgroundColor: [0, 0, 0, 0],
     detectRetina: true,
     fpsLimit: 0,
-    featuresOld: [
-        Feature.LINKS,
-    ],
     features: [],
     camera: {
         enabled: true,
@@ -150,7 +146,6 @@ export class Main extends DrawingInterface implements ILibraryInterface {
     }
 
     private _initSystems() {
-        const {width, height, depth} = this.configuration;
         this.systems.forEach(x => x.attach());
     }
 
@@ -258,7 +253,6 @@ export type Params = {
     proximityDetectionSystem?: IProximityDetectionSystemBuilder;
     backgroundColor?         : number[];
     detectRetina?            : boolean;
-    featuresOld?             : Feature[];
     features?                : TFeatureBuilder[];
     fpsLimit?                : number;
     camera?: {

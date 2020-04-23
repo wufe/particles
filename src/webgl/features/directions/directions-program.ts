@@ -1,10 +1,9 @@
-import { IProgram } from "./webgl-program";
-import { ProgramContainer } from "./webgl-program-container";
-import { ViewBox } from "../camera/view-box";
-import directionsVertexShader from "./shaders/directions/directions.vert";
-import directionsFragmentShader from "./shaders/directions/directions.frag";
-import { BaseProgram } from "./base-webgl-program";
-import { IWebGLLibraryInterface } from "../../rendering/renderer-webgl";
+import { ViewBox } from "../../camera/view-box";
+import directionsVertexShader from "../../programs/shaders/directions/directions.vert";
+import directionsFragmentShader from "../../programs/shaders/directions/directions.frag";
+import { BaseProgram } from "../../programs/base-webgl-program";
+import { IWebGLLibraryInterface } from "../../../rendering/renderer-webgl";
+import { IProgram } from "../../programs/webgl-program";
 
 enum Attr {
     POSITION = 'v_pos',
