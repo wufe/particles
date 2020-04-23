@@ -12,6 +12,7 @@ import { IProximityDetectionSystemBuilder, IProximityDetectionSystem } from "./m
 import { NaiveProximityDetectionSystem, NaiveProximityDetectionSystemBuilder } from "./models/proximity-detection/naive-proximity-detection-system";
 import { performanceMetricsHelper } from "./utils/performance-metrics";
 import { IVector4D, Vector4D } from "./models/vector4d";
+import { TFeatureBuilder } from "./webgl/features/feature";
 
 export const getDefaultParams = (): DefaultObject<Params> => ({
     selectorOrCanvas: '#canvas',
@@ -21,9 +22,10 @@ export const getDefaultParams = (): DefaultObject<Params> => ({
     backgroundColor: [0, 0, 0, 0],
     detectRetina: true,
     fpsLimit: 0,
-    features: [
+    featuresOld: [
         Feature.LINKS,
     ],
+    features: [],
     camera: {
         enabled: true,
         pitch: 0,
@@ -42,10 +44,6 @@ export const getDefaultParams = (): DefaultObject<Params> => ({
             debounce: -1
         }
     },
-    quadtree: {
-        capacity: 4,
-        color   : [255, 229, 104, .21]
-    }
 });
 
 export interface ILibraryInterface extends IDrawingInterface, ISystemBridge {
@@ -260,7 +258,8 @@ export type Params = {
     proximityDetectionSystem?: IProximityDetectionSystemBuilder;
     backgroundColor?         : number[];
     detectRetina?            : boolean;
-    features?                : Feature[];
+    featuresOld?             : Feature[];
+    features?                : TFeatureBuilder[];
     fpsLimit?                : number;
     camera?: {
         enabled?: boolean;
@@ -280,12 +279,6 @@ export type Params = {
             debounce?: number;
         }
     };
-    quadtree?: {
-        capacity?: number;
-        color   ?: number[];
-    };
-    // This parameter should be set by the system, and not by the library
-    //particles?          : RecursivePartial<ParticlesProps>;
 };
 
 export type TConfiguration = {

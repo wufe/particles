@@ -6,6 +6,8 @@ import quadTreeFragmentShader from "./shaders/quadtree/quadtree.frag";
 import { IWebGLLibraryInterface, getColor } from "../../rendering/renderer-webgl";
 import { QuadTree, IBoundaryObject } from "../../models/proximity-detection/quad-tree/quad-tree";
 import { BaseProgram } from "./base-webgl-program";
+import { RecursivePartial, getDefault } from "../../utils/object-utils";
+import { QuadTreeProximityDetectionSystem } from "../../models/proximity-detection/quad-tree/quad-tree-proximity-detection-system";
 
 enum Attr {
     POSITION = 'v_pos',
@@ -13,6 +15,10 @@ enum Attr {
 
 enum Uni {
 	COLOR = 'v_col',
+}
+
+type TQuadTreeProgramParams = {
+    color: number[];
 }
 
 export class QuadTreeProgram extends BaseProgram<Attr, Uni> implements IProgram {
@@ -26,6 +32,7 @@ export class QuadTreeProgram extends BaseProgram<Attr, Uni> implements IProgram 
         gl: WebGLRenderingContext,
         viewBox: ViewBox,
         libraryInterface: IWebGLLibraryInterface,
+        private _params: TQuadTreeProgramParams
     ) {
         super(
             gl,
@@ -38,16 +45,26 @@ export class QuadTreeProgram extends BaseProgram<Attr, Uni> implements IProgram 
         );
     }
 
-    init(quadTree: QuadTree) {
-        const [r, g, b, a] = this._libraryInterface.params.quadtree.color;
-        this._color = new Float32Array(getColor(r, g, b, a));
-        this._vectorsBuffer = this._gl.createBuffer();
-        this.useQuadTree(quadTree);
+    private _getQuadTree() {
+        return (this._libraryInterface.getProximityDetectionSystem() as QuadTreeProximityDetectionSystem).quadTree;
     }
 
-    useQuadTree(quadTree: QuadTree) {
+    init() {
+        const [r, g, b, a] = this._params.color;
+        this._color = new Float32Array(getColor(r, g, b, a));
+        this._vectorsBuffer = this._gl.createBuffer();
+        this._updateQuadTree();
+    }
+
+    private _updateQuadTree() {
+        const quadTree = this._getQuadTree();
         this._quadTree = quadTree;
         this._buildVertices();
+    }
+
+    update(deltaT: number, T: number) {
+        super.update(deltaT, T);
+        this._updateQuadTree();
     }
 
     private _buildVertices() {

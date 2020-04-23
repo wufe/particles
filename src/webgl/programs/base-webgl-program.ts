@@ -1,6 +1,10 @@
 import { ViewBox } from "../camera/view-box";
 import { IWebGLLibraryInterface } from "../../rendering/renderer-webgl";
 
+export interface IBaseProgram<TUniforms extends string = string> {
+	uniformChanged(uniform: BaseUniformAggregationType | TUniforms): void;
+}
+
 export enum BaseUniforms {
     RESOLUTION = 'v_res',
     WORLD      = 'm_world',
@@ -15,7 +19,7 @@ export enum BaseUniformAggregationType {
     RESOLUTION = 'resolution',
 }
 
-export class BaseProgram<TAttribs extends string = string, TUniforms extends string = string> {
+export class BaseProgram<TAttribs extends string = string, TUniforms extends string = string> implements IBaseProgram<TUniforms> {
 
     protected _uniformsToUpdate: {[k in (BaseUniformAggregationType | TUniforms)]?: boolean} = {
         camera    : true,

@@ -2,7 +2,7 @@ import { ILibraryInterface } from "../../main";
 import { IParticle } from "../particle";
 
 export interface IProximityDetectionSystemBuilder {
-    new(manager: ILibraryInterface): IProximityDetectionSystem;
+    new(manager: ILibraryInterface, ...args: any[]): IProximityDetectionSystem;
 }
 
 export interface IProximityDetectionSystem {
