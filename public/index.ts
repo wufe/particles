@@ -13,9 +13,9 @@ init({
     renderer: RendererWebGL,
     systems: [/*LiquidParticleSystemBuilder.build() as any*/DefaultParticleSystem],
     features: [
-        QuadTreeFeatureBuilder.build({ color: [255, 0, 0, .22] }),
-        DirectionsFeatureBuilder.build(),
-        LinksFeatureBuilder.build(),
+        // QuadTreeFeatureBuilder.build({ color: [255, 255, 255, .22] }),
+        // DirectionsFeatureBuilder.build(),
+        // LinksFeatureBuilder.build(),
     ],
     camera: {
         enabled: true,

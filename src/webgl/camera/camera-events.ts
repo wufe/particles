@@ -31,18 +31,79 @@ export class CameraEvents {
 	) {
 		const camera = this._libraryInterface.configuration.webgl.camera;
 
-		canvas.addEventListener('mousedown', event => {
-			this._lastMouseX = event.x;
-			this._lastMouseY = event.y;
+		document.body.style.touchAction = "none";
+
+		let pointerEvents: PointerEvent[] = [];
+		let prevPointerDiff = -1;
+		let isPinchZooming = false;
+
+		const pointerDownHandler = (event: PointerEvent) => {
+			pointerEvents.push(event);
+			isPinchZooming = pointerEvents.length === 2;
+		};
+		const pointerMoveHandler = (event: PointerEvent) => {
+			for (let i = 0; i < pointerEvents.length; i++) {
+				if (event.pointerId === pointerEvents[i].pointerId) {
+					pointerEvents[i] = event;
+					break;
+				}
+			}
+
+			if (pointerEvents.length === 2) {
+				const currentPointerDiff = Math.hypot(
+					pointerEvents[1].clientX - pointerEvents[0].clientX,
+					pointerEvents[1].clientY - pointerEvents[0].clientY);
+
+				if (prevPointerDiff > 0) {
+					if (currentPointerDiff > prevPointerDiff) {
+						camera.zoom.value -= currentPointerDiff * this._zoomSensitivity * .1;
+					}
+					if (currentPointerDiff < prevPointerDiff) {
+						camera.zoom.value += currentPointerDiff * this._zoomSensitivity * .1;
+					}
+
+					camera.zoom.value = Math.min(10, camera.zoom.value);
+						camera.zoom.value = Math.max(0.001, camera.zoom.value);
+						if (this.onChange)
+							this.onChange();
+				}
+				prevPointerDiff = currentPointerDiff;
+			}
+		};
+		const pointerUpHandler = (event: PointerEvent) => {
+			pointerEvents = pointerEvents
+				.filter(x => x.pointerId !== event.pointerId);
+			if (pointerEvents.length < 2)
+				prevPointerDiff = -1;
+			isPinchZooming = pointerEvents.length === 2;
+		};
+
+		canvas.addEventListener('pointerdown', pointerDownHandler);
+		canvas.addEventListener('pointermove', pointerMoveHandler);
+		canvas.addEventListener('pointerup', pointerUpHandler);
+		canvas.addEventListener('pointercancel', pointerUpHandler);
+		canvas.addEventListener('pointerout', pointerUpHandler);
+		canvas.addEventListener('pointerleave', pointerUpHandler);
+
+		const getXY = (event: MouseEvent | TouchEvent) => {
+			if ('x' in event)
+				return {x: event.x, y: event.y};
+			return {x: event.touches[0].clientX, y: event.touches[0].clientY};
+		}
+
+		const mouseDownHandler = (event: MouseEvent) => {
+			const {x, y} = getXY(event);
+			this._lastMouseX = x;
+			this._lastMouseY = y;
 			this._isMouseDown = true;
-		});
-		canvas.addEventListener('mouseup', event => {
-			this._isMouseDown = false;
-		});
-		canvas.addEventListener('mousemove', event => {
+		};
+		const mouseMoveHandler = (event: MouseEvent) => {
+			const {x, y} = getXY(event);
+			event.preventDefault();
+			if (isPinchZooming) return;
 			if (this._isMouseDown) {
-				this._currMouseX = event.x;
-				this._currMouseY = event.y;
+				this._currMouseX = x;
+				this._currMouseY = y;
 				let mouseMovX = (this._currMouseX - this._lastMouseX) * this._mouseSensitivity;
 				let mouseMovY = (this._currMouseY - this._lastMouseY) * this._mouseSensitivity;
 				this._lastMouseX = this._currMouseX;
@@ -52,9 +113,6 @@ export class CameraEvents {
 
 				pitch -= mouseMovX;
 				yaw -= mouseMovY;
-
-				// pitch = Math.max(pitch, -1 * (Math.PI / 2));
-				// pitch = Math.min(pitch, Math.PI / 2);
 
 				yaw = Math.max(yaw, (-1 * (Math.PI / 2)) + .0001);
 				yaw = Math.min(yaw, Math.PI / 2);
@@ -66,7 +124,22 @@ export class CameraEvents {
 					this.onChange();
 				
 			}
-		});
+		};
+		const mouseUpHandler = (event: MouseEvent) => {
+			this._isMouseDown = false;
+		}
+
+		canvas.addEventListener('mousedown', mouseDownHandler);
+		canvas.addEventListener('mouseup', mouseUpHandler);
+		canvas.addEventListener('mousemove', mouseMoveHandler);
+		canvas.addEventListener('mouseleave', mouseUpHandler);
+		canvas.addEventListener('mouseout', mouseUpHandler);
+
+		canvas.addEventListener('touchstart', mouseDownHandler);
+		canvas.addEventListener('touchend', mouseUpHandler);
+		canvas.addEventListener('touchmove', mouseMoveHandler);
+		canvas.addEventListener('touchleave', mouseUpHandler);
+		canvas.addEventListener('touchout', mouseUpHandler);
 	
 		if (!camera.zoom.locked) {
 			canvas.addEventListener('wheel', event => {
