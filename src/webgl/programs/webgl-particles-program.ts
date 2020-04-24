@@ -48,13 +48,14 @@ export class ParticlesProgram extends BaseProgram<Attr, Uni> implements IProgram
         return this._viewBox.getResolutionVector();
     }
 
-    init(particles: IParticle[]) {
-        this.useParticles(particles);
+    init() {
+        this.useParticles();
 
         this._vectorsBuffer = this._gl.createBuffer();
     }
 
-    useParticles(particles: IParticle[]) {
+    useParticles() {
+        const particles = this._libraryInterface.getAllParticles();
         this._emptyEventAttachedParticles();
         this._vertices = new Float32Array(particles
             .map((particle, index) => {

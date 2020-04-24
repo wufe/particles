@@ -160,7 +160,7 @@ export class RendererWebGL implements IRenderer {
 
         // #region Particles program
         const particlesProgram = new ParticlesProgram(context, viewBox, libraryInterface);
-        particlesProgram.init(particles);
+        particlesProgram.init();
         webgl.programs.particles = particlesProgram;
         // #endregion
 
@@ -239,7 +239,7 @@ export class RendererWebGL implements IRenderer {
 
     private _onSystemUpdated(libraryInterface: IWebGLLibraryInterface) {
         const particles = libraryInterface.getAllParticles();
-        libraryInterface.configuration.webgl.programs.particles.useParticles(particles);
+        libraryInterface.configuration.webgl.programs.particles.useParticles();
     }
 
     private _callSystemsConfigurationHooks(libraryInterface: IWebGLLibraryInterface, hookType: RendererHook, params: any[]) {

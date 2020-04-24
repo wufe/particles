@@ -1,9 +1,11 @@
 import { DrawingInterface, IDrawingInterface } from "./drawing/drawing-interface";
 import { IRenderer, IRendererBuilder } from "./rendering/renderer";
 import { DefaultObject } from "./utils/object-utils";
-import { IParticleSystem, IParticleSystemBuilder } from "./models/particle-system";
+import { IParticleSystem, IParticleSystemBuilder, SystemLinksConfiguration } from "./models/particle-system";
 import { ISystemBridge, SystemBridgeEventNotification } from "./drawing/system-bridge";
 import { IParticle } from "./models/particle";
+import { IProximityDetectionSystemBuilder, IProximityDetectionSystem } from "./models/proximity-detection/proximity-detection-system";
+import { TFeatureBuilder } from "./webgl/features/feature";
 export declare const getDefaultParams: () => DefaultObject<Params>;
 export interface ILibraryInterface extends IDrawingInterface, ISystemBridge {
     params: Params;
@@ -11,12 +13,17 @@ export interface ILibraryInterface extends IDrawingInterface, ISystemBridge {
     time: number;
     deltaTime: number;
     getAllParticles: () => IParticle[];
+    getAllLinkableParticles: () => [IParticle[], SystemLinksConfiguration];
+    feedProximityDetectionSystem(objects: IParticle[]): void;
+    getNeighbours(particle: IParticle, radius: number): IParticle[];
+    getProximityDetectionSystem(): IProximityDetectionSystem;
 }
 export declare class Main extends DrawingInterface implements ILibraryInterface {
     params: Params;
     private _plugin;
     configuration: TConfiguration;
     systems: IParticleSystem[];
+    proximityDetectionSystem: IProximityDetectionSystem | null;
     renderer: IRenderer;
     constructor(params: Params);
     start(): void;
@@ -28,20 +35,33 @@ export declare class Main extends DrawingInterface implements ILibraryInterface 
     private _initResizeEventListeners;
     private _configureSize;
     private _initSystems;
+    private _initProximityDetectionSystems;
     private _preStart;
     time: number;
     deltaTime: number;
     private _lastPerf;
     private _loop;
     notify(type: SystemBridgeEventNotification, system: IParticleSystem): void;
-    getAllParticles(): any[];
+    getAllParticles(): IParticle[];
+    getAllLinkableParticles(): [IParticle[], SystemLinksConfiguration];
+    feedProximityDetectionSystem(objects: IParticle[]): void;
+    getNeighbours(particle: IParticle, radius: number): IParticle[];
+    getProximityDetectionSystem(): IProximityDetectionSystem;
+}
+export declare enum Feature {
+    LINKS = "links",
+    DIRECTIONS = "directions",
+    QUAD_TREE = "quadTree"
 }
 export declare type Params = {
     selectorOrCanvas: string | HTMLCanvasElement;
     renderer?: IRendererBuilder;
     systems?: IParticleSystemBuilder[];
+    proximityDetectionSystem?: IProximityDetectionSystemBuilder;
     backgroundColor?: number[];
     detectRetina?: boolean;
+    features?: TFeatureBuilder[];
+    fpsLimit?: number;
     camera?: {
         enabled?: boolean;
         pitch?: number;
@@ -52,6 +72,7 @@ export declare type Params = {
         };
         ortho?: boolean;
         fov?: number;
+        depthOfField?: boolean;
     };
     events?: {
         resize?: {

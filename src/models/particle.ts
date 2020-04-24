@@ -168,7 +168,8 @@ export class Particle extends BaseListenableParticle implements IParticle {
     private _lastTickDelta: number = -1;
     private _lastTickTime: number = -1;
     update(delta: number, time: number) {
-        
+        this._lastTickDelta = delta;
+        this._lastTickTime = time;
         const transition = this._transitionSpecificationBuilder;
 
         if (transition.specification.enabled) {

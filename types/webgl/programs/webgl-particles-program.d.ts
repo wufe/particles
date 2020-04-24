@@ -1,29 +1,34 @@
 import { IProgram } from "./webgl-program";
 import { ViewBox } from "../camera/view-box";
-import { IParticle } from "../../models/particle";
 import { IWebGLLibraryInterface } from "../../rendering/renderer-webgl";
-export declare enum UpdateableParticlesProgramParam {
-    CAMERA = "cam",
-    RESOLUTION = "res"
+import { BaseProgram } from "./base-webgl-program";
+declare enum Attr {
+    POSITION = "v_pos",
+    COLOR = "v_col",
+    SIZE = "f_size",
+    POSITION_TRANSITION_ENABLED = "t_position_enabled",
+    POSITION_TRANSITION_START = "t_position_start",
+    POSITION_TRANSITION_END = "t_position_end",
+    POSITION_TRANSITION_START_TIME = "t_position_start_time",
+    POSITION_TRANSITION_END_TIME = "t_position_end_time",
+    POSITION_TRANSITION_EASING_FUNCTION = "t_position_easing_function"
 }
-export declare class ParticlesProgram implements IProgram {
-    private _gl;
-    private _viewBox;
-    private _libraryInterface;
+declare enum Uni {
+    EYE = "v_eye",
+    DEPTH_OF_FIELD = "f_dof"
+}
+export declare class ParticlesProgram extends BaseProgram<Attr, Uni> implements IProgram {
     private _vectorsBuffer;
-    private _programContainer;
-    private _willUpdateParams;
     private _vertices;
     private _strideLength;
-    constructor(_gl: WebGLRenderingContext, _viewBox: ViewBox, _libraryInterface: IWebGLLibraryInterface);
-    notifyParamChange(param: UpdateableParticlesProgramParam): void;
+    constructor(gl: WebGLRenderingContext, viewBox: ViewBox, libraryInterface: IWebGLLibraryInterface);
     getResolutionVector(): number[];
-    init(particles: IParticle[]): void;
-    useParticles(particles: IParticle[]): void;
+    init(): void;
+    useParticles(): void;
     private _updateEventAttachedParticles;
     private _attachParticleUpdateEventHandler;
     private _onParticleUpdate;
     private _emptyEventAttachedParticles;
-    update(deltaT: number, T: number): void;
-    draw(): void;
+    draw(deltaT: number, T: number): void;
 }
+export {};

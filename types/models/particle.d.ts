@@ -43,6 +43,7 @@ export declare class Particle extends BaseListenableParticle implements IParticl
     alpha: number;
     setVelocity(direction: ParticleDirection, options: RecursivePartial<TVelocityConfigurationOptions> | null): void;
     private _randomizeVectorComponent;
+    setColor(r: number, g: number, b: number, a?: number): void;
     setSize(value: number): void;
     setSize(options: TRandomizeBoundary): void;
     setSize(options: TRandomizedValueOptions): void;

@@ -10,7 +10,7 @@ export declare const ZeroVector4D: {
 };
 export declare class Vector4D extends Vector3D {
     w: number;
-    constructor(_vec?: IVector4D);
+    constructor(vec?: Pick<IVector4D, 'x' | 'y' | 'z' | 'w'>);
     get components(): number[];
     clone(): Vector4D;
     add(vector: IVector3D | IVector4D): Vector4D;
@@ -21,4 +21,5 @@ export declare class Vector4D extends Vector3D {
     get length(): number;
     unit(): this;
     cross(vector: IVector4D): this;
+    static fromArray(components: number[]): Vector4D;
 }

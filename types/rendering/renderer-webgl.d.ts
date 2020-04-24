@@ -3,7 +3,14 @@ import { IRenderer } from "./renderer";
 import { ILibraryInterface } from "../main";
 import { ParticlesProgram } from "../webgl/programs/webgl-particles-program";
 import { ViewBox } from "../webgl/camera/view-box";
-import { ParticlesLinesProgram } from "../webgl/programs/webgl-particles-lines-program";
+import { IFeature } from "../webgl/features/feature";
+import { IProgram } from "../webgl/programs/webgl-program";
+export declare enum WebGLProgram {
+    PARTICLES = "particles",
+    LINES = "lines",
+    DIRECTIONS = "directions",
+    QUADTREE = "quadtree"
+}
 export declare type TWebGLConfiguration = {
     backgroundColor: number[];
     camera: {
@@ -18,9 +25,12 @@ export declare type TWebGLConfiguration = {
         fov: number;
     };
     viewBox: ViewBox | null;
+    features: {
+        feature: IFeature;
+        program?: IProgram;
+    }[];
     programs: {
-        particles: ParticlesProgram | null;
-        lines: ParticlesLinesProgram | null;
+        [WebGLProgram.PARTICLES]: ParticlesProgram | null;
     };
 };
 export interface IWebGLLibraryInterface extends ILibraryInterface {
@@ -39,8 +49,8 @@ export declare class RendererWebGL implements IRenderer {
     private _initCanvas;
     private _preStart;
     private _clearCanvas;
-    private _draw;
     private _update;
+    private _draw;
     private _onResize;
     private _onCameraChange;
     private _onSystemUpdated;

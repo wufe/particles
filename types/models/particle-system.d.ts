@@ -1,6 +1,7 @@
 import { IParticle } from "./particle";
 import { ILibraryInterface } from "../main";
 import { RecursivePartial } from "../utils/object-utils";
+import { Unit } from "../utils/units";
 export declare type TParticleSystemConfiguration = {
     renderer: {
         [renderer: string]: TRendererHooksConfiguration;
@@ -28,4 +29,10 @@ export interface IParticleSystem {
     attach(): void;
     getParticles(): IParticle[];
     tick?: (deltaT: number, T: number) => void;
+    links: SystemLinksConfiguration;
 }
+export declare type SystemLinksConfiguration = {
+    required: boolean;
+    distance?: number;
+    unit?: Unit;
+};
