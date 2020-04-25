@@ -98,7 +98,7 @@ export class LinksProgram extends BaseProgram<Attr, Uni> implements IProgram {
         super.update(deltaT, T);
         const [linkableParticles, linksConfiguration] = this._libraryInterface.getAllLinkableParticles();
         if (linksConfiguration.required) {
-            this._libraryInterface.feedProximityDetectionSystem(linkableParticles);
+            // this._libraryInterface.feedProximityDetectionSystem(linkableParticles);
 
             this._useParticles(linkableParticles, linksConfiguration);
         }

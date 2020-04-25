@@ -190,6 +190,9 @@ export class RendererWebGL implements IRenderer {
         const webgl = libraryInterface.configuration.webgl;
         const programs = webgl.programs;
         programs.particles.update(libraryInterface.deltaTime, libraryInterface.time);
+        
+        const particles = libraryInterface.getAllParticles();
+        libraryInterface.feedProximityDetectionSystem(particles);
 
         webgl.features.forEach(({program}) => {
             if (program)
