@@ -1,6 +1,6 @@
 import { ILibraryInterface } from "../main";
 import { SystemBridgeEventNotification } from "../drawing/system-bridge";
-import { IParticleSystem, TParticleSystemConfiguration, SystemLinksConfiguration } from "../models/particle-system";
+import { IParticleSystem, TSystemLinksConfiguration } from "../models/particle-system";
 import { IParticle } from "../models/particle";
 import { RecursivePartial } from "../utils/object-utils";
 import { SystemTimer, TTimerHandle } from "./timers/system-timer";
@@ -9,7 +9,7 @@ import { Unit } from "../utils/units";
 export abstract class BaseParticleSystem implements IParticleSystem {
     abstract attach(): void;
     abstract getParticles(): IParticle[];
-    public links: SystemLinksConfiguration = { required: false };
+    public links: TSystemLinksConfiguration = { required: false };
 
     protected _lastTickDelta = -1;
     protected _lastTickTime = -1;
@@ -28,8 +28,6 @@ export abstract class BaseParticleSystem implements IParticleSystem {
         this._lastTickTime = time;
         this._systemTimer.check(time);
     }
-
-    public static configuration?: RecursivePartial<TParticleSystemConfiguration>;
 
     setTimeout(callback: () => any, timeout: number) {
         return this._systemTimer.add(callback, this._lastTickTime, this._lastTickTime + timeout, false);

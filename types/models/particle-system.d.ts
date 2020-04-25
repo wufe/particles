@@ -1,37 +1,16 @@
 import { IParticle } from "./particle";
 import { ILibraryInterface } from "../main";
-import { RecursivePartial } from "../utils/object-utils";
 import { Unit } from "../utils/units";
-export declare type TParticleSystemConfiguration = {
-    renderer: {
-        [renderer: string]: TRendererHooksConfiguration;
-    };
+export declare type TParticleSystemBuilder = {
+    build(manager: ILibraryInterface): IParticleSystem;
 };
-export declare enum RendererHook {
-    INIT_CONTEXT = "initContext",
-    INIT_CANVAS = "initCanvas"
-}
-export declare type TRendererHooksConfiguration = {
-    [h in RendererHook]: TRendererHook<any>;
-};
-export declare type TRendererHook<T> = (p: T) => any;
-export declare type TRendererContextHook<T extends RenderingContext = RenderingContext> = TRendererHook<T>;
-export declare type TRendererCanvasHook = TRendererHook<HTMLCanvasElement>;
-export declare type TWebGLRendererHooksConfiguration = TRendererHooksConfiguration & {
-    [RendererHook.INIT_CONTEXT]: TRendererContextHook<WebGLRenderingContext>;
-    [RendererHook.INIT_CANVAS]: TRendererCanvasHook;
-};
-export interface IParticleSystemBuilder {
-    new (manager: ILibraryInterface): IParticleSystem;
-    configuration?: RecursivePartial<TParticleSystemConfiguration>;
-}
 export interface IParticleSystem {
     attach(): void;
     getParticles(): IParticle[];
     tick?: (deltaT: number, T: number) => void;
-    links: SystemLinksConfiguration;
+    links: TSystemLinksConfiguration;
 }
-export declare type SystemLinksConfiguration = {
+export declare type TSystemLinksConfiguration = {
     required: boolean;
     distance?: number;
     unit?: Unit;

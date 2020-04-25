@@ -1,8 +1,8 @@
 import { init, Feature } from '../src/main';
 import { RendererWebGL } from '../src/rendering/renderer-webgl';
-import { IParticleSystemBuilder } from '../src/models/particle-system';
+import { TParticleSystemBuilder } from '../src/models/particle-system';
 import { LiquidParticleSystemBuilder, LiquidParticleSystem } from '@wufe/liquid-particle-system';
-import { DefaultParticleSystem } from '../src/systems/default-particle-system';
+import { DefaultParticleSystem, DefaultParticleSystemBuilder } from '../src/systems/default-particle-system';
 import { QuadTreeFeatureBuilder, QuadTreeProximityDetectionSystem } from '@wufe/particles-quadtree';
 import { DirectionsFeatureBuilder } from '../src/webgl/features/directions/directions-feature';
 import { LinksFeatureBuilder } from '../src/webgl/features/links/links-feature';
@@ -12,7 +12,9 @@ import { IProximityDetectionSystemBuilder } from '../src/models/proximity-detect
 init({
     selectorOrCanvas: '#canvas',
     renderer: RendererWebGL,
-    systems: [/*LiquidParticleSystemBuilder.build() as any*/DefaultParticleSystem],
+    systems: [/*LiquidParticleSystemBuilder.build() as any*/DefaultParticleSystemBuilder.build({
+        color: [13, 41, 57, 1]
+    })],
     features: [
         // QuadTreeFeatureBuilder.build({ color: [255, 255, 255, .22] }) as any as TFeatureBuilder,
         // DirectionsFeatureBuilder.build(),

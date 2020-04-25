@@ -3,10 +3,10 @@ import { DrawingInterface, IDrawingInterface } from "./drawing/drawing-interface
 import { IRenderer, IRendererBuilder } from "./rendering/renderer";
 import { Renderer2D } from "./rendering/renderer-2d";
 import { getDefault, LazyFactory, DefaultObject } from "./utils/object-utils";
-import { IParticleSystem, IParticleSystemBuilder, SystemLinksConfiguration } from "./models/particle-system";
+import { IParticleSystem, TParticleSystemBuilder, TSystemLinksConfiguration } from "./models/particle-system";
 import { ISystemBridge, SystemBridgeEventNotification } from "./drawing/system-bridge";
 import { IParticle } from "./models/particle";
-import { DefaultParticleSystem } from "./systems/default-particle-system";
+import { DefaultParticleSystem, DefaultParticleSystemBuilder } from "./systems/default-particle-system";
 import { BaseParticleSystem } from "./systems/base-particle-system";
 import { IProximityDetectionSystemBuilder, IProximityDetectionSystem } from "./models/proximity-detection/proximity-detection-system";
 import { NaiveProximityDetectionSystemBuilder } from "./models/proximity-detection/naive-proximity-detection-system";
@@ -16,7 +16,7 @@ import { TFeatureBuilder } from "./webgl/features/feature";
 export const getDefaultParams = (): DefaultObject<Params> => ({
     selectorOrCanvas: '#canvas',
     renderer: new LazyFactory(() => Renderer2D),
-    systems: [DefaultParticleSystem],
+    systems: [DefaultParticleSystemBuilder.build()],
     proximityDetectionSystem: NaiveProximityDetectionSystemBuilder.build(),
     backgroundColor: [0, 0, 0, 0],
     detectRetina: true,
@@ -48,7 +48,7 @@ export interface ILibraryInterface extends IDrawingInterface, ISystemBridge {
     time: number;
     deltaTime: number;
     getAllParticles: () => IParticle[];
-    getAllLinkableParticles: () => [IParticle[], SystemLinksConfiguration];
+    getAllLinkableParticles: () => [IParticle[], TSystemLinksConfiguration];
     feedProximityDetectionSystem(objects: IParticle[]): void;
     getNeighbours(particle: IParticle, radius: number): IParticle[];
     getProximityDetectionSystem(): IProximityDetectionSystem;
@@ -82,7 +82,7 @@ export class Main extends DrawingInterface implements ILibraryInterface {
 
     private _initParams() {
         this.params = getDefault(this.params, getDefaultParams());
-        this.systems = this.params.systems.map(builder => new builder(this));
+        this.systems = this.params.systems.map(builder => builder.build(this));
         this.proximityDetectionSystem = new this.params.proximityDetectionSystem(this);
         this.renderer = new this.params.renderer(this._plugin);
         let canvas = this.params.selectorOrCanvas;
@@ -214,8 +214,8 @@ export class Main extends DrawingInterface implements ILibraryInterface {
         return this.systems.map(system => system.getParticles()).flat();
     }
 
-    getAllLinkableParticles(): [IParticle[], SystemLinksConfiguration] {
-        let linesConfiguration: SystemLinksConfiguration = { required: false };
+    getAllLinkableParticles(): [IParticle[], TSystemLinksConfiguration] {
+        let linesConfiguration: TSystemLinksConfiguration = { required: false };
         let particles: IParticle[][] = [];
         this.systems
             .forEach(system => {
@@ -249,7 +249,7 @@ export enum Feature {
 export type Params = {
     selectorOrCanvas         : string | HTMLCanvasElement;
     renderer?                : IRendererBuilder;
-    systems?                 : IParticleSystemBuilder[];
+    systems?                 : TParticleSystemBuilder[];
     proximityDetectionSystem?: IProximityDetectionSystemBuilder;
     backgroundColor?         : number[];
     detectRetina?            : boolean;

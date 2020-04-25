@@ -54,5 +54,4 @@ export declare class RendererWebGL implements IRenderer {
     private _onResize;
     private _onCameraChange;
     private _onSystemUpdated;
-    private _callSystemsConfigurationHooks;
 }

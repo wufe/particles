@@ -1,17 +1,37 @@
-import { IParticleSystem } from "../models/particle-system";
+import { IParticleSystem, TParticleSystemBuilder } from "../models/particle-system";
 import { IParticle, Particle, ParticleDirection } from "../models/particle";
 import { Vector3D } from "../models/vector3d";
 import { BaseParticleSystem } from "./base-particle-system";
 import { Unit } from "../utils/units";
+import { RecursivePartial, getDefault } from "../utils/object-utils";
+import { ILibraryInterface } from "../main";
+
+type TDefaultParticleSystemParams = {
+    color: number[];
+}
+
+export class DefaultParticleSystemBuilder {
+    static build = (partialParams?: RecursivePartial<TDefaultParticleSystemParams>): TParticleSystemBuilder => ({
+        build: (manager: ILibraryInterface) => new DefaultParticleSystem(manager, getDefault(partialParams, {
+            color: [153, 255, 153, 1]
+        }))
+    })
+}
 
 export class DefaultParticleSystem extends BaseParticleSystem implements IParticleSystem {
 
     private _particles: IParticle[] = [];
 
+    constructor(manager: ILibraryInterface, private _params: TDefaultParticleSystemParams) {
+        super(manager);
+    }
+
     attach() {
         const { width, height, depth } = this.manager.configuration;
 
         this.useLinks(20, Unit.VMIN);
+
+        const [r, g, b, a] = this._params.color;
 
         this._particles = new Array(300)
             .fill(null)
@@ -20,8 +40,7 @@ export class DefaultParticleSystem extends BaseParticleSystem implements IPartic
                 const y = Math.random() * height;
                 const z = Math.random() * depth;
                 const particle = new Particle(new Vector3D({ x, y, z }), this.manager);
-                particle.setColor(153, 255, 153, 1);
-                // particle.setColor(0, 0, 0, 1);
+                particle.setColor(r, g, b, a);
                 particle.setSize({ value: 20, randomize: true, boundary: { min: 20, max: 30 }})
                 particle.setVelocity(ParticleDirection.UP, {
                     randomize: true,

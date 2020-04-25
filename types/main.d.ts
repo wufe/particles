@@ -1,7 +1,7 @@
 import { DrawingInterface, IDrawingInterface } from "./drawing/drawing-interface";
 import { IRenderer, IRendererBuilder } from "./rendering/renderer";
 import { DefaultObject } from "./utils/object-utils";
-import { IParticleSystem, IParticleSystemBuilder, SystemLinksConfiguration } from "./models/particle-system";
+import { IParticleSystem, TParticleSystemBuilder, TSystemLinksConfiguration } from "./models/particle-system";
 import { ISystemBridge, SystemBridgeEventNotification } from "./drawing/system-bridge";
 import { IParticle } from "./models/particle";
 import { IProximityDetectionSystemBuilder, IProximityDetectionSystem } from "./models/proximity-detection/proximity-detection-system";
@@ -13,7 +13,7 @@ export interface ILibraryInterface extends IDrawingInterface, ISystemBridge {
     time: number;
     deltaTime: number;
     getAllParticles: () => IParticle[];
-    getAllLinkableParticles: () => [IParticle[], SystemLinksConfiguration];
+    getAllLinkableParticles: () => [IParticle[], TSystemLinksConfiguration];
     feedProximityDetectionSystem(objects: IParticle[]): void;
     getNeighbours(particle: IParticle, radius: number): IParticle[];
     getProximityDetectionSystem(): IProximityDetectionSystem;
@@ -43,7 +43,7 @@ export declare class Main extends DrawingInterface implements ILibraryInterface 
     private _loop;
     notify(type: SystemBridgeEventNotification, system: IParticleSystem): void;
     getAllParticles(): IParticle[];
-    getAllLinkableParticles(): [IParticle[], SystemLinksConfiguration];
+    getAllLinkableParticles(): [IParticle[], TSystemLinksConfiguration];
     feedProximityDetectionSystem(objects: IParticle[]): void;
     getNeighbours(particle: IParticle, radius: number): IParticle[];
     getProximityDetectionSystem(): IProximityDetectionSystem;
@@ -56,7 +56,7 @@ export declare enum Feature {
 export declare type Params = {
     selectorOrCanvas: string | HTMLCanvasElement;
     renderer?: IRendererBuilder;
-    systems?: IParticleSystemBuilder[];
+    systems?: TParticleSystemBuilder[];
     proximityDetectionSystem?: IProximityDetectionSystemBuilder;
     backgroundColor?: number[];
     detectRetina?: boolean;

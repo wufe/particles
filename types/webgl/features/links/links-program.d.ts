@@ -2,7 +2,7 @@ import { IProgram } from "../../programs/webgl-program";
 import { ViewBox } from "../../camera/view-box";
 import { IParticle } from "../../../models/particle";
 import { IWebGLLibraryInterface } from "../../../rendering/renderer-webgl";
-import { SystemLinksConfiguration } from "../../../models/particle-system";
+import { TSystemLinksConfiguration } from "../../../models/particle-system";
 import { BaseProgram } from "../../programs/base-webgl-program";
 declare enum Attr {
     POSITION = "v_position",
@@ -21,7 +21,7 @@ export declare class LinksProgram extends BaseProgram<Attr, Uni> implements IPro
     private _maxParticleDistance;
     constructor(gl: WebGLRenderingContext, viewBox: ViewBox, libraryInterface: IWebGLLibraryInterface);
     init(): void;
-    _useParticles(particles: IParticle[], linksConfiguration: SystemLinksConfiguration): void;
+    _useParticles(particles: IParticle[], linksConfiguration: TSystemLinksConfiguration): void;
     update(deltaT: number, T: number): void;
     draw(deltaT: number, T: number): void;
 }

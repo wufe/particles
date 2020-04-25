@@ -1,3 +1,4 @@
+.cache
 src
 public
 webpack.config.js

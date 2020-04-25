@@ -11,7 +11,7 @@ import { ParticleEventType } from "../../../models/base-particle";
 import { AttributeMapper, ICommittedAttributeMapper } from "../../programs/webgl-attribute-mapper";
 import { ParticleLinkPoint, ParticleLineEventType, IParticleLinkPoint } from "../../../models/particle-link-point";
 import { performanceMetricsHelper } from "../../../utils/performance-metrics";
-import { SystemLinksConfiguration } from "../../../models/particle-system";
+import { TSystemLinksConfiguration } from "../../../models/particle-system";
 import { getPxFromUnit } from "../../../utils/units";
 import { BaseProgram } from "../../programs/base-webgl-program";
 
@@ -60,7 +60,7 @@ export class LinksProgram extends BaseProgram<Attr, Uni> implements IProgram {
         this._vectorsBuffer = this._gl.createBuffer();
     }
 
-    _useParticles(particles: IParticle[], linksConfiguration: SystemLinksConfiguration) {
+    _useParticles(particles: IParticle[], linksConfiguration: TSystemLinksConfiguration) {
 
         const { width, height, depth } = this._libraryInterface.configuration;
 
