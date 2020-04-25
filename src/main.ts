@@ -12,6 +12,8 @@ import { IProximityDetectionSystemBuilder, IProximityDetectionSystem } from "./m
 import { NaiveProximityDetectionSystemBuilder } from "./models/proximity-detection/naive-proximity-detection-system";
 import { performanceMetricsHelper } from "./utils/performance-metrics";
 import { TFeatureBuilder } from "./webgl/features/feature";
+import { Subject } from "./utils/observable";
+import { Params, ILibraryInterface, TOnResize } from "./library-interface";
 
 export const getDefaultParams = (): DefaultObject<Params> => ({
     selectorOrCanvas: '#canvas',
@@ -42,18 +44,6 @@ export const getDefaultParams = (): DefaultObject<Params> => ({
     },
 });
 
-export interface ILibraryInterface extends IDrawingInterface, ISystemBridge {
-    params: Params;
-    configuration: TConfiguration;
-    time: number;
-    deltaTime: number;
-    getAllParticles: () => IParticle[];
-    getAllLinkableParticles: () => [IParticle[], TSystemLinksConfiguration];
-    feedProximityDetectionSystem(objects: IParticle[]): void;
-    getNeighbours(particle: IParticle, radius: number): IParticle[];
-    getProximityDetectionSystem(): IProximityDetectionSystem;
-}
-
 export class Main extends DrawingInterface implements ILibraryInterface {
     private _plugin = new PluginAdapter();
     public configuration: TConfiguration = {
@@ -62,6 +52,8 @@ export class Main extends DrawingInterface implements ILibraryInterface {
     public systems: IParticleSystem[] = [];
     public proximityDetectionSystem: IProximityDetectionSystem | null = null;;
     public renderer: IRenderer = null;
+
+    onResize = new Subject<TOnResize>();
 
     constructor(public params: Params) {
         super();
@@ -138,11 +130,13 @@ export class Main extends DrawingInterface implements ILibraryInterface {
                 this.configuration.isRetina = false;
             }
         }
+        const depth = Math.max(width, height);
         this.configuration.width  = width;
         this.configuration.height = height;
-        this.configuration.depth  = Math.max(width, height);
+        this.configuration.depth  = depth;
         this.canvas.width         = width;
         this.canvas.height        = height;
+        this.onResize.next({ width, height, depth, isRetina: this.configuration.isRetina, pixelRatio: this.configuration.pixelRatio });
     }
 
     private _initSystems() {
@@ -240,40 +234,7 @@ export class Main extends DrawingInterface implements ILibraryInterface {
     }
 }
 
-export enum Feature {
-    LINKS      = 'links',
-    DIRECTIONS = 'directions',
-    QUAD_TREE  = 'quadTree',
-}
 
-export type Params = {
-    selectorOrCanvas         : string | HTMLCanvasElement;
-    renderer?                : IRendererBuilder;
-    systems?                 : TParticleSystemBuilder[];
-    proximityDetectionSystem?: IProximityDetectionSystemBuilder;
-    backgroundColor?         : number[];
-    detectRetina?            : boolean;
-    features?                : TFeatureBuilder[];
-    fpsLimit?                : number;
-    camera?: {
-        enabled?: boolean;
-        pitch?  : number;
-        yaw?    : number;
-        zoom?   : {
-            value? : number;
-            locked?: boolean;
-        };
-        ortho?       : boolean;
-        fov?         : number;
-        depthOfField?: boolean;
-    };
-    events?: {
-        resize?: {
-            enabled?: boolean;
-            debounce?: number;
-        }
-    };
-};
 
 export type TConfiguration = {
     pixelRatio?            : number;

@@ -1,4 +1,4 @@
-import { init, Feature } from '../src/main';
+import { init } from '../src/main';
 import { RendererWebGL } from '../src/rendering/renderer-webgl';
 import { TParticleSystemBuilder } from '../src/models/particle-system';
 import { LiquidParticleSystemBuilder, LiquidParticleSystem } from '@wufe/liquid-particle-system';

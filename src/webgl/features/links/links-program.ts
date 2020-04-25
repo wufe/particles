@@ -12,7 +12,7 @@ import { AttributeMapper, ICommittedAttributeMapper } from "../../programs/webgl
 import { ParticleLinkPoint, ParticleLineEventType, IParticleLinkPoint } from "../../../models/particle-link-point";
 import { performanceMetricsHelper } from "../../../utils/performance-metrics";
 import { TSystemLinksConfiguration } from "../../../models/particle-system";
-import { getPxFromUnit } from "../../../utils/units";
+import { getPxFromUnit, Unit } from "../../../utils/units";
 import { BaseProgram } from "../../programs/base-webgl-program";
 
 enum Attr {
@@ -29,9 +29,15 @@ export class LinksProgram extends BaseProgram<Attr, Uni> implements IProgram {
     private _vectorsBuffer: WebGLBuffer;
     private _vertices: Float32Array = new Float32Array([]);
     private _mapper: ICommittedAttributeMapper<IParticleLinkPoint> | null = null;
-    private _lines: IParticleLinkPoint[] = [];
-    private _links: ParticleLinkPoint[] = [];
     private _maxParticleDistance = 300;
+
+    private _distance = 300;
+    private _unit = Unit.PX;
+
+    private _width = 0;
+    private _height = 0;
+    private _depth = 0;
+    private _pixelRatio = 1;
 
     constructor(
         gl: WebGLRenderingContext,
@@ -58,20 +64,21 @@ export class LinksProgram extends BaseProgram<Attr, Uni> implements IProgram {
             .commit();
 
         this._vectorsBuffer = this._gl.createBuffer();
+
+        this._libraryInterface.onResize.subscribe(({ width, height, depth, pixelRatio }) => {
+            if (width !== this._width || height !== this._height || depth !== this._depth || pixelRatio !== this._pixelRatio) {
+                this._width = width;
+                this._height = height;
+                this._depth = depth;
+                this._pixelRatio = pixelRatio;
+                this._calculateMaxDistance();
+            }
+        });
     }
 
     _useParticles(particles: IParticle[], linksConfiguration: TSystemLinksConfiguration) {
 
         const { width, height, depth } = this._libraryInterface.configuration;
-
-        this._maxParticleDistance = getPxFromUnit(
-            linksConfiguration.distance,
-            linksConfiguration.unit,
-            width,
-            height,
-            depth,
-            this._libraryInterface.configuration.pixelRatio
-        );
 
         const vertices: number[] = [];
         
@@ -98,10 +105,31 @@ export class LinksProgram extends BaseProgram<Attr, Uni> implements IProgram {
         super.update(deltaT, T);
         const [linkableParticles, linksConfiguration] = this._libraryInterface.getAllLinkableParticles();
         if (linksConfiguration.required) {
-            // this._libraryInterface.feedProximityDetectionSystem(linkableParticles);
+            
+            const { distance, unit } = linksConfiguration;
+
+            if (distance !== this._distance || unit !== this._unit) {
+                this._distance = linksConfiguration.distance;
+                this._unit = linksConfiguration.unit;
+
+                this._calculateMaxDistance();
+            }
 
             this._useParticles(linkableParticles, linksConfiguration);
         }
+    }
+
+    private _calculateMaxDistance() {
+        const {_distance, _unit, _width, _height, _depth, _pixelRatio} = this;
+
+        this._maxParticleDistance = getPxFromUnit(
+            _distance,
+            _unit,
+            _width,
+            _height,
+            _depth,
+            _pixelRatio
+        );
     }
 
     draw(deltaT: number, T: number) {

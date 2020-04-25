@@ -1,3 +1,4 @@
+export * from './library-interface';
 export * from './main';
 export * from './models/base-particle';
 export * from './models/particle';
