@@ -1,4 +1,4 @@
-#pragma glslify: vecToAbs = require(../utils/positioning.glsl)
+#pragma glslify: vecToAbs = require(./positioning.glsl)
 
 float getParticleBlur(vec3 v_pos, vec3 v_res, vec3 v_eye) {
     vec3 v_normalizedPos = vecToAbs(v_pos, v_res);

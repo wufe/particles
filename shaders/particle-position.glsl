@@ -1,4 +1,4 @@
-#pragma glslify: vec3Easing = require(../utils/easing.glsl)
+#pragma glslify: vec3Easing = require(./easing.glsl)
 
 vec3 getParticlePosition(
     vec3 v_pos,

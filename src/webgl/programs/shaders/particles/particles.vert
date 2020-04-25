@@ -2,10 +2,10 @@ precision highp float;
 
 #define BOUNDARY_MARGIN_PERCENTAGE 10.0
 
-#pragma glslify: getParticlePosition = require(../shared/particle-position.glsl)
-#pragma glslify: getParticleColor = require(../shared/particle-color.glsl)
-#pragma glslify: getParticleBlur = require(../shared/particle-blur.glsl)
-#pragma glslify: vecToAbs = require(../utils/positioning.glsl)
+#pragma glslify: getParticlePosition = require(../../../../../shaders/particle-position.glsl)
+#pragma glslify: getParticleColor = require(../../../../../shaders/particle-color.glsl)
+#pragma glslify: getParticleBlur = require(../../../../../shaders/particle-blur.glsl)
+#pragma glslify: vecToAbs = require(../../../../../shaders/positioning.glsl)
 
 attribute vec3 v_pos;
 attribute vec4 v_col;

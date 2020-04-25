@@ -1,8 +1,8 @@
 import { IProgram } from "../../programs/webgl-program";
 import { ProgramContainer } from "../../programs/webgl-program-container";
 import { ViewBox } from "../../camera/view-box";
-import quadTreeVertexShader from "../../programs/shaders/quadtree/quadtree.vert";
-import quadTreeFragmentShader from "../../programs/shaders/quadtree/quadtree.frag";
+import quadTreeVertexShader from "./shaders/quadtree.vert";
+import quadTreeFragmentShader from "./shaders/quadtree.frag";
 import { IWebGLLibraryInterface, getColor } from "../../../rendering/renderer-webgl";
 import { QuadTree, IBoundaryObject } from "../../../models/proximity-detection/quad-tree/quad-tree";
 import { BaseProgram } from "../../programs/base-webgl-program";
@@ -43,6 +43,7 @@ export class QuadTreeProgram extends BaseProgram<Attr, Uni> implements IProgram 
             viewBox,
             libraryInterface
         );
+        console.log(quadTreeVertexShader)
     }
 
     private _getQuadTree() {

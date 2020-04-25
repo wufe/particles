@@ -1,6 +1,6 @@
 precision highp float;
 
-#pragma glslify: vecToAbs = require(../utils/positioning.glsl)
+#pragma glslify: vecToAbs = require(../../../../../shaders/positioning.glsl)
 
 attribute vec3 v_pos;
 
