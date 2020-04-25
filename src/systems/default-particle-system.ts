@@ -5,15 +5,20 @@ import { BaseParticleSystem } from "./base-particle-system";
 import { Unit } from "../utils/units";
 import { RecursivePartial, getDefault } from "../utils/object-utils";
 import { ILibraryInterface } from "../main";
+import { TRandomizedValueOptions, valueFromRandomOptions } from "../utils/random";
 
 type TDefaultParticleSystemParams = {
     color: number[];
+    count: TRandomizedValueOptions;
+    size: TRandomizedValueOptions;
 }
 
 export class DefaultParticleSystemBuilder {
     static build = (partialParams?: RecursivePartial<TDefaultParticleSystemParams>): TParticleSystemBuilder => ({
         build: (manager: ILibraryInterface) => new DefaultParticleSystem(manager, getDefault(partialParams, {
-            color: [153, 255, 153, 1]
+            color: [153, 255, 153, 1],
+            size: { value: 10, randomize: false, boundary: { min: 20, max: 30 }},
+            count: { value: 300, randomize: false, boundary: { min: 100, max: 200 }}
         }))
     })
 }
@@ -33,7 +38,7 @@ export class DefaultParticleSystem extends BaseParticleSystem implements IPartic
 
         const [r, g, b, a] = this._params.color;
 
-        this._particles = new Array(300)
+        this._particles = new Array(Math.floor(valueFromRandomOptions(this._params.count)))
             .fill(null)
             .map(_ => {
                 const x = Math.random() * width;
@@ -41,7 +46,7 @@ export class DefaultParticleSystem extends BaseParticleSystem implements IPartic
                 const z = Math.random() * depth;
                 const particle = new Particle(new Vector3D({ x, y, z }), this.manager);
                 particle.setColor(r, g, b, a);
-                particle.setSize({ value: 20, randomize: true, boundary: { min: 20, max: 30 }})
+                particle.setSize(this._params.size)
                 particle.setVelocity(ParticleDirection.UP, {
                     randomize: true,
                     boundary: {

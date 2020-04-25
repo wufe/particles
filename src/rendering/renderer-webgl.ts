@@ -110,7 +110,9 @@ export class RendererWebGL implements IRenderer {
         context.viewport(0, 0, width, height);
 
         context.enable(context.BLEND);
-        context.blendFunc(context.SRC_ALPHA, context.ONE);
+        context.blendEquation(context.FUNC_ADD)
+        context.blendFunc(context.ONE, context.ONE_MINUS_SRC_ALPHA);
+        context.blendFuncSeparate(context.SRC_ALPHA, context.ONE_MINUS_SRC_ALPHA, context.ONE, context.ONE_MINUS_SRC_COLOR)
 		context.enable(context.CULL_FACE);
 		context.cullFace(context.BACK);
         context.frontFace(context.CW);

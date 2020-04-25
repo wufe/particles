@@ -13,7 +13,9 @@ init({
     selectorOrCanvas: '#canvas',
     renderer: RendererWebGL,
     systems: [/*LiquidParticleSystemBuilder.build() as any*/DefaultParticleSystemBuilder.build({
-        color: [13, 41, 57, 1]
+        color: [13, 41, 57, 1],
+        count: { value: 500 },
+        size: { value: 30 }
     })],
     features: [
         // QuadTreeFeatureBuilder.build({ color: [255, 255, 255, .22] }) as any as TFeatureBuilder,
