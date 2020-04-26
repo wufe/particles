@@ -1,18 +1,23 @@
 import { IParticle } from "./particle";
 import { ISystemBridge } from "../drawing/system-bridge";
-import { ILibraryInterface } from "../main";
 import { RecursivePartial } from "../utils/object-utils";
 import { Unit } from "../utils/units";
+import { ILibraryInterface } from "../library-interface";
 
 export type TParticleSystemBuilder = {
     build(manager: ILibraryInterface): IParticleSystem;
+}
+
+export enum ParticleSystemRequiredFeature {
+    LINKS               = 'links',
+    PROXIMITY_DETECTION = 'proximityDetection',
 }
 
 export interface IParticleSystem {
     attach(): void;
     getParticles(): IParticle[];
     tick?: (deltaT: number, T: number) => void;
-    links: TSystemLinksConfiguration;
+    requirements: ParticleSystemRequiredFeature[];
 }
 
 export type TSystemLinksConfiguration = {

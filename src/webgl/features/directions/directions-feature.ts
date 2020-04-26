@@ -1,9 +1,9 @@
 import { RecursivePartial, getDefault } from "../../../utils/object-utils"
 import { TFeatureBuilder, IFeature } from "../feature"
-import { ILibraryInterface } from "../../../main"
 import { DirectionsProgram } from "./directions-program"
 import { ViewBox } from "../../camera/view-box"
 import { IWebGLLibraryInterface } from "../../../rendering/renderer-webgl"
+import { ILibraryInterface } from "../../../library-interface"
 
 export type TDirectionsFeatureParams = {}
 

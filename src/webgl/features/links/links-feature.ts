@@ -1,18 +1,25 @@
 import { RecursivePartial, getDefault } from "../../../utils/object-utils"
 import { TFeatureBuilder, IFeature } from "../feature"
-import { ILibraryInterface } from "../../../main"
 import { LinksProgram } from "./links-program"
 import { ViewBox } from "../../camera/view-box"
 import { IWebGLLibraryInterface } from "../../../rendering/renderer-webgl"
+import { ILibraryInterface } from "../../../library-interface"
+import { Unit } from "../../../utils/units"
 
 export type TLinksFeatureParams = {
-    // distance ???
+    distance: {
+        value: number;
+        unit: Unit;
+    }
 }
 
 export class LinksFeatureBuilder {
     static build = (partialParams?: RecursivePartial<TLinksFeatureParams>): TFeatureBuilder => ({
         build: (manager: ILibraryInterface) => new LinksFeature(manager, getDefault(partialParams, {
-            // distance ?
+            distance: {
+                value: 15,
+                unit: Unit.VMIN
+            }
         }))
     })
 }
@@ -26,7 +33,7 @@ class LinksFeature implements IFeature {
     isAvailable = () => true;
 
     buildProgram(gl: WebGLRenderingContext, viewBox: ViewBox, libraryInterface: IWebGLLibraryInterface, ...args: any[]) {
-        this._program = new LinksProgram(gl, viewBox, libraryInterface);
+        this._program = new LinksProgram(gl, viewBox, libraryInterface, this._params);
         return this;
     }
 

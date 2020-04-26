@@ -1,5 +1,5 @@
 import { PluginAdapter, HookType } from "../plugin/plugin-adapter";
-import { IRenderer } from "./renderer";
+import { IRenderer, TRendererBuilder } from "./renderer";
 import { ParticlesProgram } from "../webgl/programs/webgl-particles-program";
 import { ViewBox } from "../webgl/camera/view-box";
 import { CameraEvents } from "../webgl/camera/camera-events";
@@ -7,6 +7,7 @@ import { BaseUniformAggregationType } from "../webgl/programs/base-webgl-program
 import { IFeature } from "../webgl/features/feature";
 import { IProgram } from "../webgl/programs/webgl-program";
 import { ILibraryInterface } from "../library-interface";
+import { ParticleSystemRequiredFeature } from "../models/particle-system";
 
 export enum WebGLProgram {
     PARTICLES  = 'particles',
@@ -45,7 +46,13 @@ export interface IWebGLLibraryInterface extends ILibraryInterface {
 export const getColor = (r: number, g: number, b: number, a: number = 1) =>
     [ (1 / 255) * r, (1 / 255) * g, (1 / 255) * b, a ];
 
-export class RendererWebGL implements IRenderer {
+export class RendererWebGLBuilder {
+    static build = (): TRendererBuilder => ({
+        build: pluginAdapter => new RendererWebGL(pluginAdapter)
+    })
+}
+
+class RendererWebGL implements IRenderer {
 
     constructor(private _pluginAdapter: PluginAdapter) {}
 
@@ -145,7 +152,7 @@ export class RendererWebGL implements IRenderer {
         cameraEvents.onChange = this._onCameraChange.bind(this)(libraryInterface);
         // #endregion
 
-        const particles = libraryInterface.getAllParticles();
+        // const particles = libraryInterface.getAllParticles();
 
         // #region Particles program
         const particlesProgram = new ParticlesProgram(context, viewBox, libraryInterface);
@@ -153,7 +160,8 @@ export class RendererWebGL implements IRenderer {
         webgl.programs.particles = particlesProgram;
         // #endregion
 
-        libraryInterface.feedProximityDetectionSystem(particles);
+        const proximityDetectionParticles = libraryInterface.getParticlesBySystemFeature(ParticleSystemRequiredFeature.PROXIMITY_DETECTION);
+        libraryInterface.feedProximityDetectionSystem(proximityDetectionParticles);
 
         // #region Feature programs
         webgl.features.forEach(({program}) => {

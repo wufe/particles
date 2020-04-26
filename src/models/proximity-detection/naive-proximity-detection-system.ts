@@ -1,7 +1,7 @@
 import { IProximityDetectionSystem } from "./proximity-detection-system";
-import { ILibraryInterface } from "../../main";
 import { RecursivePartial, getDefault } from "../../utils/object-utils";
 import { IParticle } from "../particle";
+import { ILibraryInterface } from "../../library-interface";
 
 export type TNativeProximityDetectionSystemParams = {
     radius: number;

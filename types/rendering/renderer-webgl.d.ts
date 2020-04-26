@@ -1,10 +1,9 @@
-import { PluginAdapter } from "../plugin/plugin-adapter";
-import { IRenderer } from "./renderer";
-import { ILibraryInterface } from "../main";
+import { TRendererBuilder } from "./renderer";
 import { ParticlesProgram } from "../webgl/programs/webgl-particles-program";
 import { ViewBox } from "../webgl/camera/view-box";
 import { IFeature } from "../webgl/features/feature";
 import { IProgram } from "../webgl/programs/webgl-program";
+import { ILibraryInterface } from "../library-interface";
 export declare enum WebGLProgram {
     PARTICLES = "particles",
     LINES = "lines",
@@ -40,18 +39,6 @@ export interface IWebGLLibraryInterface extends ILibraryInterface {
     };
 }
 export declare const getColor: (r: number, g: number, b: number, a?: number) => number[];
-export declare class RendererWebGL implements IRenderer {
-    private _pluginAdapter;
-    constructor(_pluginAdapter: PluginAdapter);
-    register(): void;
-    private _initRenderer;
-    private _initContext;
-    private _initCanvas;
-    private _preStart;
-    private _clearCanvas;
-    private _update;
-    private _draw;
-    private _onResize;
-    private _onCameraChange;
-    private _onSystemUpdated;
+export declare class RendererWebGLBuilder {
+    static build: () => TRendererBuilder;
 }

@@ -1,14 +1,18 @@
 import { IParticle } from "./particle";
-import { ILibraryInterface } from "../main";
 import { Unit } from "../utils/units";
+import { ILibraryInterface } from "../library-interface";
 export declare type TParticleSystemBuilder = {
     build(manager: ILibraryInterface): IParticleSystem;
 };
+export declare enum ParticleSystemRequiredFeature {
+    LINKS = "links",
+    PROXIMITY_DETECTION = "proximityDetection"
+}
 export interface IParticleSystem {
     attach(): void;
     getParticles(): IParticle[];
     tick?: (deltaT: number, T: number) => void;
-    links: TSystemLinksConfiguration;
+    requirements: ParticleSystemRequiredFeature[];
 }
 export declare type TSystemLinksConfiguration = {
     required: boolean;

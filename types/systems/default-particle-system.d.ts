@@ -2,9 +2,12 @@ import { IParticleSystem, TParticleSystemBuilder } from "../models/particle-syst
 import { IParticle } from "../models/particle";
 import { BaseParticleSystem } from "./base-particle-system";
 import { RecursivePartial } from "../utils/object-utils";
-import { ILibraryInterface } from "../main";
+import { TRandomizedValueOptions } from "../utils/random";
+import { ILibraryInterface } from "../library-interface";
 declare type TDefaultParticleSystemParams = {
     color: number[];
+    count: TRandomizedValueOptions;
+    size: TRandomizedValueOptions;
 };
 export declare class DefaultParticleSystemBuilder {
     static build: (partialParams?: RecursivePartial<TDefaultParticleSystemParams>) => TParticleSystemBuilder;

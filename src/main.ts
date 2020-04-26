@@ -1,9 +1,9 @@
 import { PluginAdapter, HookType } from "./plugin/plugin-adapter";
 import { DrawingInterface, IDrawingInterface } from "./drawing/drawing-interface";
-import { IRenderer, IRendererBuilder } from "./rendering/renderer";
-import { Renderer2D } from "./rendering/renderer-2d";
+import { IRenderer, TRendererBuilder } from "./rendering/renderer";
+import { Renderer2DBuilder } from "./rendering/renderer-2d";
 import { getDefault, LazyFactory, DefaultObject } from "./utils/object-utils";
-import { IParticleSystem, TParticleSystemBuilder, TSystemLinksConfiguration } from "./models/particle-system";
+import { IParticleSystem, TParticleSystemBuilder, TSystemLinksConfiguration, ParticleSystemRequiredFeature } from "./models/particle-system";
 import { ISystemBridge, SystemBridgeEventNotification } from "./drawing/system-bridge";
 import { IParticle } from "./models/particle";
 import { DefaultParticleSystem, DefaultParticleSystemBuilder } from "./systems/default-particle-system";
@@ -14,10 +14,11 @@ import { performanceMetricsHelper } from "./utils/performance-metrics";
 import { TFeatureBuilder } from "./webgl/features/feature";
 import { Subject, BehaviorSubject, IObservable, ISubject } from "./utils/observable";
 import { Params, ILibraryInterface, TOnResize } from "./library-interface";
+import { RendererWebGLBuilder } from "./rendering/renderer-webgl";
 
 export const getDefaultParams = (): DefaultObject<Params> => ({
     selectorOrCanvas: '#canvas',
-    renderer: new LazyFactory(() => Renderer2D),
+    renderer: RendererWebGLBuilder.build(),
     systems: [DefaultParticleSystemBuilder.build()],
     proximityDetectionSystem: NaiveProximityDetectionSystemBuilder.build(),
     backgroundColor: [0, 0, 0, 0],
@@ -76,7 +77,7 @@ export class Main extends DrawingInterface implements ILibraryInterface {
         this.params = getDefault(this.params, getDefaultParams());
         this.systems = this.params.systems.map(builder => builder.build(this));
         this.proximityDetectionSystem = new this.params.proximityDetectionSystem(this);
-        this.renderer = new this.params.renderer(this._plugin);
+        this.renderer = this.params.renderer.build(this._plugin);
         let canvas = this.params.selectorOrCanvas;
         if (typeof canvas === 'string')
             canvas = document.querySelector(canvas) as HTMLCanvasElement;
@@ -211,17 +212,11 @@ export class Main extends DrawingInterface implements ILibraryInterface {
         return this.systems.map(system => system.getParticles()).flat();
     }
 
-    getAllLinkableParticles(): [IParticle[], TSystemLinksConfiguration] {
-        let linesConfiguration: TSystemLinksConfiguration = { required: false };
-        let particles: IParticle[][] = [];
-        this.systems
-            .forEach(system => {
-                if (system.links.required) {
-                    linesConfiguration = system.links;
-                    particles.push(system.getParticles());
-                }
-            });
-        return [particles.flat(), linesConfiguration];
+    getParticlesBySystemFeature(feature: ParticleSystemRequiredFeature) {
+        return this.systems
+            .filter(system => system.requirements.includes(feature))
+            .map(system => system.getParticles())
+            .flat();
     }
 
     feedProximityDetectionSystem(objects: IParticle[]) {

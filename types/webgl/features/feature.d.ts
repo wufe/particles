@@ -1,7 +1,7 @@
-import { ILibraryInterface } from "../../main";
 import { IProgram } from "../programs/webgl-program";
 import { ViewBox } from "../camera/view-box";
 import { IWebGLLibraryInterface } from "../../rendering/renderer-webgl";
+import { ILibraryInterface } from "../../library-interface";
 export declare type TFeatureBuilder = {
     build(manager: ILibraryInterface): IFeature;
 };

@@ -1,5 +1,5 @@
 import { init } from '../src/main';
-import { RendererWebGL } from '../src/rendering/renderer-webgl';
+import { RendererWebGLBuilder } from '../src/rendering/renderer-webgl';
 import { TParticleSystemBuilder } from '../src/models/particle-system';
 import { LiquidParticleSystemBuilder, LiquidParticleSystem } from '@wufe/liquid-particle-system';
 import { DefaultParticleSystem, DefaultParticleSystemBuilder } from '../src/systems/default-particle-system';
@@ -11,7 +11,7 @@ import { IProximityDetectionSystemBuilder } from '../src/models/proximity-detect
 
 init({
     selectorOrCanvas: '#canvas',
-    renderer: RendererWebGL,
+    renderer: RendererWebGLBuilder.build(),
     systems: [/*LiquidParticleSystemBuilder.build() as any*/DefaultParticleSystemBuilder.build({
         color: [13, 41, 57, 1],
         count: { value: 500 },

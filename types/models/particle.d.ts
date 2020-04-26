@@ -1,10 +1,10 @@
 import { IVector3D, Vector3D } from "./vector3d";
 import { IVector4D } from "./vector4d";
-import { ILibraryInterface } from "../main";
 import { BaseListenableParticle, IParticleBase } from "./base-particle";
 import { RecursivePartial } from "../utils/object-utils";
 import { ITransitionSpecification, TransitionSpecificationBuilder } from "../systems/transition/transition-specification";
 import { TRandomizeOptions, TRandomizeBoundary, TRandomizedValueOptions } from "../utils/random";
+import { ILibraryInterface } from "../library-interface";
 export interface IMoveable {
     coords: IVector3D;
     velocity: IVector3D;

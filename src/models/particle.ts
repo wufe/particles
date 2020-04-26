@@ -1,11 +1,11 @@
 import { IVector3D, Vector3D } from "./vector3d";
 import { Vector4D, IVector4D } from "./vector4d";
-import { ILibraryInterface } from "../main";
 import { ParticleEventType, BaseListenableParticle, IParticleBase } from "./base-particle";
 import { RecursivePartial, getDefault } from "../utils/object-utils";
 import { ITransitionSpecification, TransitionSpecificationBuilder } from "../systems/transition/transition-specification";
 import { TRandomizeOptions, TRandomizeBoundary, TRandomizedValueOptions, randomValueFromBoundary, valueFromRandomOptions } from "../utils/random";
 import { getColor } from "../rendering/renderer-webgl";
+import { ILibraryInterface } from "../library-interface";
 
 // Represents the parameter and the methods required by the particle
 // to move through the available space.

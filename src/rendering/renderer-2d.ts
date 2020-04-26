@@ -1,9 +1,15 @@
 import { PluginAdapter, HookType } from "../plugin/plugin-adapter";
 import { IDrawingInterface } from "../drawing/drawing-interface";
-import { IRenderer } from "./renderer";
+import { IRenderer, TRendererBuilder } from "./renderer";
 import { IParticleSystem } from "../models/particle-system";
 
-export class Renderer2D implements IRenderer {
+export class Renderer2DBuilder {
+    static build = (): TRendererBuilder => ({
+        build: (pluginAdapter: PluginAdapter) => new Renderer2D(pluginAdapter)
+    })
+}
+
+class Renderer2D implements IRenderer {
     constructor(private _pluginAdapter: PluginAdapter) {}
 
     register() {

@@ -4,8 +4,8 @@ import { Vector3D } from "../models/vector3d";
 import { BaseParticleSystem } from "./base-particle-system";
 import { Unit } from "../utils/units";
 import { RecursivePartial, getDefault } from "../utils/object-utils";
-import { ILibraryInterface } from "../main";
 import { TRandomizedValueOptions, valueFromRandomOptions } from "../utils/random";
+import { ILibraryInterface } from "../library-interface";
 
 type TDefaultParticleSystemParams = {
     color: number[];
@@ -34,7 +34,7 @@ export class DefaultParticleSystem extends BaseParticleSystem implements IPartic
     attach() {
         const { width, height, depth } = this.manager.configuration;
 
-        this.useLinks(15, Unit.VMIN);
+        this.useLinks();
 
         const [r, g, b, a] = this._params.color;
 

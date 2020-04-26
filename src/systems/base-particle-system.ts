@@ -1,15 +1,15 @@
-import { ILibraryInterface } from "../main";
 import { SystemBridgeEventNotification } from "../drawing/system-bridge";
-import { IParticleSystem, TSystemLinksConfiguration } from "../models/particle-system";
+import { IParticleSystem, TSystemLinksConfiguration, ParticleSystemRequiredFeature } from "../models/particle-system";
 import { IParticle } from "../models/particle";
 import { RecursivePartial } from "../utils/object-utils";
 import { SystemTimer, TTimerHandle } from "./timers/system-timer";
 import { Unit } from "../utils/units";
+import { ILibraryInterface } from "../library-interface";
 
 export abstract class BaseParticleSystem implements IParticleSystem {
     abstract attach(): void;
     abstract getParticles(): IParticle[];
-    public links: TSystemLinksConfiguration = { required: false };
+    public requirements: ParticleSystemRequiredFeature[] = [];
 
     protected _lastTickDelta = -1;
     protected _lastTickTime = -1;
@@ -41,11 +41,12 @@ export abstract class BaseParticleSystem implements IParticleSystem {
         return this._systemTimer.remove(timerHandle);
     }
 
-    useLinks(distance: number, unit: Unit = Unit.PX) {
-        this.links = {
-            required: true,
-            distance,
-            unit
-        };
+    useLinks() {
+        this.useProximityDetection();
+        this.requirements.push(ParticleSystemRequiredFeature.LINKS);
+    }
+    
+    useProximityDetection() {
+        this.requirements.push(ParticleSystemRequiredFeature.PROXIMITY_DETECTION);
     }
 }

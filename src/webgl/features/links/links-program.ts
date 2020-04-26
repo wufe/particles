@@ -11,9 +11,10 @@ import { ParticleEventType } from "../../../models/base-particle";
 import { AttributeMapper, ICommittedAttributeMapper } from "../../programs/webgl-attribute-mapper";
 import { ParticleLinkPoint, ParticleLineEventType, IParticleLinkPoint } from "../../../models/particle-link-point";
 import { performanceMetricsHelper } from "../../../utils/performance-metrics";
-import { TSystemLinksConfiguration } from "../../../models/particle-system";
+import { TSystemLinksConfiguration, ParticleSystemRequiredFeature } from "../../../models/particle-system";
 import { getPxFromUnit, Unit } from "../../../utils/units";
 import { BaseProgram } from "../../programs/base-webgl-program";
+import { TLinksFeatureParams } from "./links-feature";
 
 enum Attr {
     POSITION       = 'v_position',
@@ -31,8 +32,8 @@ export class LinksProgram extends BaseProgram<Attr, Uni> implements IProgram {
     private _mapper: ICommittedAttributeMapper<IParticleLinkPoint> | null = null;
     private _maxParticleDistance = 300;
 
-    private _distance = 300;
-    private _unit = Unit.PX;
+    private _distance = 1;
+    private _unit = Unit.VMIN;
 
     private _width = 0;
     private _height = 0;
@@ -43,6 +44,7 @@ export class LinksProgram extends BaseProgram<Attr, Uni> implements IProgram {
         gl: WebGLRenderingContext,
         viewBox: ViewBox,
         libraryInterface: IWebGLLibraryInterface,
+        private _params: TLinksFeatureParams
     ) {
         super(
             gl,
@@ -56,6 +58,10 @@ export class LinksProgram extends BaseProgram<Attr, Uni> implements IProgram {
     }
 
     init() {
+
+        this._distance = this._params.distance.value;
+        this._unit = this._params.distance.unit;
+
         this._mapper = AttributeMapper.build<IParticleLinkPoint>()
             .bringYourOwnVertices()
             .addMap(this.attr(Attr.POSITION), 3, this._gl.FLOAT, p => p.position)
@@ -76,9 +82,7 @@ export class LinksProgram extends BaseProgram<Attr, Uni> implements IProgram {
         });
     }
 
-    _useParticles(particles: IParticle[], linksConfiguration: TSystemLinksConfiguration) {
-
-        const { width, height, depth } = this._libraryInterface.configuration;
+    _useParticles(particles: IParticle[]) {
 
         const vertices: number[] = [];
         
@@ -103,19 +107,12 @@ export class LinksProgram extends BaseProgram<Attr, Uni> implements IProgram {
 
     update(deltaT: number, T: number) {
         super.update(deltaT, T);
-        const [linkableParticles, linksConfiguration] = this._libraryInterface.getAllLinkableParticles();
-        if (linksConfiguration.required) {
-            
-            const { distance, unit } = linksConfiguration;
 
-            if (distance !== this._distance || unit !== this._unit) {
-                this._distance = linksConfiguration.distance;
-                this._unit = linksConfiguration.unit;
+        const linkableParticles = this._libraryInterface.getParticlesBySystemFeature(ParticleSystemRequiredFeature.LINKS);
 
-                this._calculateMaxDistance();
-            }
+        if (linkableParticles.length) {
 
-            this._useParticles(linkableParticles, linksConfiguration);
+            this._useParticles(linkableParticles);
         }
     }
 
