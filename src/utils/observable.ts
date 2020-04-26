@@ -36,7 +36,12 @@ export class Subject<T> extends Observable<T> implements ISubject<T> {
 
 }
 
-export class ImmediateSubject<T> extends Subject<T> implements ISubject<T> {
+export class BehaviorSubject<T> extends Subject<T> implements ISubject<T> {
+
+    constructor(value: T) {
+        super();
+        this._lastValue = value;
+    }
 
     subscribe(callback: TCallback<T>) {
         const ret = super.subscribe(callback);

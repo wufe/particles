@@ -12,7 +12,7 @@ import { IProximityDetectionSystemBuilder, IProximityDetectionSystem } from "./m
 import { NaiveProximityDetectionSystemBuilder } from "./models/proximity-detection/naive-proximity-detection-system";
 import { performanceMetricsHelper } from "./utils/performance-metrics";
 import { TFeatureBuilder } from "./webgl/features/feature";
-import { Subject, ImmediateSubject } from "./utils/observable";
+import { Subject, BehaviorSubject, IObservable, ISubject } from "./utils/observable";
 import { Params, ILibraryInterface, TOnResize } from "./library-interface";
 
 export const getDefaultParams = (): DefaultObject<Params> => ({
@@ -53,7 +53,7 @@ export class Main extends DrawingInterface implements ILibraryInterface {
     public proximityDetectionSystem: IProximityDetectionSystem | null = null;;
     public renderer: IRenderer = null;
 
-    onResize = new ImmediateSubject<TOnResize>();
+    public onResize: ISubject<TOnResize>;
 
     constructor(public params: Params) {
         super();
@@ -136,7 +136,10 @@ export class Main extends DrawingInterface implements ILibraryInterface {
         this.configuration.depth  = depth;
         this.canvas.width         = width;
         this.canvas.height        = height;
-        this.onResize.next({ width, height, depth, isRetina: this.configuration.isRetina, pixelRatio: this.configuration.pixelRatio });
+        const resizeParameter: TOnResize = { width, height, depth, isRetina: this.configuration.isRetina, pixelRatio: this.configuration.pixelRatio };
+        if (!this.onResize)
+            this.onResize = new BehaviorSubject(resizeParameter);
+        this.onResize.next(resizeParameter);
     }
 
     private _initSystems() {
