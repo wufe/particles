@@ -20,7 +20,7 @@ init({
     features: [
         // QuadTreeFeatureBuilder.build({ color: [255, 255, 255, .22] }) as any as TFeatureBuilder,
         // DirectionsFeatureBuilder.build(),
-        // LinksFeatureBuilder.build(),
+        LinksFeatureBuilder.build(),
     ],
     camera: {
         enabled: true,

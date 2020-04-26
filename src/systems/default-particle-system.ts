@@ -34,7 +34,7 @@ export class DefaultParticleSystem extends BaseParticleSystem implements IPartic
     attach() {
         const { width, height, depth } = this.manager.configuration;
 
-        this.useLinks(20, Unit.VMIN);
+        this.useLinks(15, Unit.VMIN);
 
         const [r, g, b, a] = this._params.color;
 

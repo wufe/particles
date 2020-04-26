@@ -4,7 +4,7 @@ import { TConfiguration } from "./main";
 import { IParticle } from "./models/particle";
 import { TSystemLinksConfiguration, TParticleSystemBuilder } from "./models/particle-system";
 import { IProximityDetectionSystem, IProximityDetectionSystemBuilder } from "./models/proximity-detection/proximity-detection-system";
-import { Subject } from "./utils/observable";
+import { Subject, IObservable } from "./utils/observable";
 import { IRendererBuilder } from "./rendering/renderer";
 import { TFeatureBuilder } from "./webgl/features/feature";
 
@@ -19,7 +19,7 @@ export interface ILibraryInterface extends IDrawingInterface, ISystemBridge {
     getNeighbours(particle: IParticle, radius: number): IParticle[];
     getProximityDetectionSystem(): IProximityDetectionSystem;
 
-    onResize: Subject<TOnResize>;
+    onResize: IObservable<TOnResize>;
 }
 
 export type TOnResize = {

@@ -15,8 +15,6 @@ export class Observable<T> implements IObservable<T> {
     subscribe(callback: TCallback<T>) {
         const id = Symbol();
         this._callbacks.push({ id, callback });
-        if (this._lastValue !== undefined)
-            callback(this._lastValue);
         return { id, value: this._lastValue };
     }
 
@@ -34,6 +32,17 @@ export class Subject<T> extends Observable<T> implements ISubject<T> {
     next(model: T) {
         this._lastValue = model;
         this._callbacks.forEach(container => container.callback(model));
+    }
+
+}
+
+export class ImmediateSubject<T> extends Subject<T> implements ISubject<T> {
+
+    subscribe(callback: TCallback<T>) {
+        const ret = super.subscribe(callback);
+        if (this._lastValue !== undefined)
+            callback(this._lastValue);
+        return ret;
     }
 
 }

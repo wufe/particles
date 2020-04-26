@@ -12,7 +12,7 @@ import { IProximityDetectionSystemBuilder, IProximityDetectionSystem } from "./m
 import { NaiveProximityDetectionSystemBuilder } from "./models/proximity-detection/naive-proximity-detection-system";
 import { performanceMetricsHelper } from "./utils/performance-metrics";
 import { TFeatureBuilder } from "./webgl/features/feature";
-import { Subject } from "./utils/observable";
+import { Subject, ImmediateSubject } from "./utils/observable";
 import { Params, ILibraryInterface, TOnResize } from "./library-interface";
 
 export const getDefaultParams = (): DefaultObject<Params> => ({
@@ -53,7 +53,7 @@ export class Main extends DrawingInterface implements ILibraryInterface {
     public proximityDetectionSystem: IProximityDetectionSystem | null = null;;
     public renderer: IRenderer = null;
 
-    onResize = new Subject<TOnResize>();
+    onResize = new ImmediateSubject<TOnResize>();
 
     constructor(public params: Params) {
         super();
