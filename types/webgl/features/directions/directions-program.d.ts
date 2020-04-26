@@ -1,4 +1,4 @@
-import { ViewBox } from "../../camera/view-box";
+import { IViewBox } from "../../camera/view-box";
 import { BaseProgram } from "../../programs/base-webgl-program";
 import { IWebGLLibraryInterface } from "../../../rendering/renderer-webgl";
 import { IProgram } from "../../programs/webgl-program";
@@ -10,7 +10,7 @@ export declare class DirectionsProgram extends BaseProgram<Attr> implements IPro
     private _vectorsBuffer;
     private _vertices;
     private _strideLength;
-    constructor(gl: WebGLRenderingContext, viewBox: ViewBox, libraryInterface: IWebGLLibraryInterface);
+    constructor(gl: WebGLRenderingContext, viewBox: IViewBox, libraryInterface: IWebGLLibraryInterface);
     init(): void;
     private _buildVertices;
     draw(deltaT: number, T: number): void;

@@ -1,5 +1,5 @@
 import { IProgram } from "./webgl-program";
-import { ViewBox } from "../camera/view-box";
+import { IViewBox } from "../camera/view-box";
 import { IWebGLLibraryInterface } from "../../rendering/renderer-webgl";
 import { BaseProgram } from "./base-webgl-program";
 declare enum Attr {
@@ -21,7 +21,7 @@ export declare class ParticlesProgram extends BaseProgram<Attr, Uni> implements 
     private _vectorsBuffer;
     private _vertices;
     private _strideLength;
-    constructor(gl: WebGLRenderingContext, viewBox: ViewBox, libraryInterface: IWebGLLibraryInterface);
+    constructor(gl: WebGLRenderingContext, viewBox: IViewBox, libraryInterface: IWebGLLibraryInterface);
     getResolutionVector(): number[];
     init(): void;
     useParticles(): void;

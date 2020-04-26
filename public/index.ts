@@ -12,7 +12,7 @@ import { IProximityDetectionSystemBuilder } from '../src/models/proximity-detect
 init({
     selectorOrCanvas: '#canvas',
     renderer: RendererWebGLBuilder.build(),
-    systems: [/*LiquidParticleSystemBuilder.build() as any*/DefaultParticleSystemBuilder.build({
+    systems: [DefaultParticleSystemBuilder.build({
         color: [13, 41, 57, 1],
         count: { value: 500 },
         size: { value: 30 }

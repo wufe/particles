@@ -1,10 +1,10 @@
 import { IWebGLLibraryInterface } from "../../rendering/renderer-webgl";
-import { ViewBox } from "../camera/view-box";
+import { IViewBox } from "../camera/view-box";
 import { IBaseProgram } from "./base-webgl-program";
 
 export interface IProgramBuilder {
 	new(gl: WebGLRenderingContext,
-        viewBox: ViewBox,
+        viewBox: IViewBox,
         libraryInterface: IWebGLLibraryInterface, ...args: any[]): IProgram;
 }
 

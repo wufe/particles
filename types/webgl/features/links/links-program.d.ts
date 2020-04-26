@@ -1,5 +1,5 @@
 import { IProgram } from "../../programs/webgl-program";
-import { ViewBox } from "../../camera/view-box";
+import { IViewBox } from "../../camera/view-box";
 import { IParticle } from "../../../models/particle";
 import { IWebGLLibraryInterface } from "../../../rendering/renderer-webgl";
 import { BaseProgram } from "../../programs/base-webgl-program";
@@ -24,7 +24,7 @@ export declare class LinksProgram extends BaseProgram<Attr, Uni> implements IPro
     private _height;
     private _depth;
     private _pixelRatio;
-    constructor(gl: WebGLRenderingContext, viewBox: ViewBox, libraryInterface: IWebGLLibraryInterface, _params: TLinksFeatureParams);
+    constructor(gl: WebGLRenderingContext, viewBox: IViewBox, libraryInterface: IWebGLLibraryInterface, _params: TLinksFeatureParams);
     init(): void;
     _useParticles(particles: IParticle[]): void;
     update(deltaT: number, T: number): void;

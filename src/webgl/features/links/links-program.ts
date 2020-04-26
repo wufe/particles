@@ -1,6 +1,6 @@
 import { IProgram } from "../../programs/webgl-program";
 import { ProgramContainer } from "../../programs/webgl-program-container";
-import { ViewBox } from "../../camera/view-box";
+import { IViewBox } from "../../camera/view-box";
 import { IParticle, Particle } from "../../../models/particle";
 import linesVertexShader from "./shaders/links.vert";
 import linesFragmentShader from "./shaders/links.frag";
@@ -42,7 +42,7 @@ export class LinksProgram extends BaseProgram<Attr, Uni> implements IProgram {
 
     constructor(
         gl: WebGLRenderingContext,
-        viewBox: ViewBox,
+        viewBox: IViewBox,
         libraryInterface: IWebGLLibraryInterface,
         private _params: TLinksFeatureParams
     ) {

@@ -2,7 +2,16 @@ import { mat4, ReadonlyVec3, vec4 } from "gl-matrix";
 import { IWebGLLibraryInterface } from "../../rendering/renderer-webgl";
 import { IVector3D, Vector3D } from "../../models/vector3d";
 
-export class ViewBox {
+export class IViewBox {
+	wMat: Iterable<number>;
+	vMat: Iterable<number>;
+	pMat: Iterable<number>;
+	eye: IVector3D;
+	recalculate: () => void;
+	getResolutionVector: () => number[];
+}
+
+export class ViewBox implements IViewBox{
 
 	public wMat = mat4.create();
 	public vMat = mat4.create();

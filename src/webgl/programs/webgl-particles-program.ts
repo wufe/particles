@@ -1,6 +1,6 @@
 import { IProgram } from "./webgl-program";
 import { ProgramContainer } from "./webgl-program-container";
-import { ViewBox } from "../camera/view-box";
+import { IViewBox } from "../camera/view-box";
 import { IParticle } from "../../models/particle";
 import particlesVertexShader from "./shaders/particles/particles.vert";
 import particlesFragmentShader from "./shaders/particles/particles.frag";
@@ -36,7 +36,7 @@ export class ParticlesProgram extends BaseProgram<Attr, Uni> implements IProgram
 
     constructor(
         gl: WebGLRenderingContext,
-        viewBox: ViewBox,
+        viewBox: IViewBox,
         libraryInterface: IWebGLLibraryInterface,
     ) {
         super(gl, particlesVertexShader, particlesFragmentShader,

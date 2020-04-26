@@ -1,4 +1,4 @@
-import { ViewBox } from "../../camera/view-box";
+import { IViewBox } from "../../camera/view-box";
 import directionsVertexShader from "./shaders/directions.vert";
 import directionsFragmentShader from "./shaders/directions.frag";
 import { BaseProgram } from "../../programs/base-webgl-program";
@@ -17,7 +17,7 @@ export class DirectionsProgram extends BaseProgram<Attr> implements IProgram {
 
     constructor(
         gl: WebGLRenderingContext,
-        viewBox: ViewBox,
+        viewBox: IViewBox,
         libraryInterface: IWebGLLibraryInterface,
     ) {
         super(

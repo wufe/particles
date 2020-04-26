@@ -1,7 +1,7 @@
 import { RecursivePartial, getDefault } from "../../../utils/object-utils"
 import { TFeatureBuilder, IFeature } from "../feature"
 import { LinksProgram } from "./links-program"
-import { ViewBox } from "../../camera/view-box"
+import { IViewBox } from "../../camera/view-box"
 import { IWebGLLibraryInterface } from "../../../rendering/renderer-webgl"
 import { ILibraryInterface } from "../../../library-interface"
 import { Unit } from "../../../utils/units"
@@ -32,7 +32,7 @@ class LinksFeature implements IFeature {
 
     isAvailable = () => true;
 
-    buildProgram(gl: WebGLRenderingContext, viewBox: ViewBox, libraryInterface: IWebGLLibraryInterface, ...args: any[]) {
+    buildProgram(gl: WebGLRenderingContext, viewBox: IViewBox, libraryInterface: IWebGLLibraryInterface, ...args: any[]) {
         this._program = new LinksProgram(gl, viewBox, libraryInterface, this._params);
         return this;
     }

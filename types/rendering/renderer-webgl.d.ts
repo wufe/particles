@@ -1,6 +1,6 @@
 import { TRendererBuilder } from "./renderer";
 import { ParticlesProgram } from "../webgl/programs/webgl-particles-program";
-import { ViewBox } from "../webgl/camera/view-box";
+import { IViewBox } from "../webgl/camera/view-box";
 import { IFeature } from "../webgl/features/feature";
 import { IProgram } from "../webgl/programs/webgl-program";
 import { ILibraryInterface } from "../library-interface";
@@ -23,7 +23,7 @@ export declare type TWebGLConfiguration = {
         ortho: boolean;
         fov: number;
     };
-    viewBox: ViewBox | null;
+    viewBox: IViewBox | null;
     features: {
         feature: IFeature;
         program?: IProgram;

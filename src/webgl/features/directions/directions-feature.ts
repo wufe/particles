@@ -1,7 +1,7 @@
 import { RecursivePartial, getDefault } from "../../../utils/object-utils"
 import { TFeatureBuilder, IFeature } from "../feature"
 import { DirectionsProgram } from "./directions-program"
-import { ViewBox } from "../../camera/view-box"
+import { IViewBox } from "../../camera/view-box"
 import { IWebGLLibraryInterface } from "../../../rendering/renderer-webgl"
 import { ILibraryInterface } from "../../../library-interface"
 
@@ -20,7 +20,7 @@ class DirectionsFeature implements IFeature {
 
     isAvailable = () => true;
 
-    buildProgram(gl: WebGLRenderingContext, viewBox: ViewBox, libraryInterface: IWebGLLibraryInterface, ...args: any[]) {
+    buildProgram(gl: WebGLRenderingContext, viewBox: IViewBox, libraryInterface: IWebGLLibraryInterface, ...args: any[]) {
         this._program = new DirectionsProgram(gl, viewBox, libraryInterface);
         return this;
     }

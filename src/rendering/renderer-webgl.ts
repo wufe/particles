@@ -1,7 +1,7 @@
 import { PluginAdapter, HookType } from "../plugin/plugin-adapter";
 import { IRenderer, TRendererBuilder } from "./renderer";
 import { ParticlesProgram } from "../webgl/programs/webgl-particles-program";
-import { ViewBox } from "../webgl/camera/view-box";
+import { ViewBox, IViewBox } from "../webgl/camera/view-box";
 import { CameraEvents } from "../webgl/camera/camera-events";
 import { BaseUniformAggregationType } from "../webgl/programs/base-webgl-program";
 import { IFeature } from "../webgl/features/feature";
@@ -29,7 +29,7 @@ export type TWebGLConfiguration = {
         ortho  : boolean;
         fov    : number;
     };
-    viewBox: ViewBox | null;
+    viewBox: IViewBox | null;
     features: { feature: IFeature, program?: IProgram }[];
     programs: {
         [WebGLProgram.PARTICLES] : ParticlesProgram | null;

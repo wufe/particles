@@ -1,4 +1,4 @@
-import { ViewBox } from "../camera/view-box";
+import { IViewBox } from "../camera/view-box";
 import { IWebGLLibraryInterface } from "../../rendering/renderer-webgl";
 
 export interface IBaseProgram<TUniforms extends string = string> {
@@ -32,7 +32,7 @@ export class BaseProgram<TAttribs extends string = string, TUniforms extends str
 		protected _fragmentShaderText: string,
 		protected _attributes: TAttribs[],
         protected _uniforms: (TUniforms | BaseUniforms)[] = [],
-        protected _viewBox: ViewBox,
+        protected _viewBox: IViewBox,
         protected _libraryInterface: IWebGLLibraryInterface,
 	) {
 		this.compileShaders();
