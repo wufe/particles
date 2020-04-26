@@ -8,6 +8,7 @@ import { DirectionsFeatureBuilder } from '../src/webgl/features/directions/dire
 import { LinksFeatureBuilder } from '../src/webgl/features/links/links-feature';
 import { TFeatureBuilder } from '../src/webgl/features/feature';
 import { IProximityDetectionSystemBuilder } from '../src/models/proximity-detection/proximity-detection-system';
+import { Unit } from '../src/utils/units';
 
 init({
     selectorOrCanvas: '#canvas',
@@ -15,12 +16,12 @@ init({
     systems: [DefaultParticleSystemBuilder.build({
         color: [13, 41, 57, 1],
         count: { value: 500 },
-        size: { value: 30 }
+        size: { randomize: true, boundary: { min: 20, max: 30 } }
     })],
     features: [
         // QuadTreeFeatureBuilder.build({ color: [255, 255, 255, .22] }) as any as TFeatureBuilder,
         // DirectionsFeatureBuilder.build(),
-        LinksFeatureBuilder.build(),
+        LinksFeatureBuilder.build({ distance: { value: 13, unit: Unit.VMIN }}),
     ],
     camera: {
         enabled: true,
