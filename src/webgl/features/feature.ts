@@ -8,7 +8,7 @@ export type TFeatureBuilder =  {
 }
 
 export interface IFeature {
-    buildProgram?: (gl: WebGLRenderingContext, viewBox: IViewBox, libraryInterface: IWebGLLibraryInterface, ...args: any[]) => this;
+    buildProgram?: (gl: WebGLRenderingContext, viewBox: IViewBox, libraryInterface: ILibraryInterface, ...args: any[]) => this;
     getProgram?: () => IProgram;
     isAvailable(): boolean;
 }

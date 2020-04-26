@@ -34,7 +34,7 @@ init({
         depthOfField: true
     },
     fpsLimit: 30,
-    proximityDetectionSystem: QuadTreeProximityDetectionSystem as any as IProximityDetectionSystemBuilder,
+    proximityDetectionSystem: QuadTreeProximityDetectionSystem,
     events: {
         resize: {
             enabled: true,
