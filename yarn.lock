@@ -1020,10 +1020,10 @@
   dependencies:
     "@wufe/particles" "^1.0.0"
 
-"@wufe/particles-quadtree@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@wufe/particles-quadtree/-/particles-quadtree-1.0.0.tgz#6e1199189987c94a7ba0ca8816309804dd784d57"
-  integrity sha512-pj1COTLft2UUEi8Zw0hgnyhuihgd23xrvbCyzJXyKGvXXX8n6ACXzb+NZMMEUuRXNm1X6AYXzRiO6DSegy9wBg==
+"@wufe/particles-quadtree@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@wufe/particles-quadtree/-/particles-quadtree-1.0.1.tgz#0e71fd17d142214ece43cbcba1bdf5a88f56d914"
+  integrity sha512-z5y1vFzK84bKkXQbAU/xhjjTx2ADCTzUwOx8SkDMpqIKdHSIM5g/iQVN+DQXM/hEj8ZtIGQLR9Z5bGCT9GWkhw==
 
 "@wufe/particles@^1.0.0":
   version "1.0.0"
