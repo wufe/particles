@@ -1,4 +1,3 @@
-import { PluginAdapter, HookType } from "../plugin/plugin-adapter";
 import { IRenderer, TRendererBuilder } from "./renderer";
 import { ParticlesProgram } from "../webgl/programs/webgl-particles-program";
 import { ViewBox, IViewBox } from "../webgl/camera/view-box";
@@ -6,7 +5,7 @@ import { CameraEvents } from "../webgl/camera/camera-events";
 import { BaseUniformAggregationType } from "../webgl/programs/base-webgl-program";
 import { IFeature } from "../webgl/features/feature";
 import { IProgram } from "../webgl/programs/webgl-program";
-import { ILibraryInterface } from "../library-interface";
+import { ILibraryInterface, LibraryInterfaceHook } from "../library-interface";
 import { ParticleSystemRequiredFeature } from "../models/particle-system";
 
 export enum WebGLProgram {
@@ -48,23 +47,23 @@ export const getColor = (r: number, g: number, b: number, a: number = 1) =>
 
 export class RendererWebGLBuilder {
     static build = (): TRendererBuilder => ({
-        build: pluginAdapter => new RendererWebGL(pluginAdapter)
+        build: libraryInterface => new RendererWebGL(libraryInterface)
     })
 }
 
 class RendererWebGL implements IRenderer {
 
-    constructor(private _pluginAdapter: PluginAdapter) {}
+    constructor(private _libraryInterface: ILibraryInterface) {}
 
     register() {
-        this._pluginAdapter.addAfter(HookType.RENDERER_INIT, this._initRenderer.bind(this));
-        this._pluginAdapter.addAfter(HookType.CONTEXT_INIT, this._initContext.bind(this));
-        this._pluginAdapter.addAfter(HookType.CANVAS_INIT, this._initCanvas.bind(this));
-        this._pluginAdapter.addAfter(HookType.PRE_START, this._preStart.bind(this));
-        this._pluginAdapter.addAfter(HookType.CANVAS_CLEAR, this._clearCanvas.bind(this));
-        this._pluginAdapter.addAfter(HookType.DRAW, this._draw.bind(this));
-        this._pluginAdapter.addAfter(HookType.UPDATE, this._update.bind(this));
-        this._pluginAdapter.addAfter(HookType.WINDOW_RESIZE, this._onResize.bind(this));
+        this._libraryInterface.hooks[LibraryInterfaceHook.RENDERER_INIT].subscribe(this._initRenderer.bind(this));
+        this._libraryInterface.hooks[LibraryInterfaceHook.CONTEXT_INIT].subscribe(this._initContext.bind(this));
+        this._libraryInterface.hooks[LibraryInterfaceHook.CANVAS_INIT].subscribe(this._initCanvas.bind(this));
+        this._libraryInterface.hooks[LibraryInterfaceHook.PRE_START].subscribe(this._preStart.bind(this));
+        this._libraryInterface.hooks[LibraryInterfaceHook.CANVAS_CLEAR].subscribe(this._clearCanvas.bind(this));
+        this._libraryInterface.hooks[LibraryInterfaceHook.DRAW].subscribe(this._draw.bind(this));
+        this._libraryInterface.hooks[LibraryInterfaceHook.UPDATE].subscribe(this._update.bind(this));
+        this._libraryInterface.hooks[LibraryInterfaceHook.WINDOW_RESIZE].subscribe(this._onResize.bind(this));
     }
 
     private _initRenderer(libraryInterface: IWebGLLibraryInterface) {
@@ -171,7 +170,7 @@ class RendererWebGL implements IRenderer {
         // #endregion
 
         // #region Particles change events
-        this._pluginAdapter.addAfter(HookType.SYSTEM_UPDATED, this._onSystemUpdated.bind(this));
+        this._libraryInterface.hooks[LibraryInterfaceHook.SYSTEM_UPDATED].subscribe(this._onSystemUpdated.bind(this));
         // #endregion
     }
 

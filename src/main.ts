@@ -1,4 +1,3 @@
-import { PluginAdapter, HookType } from "./plugin/plugin-adapter";
 import { DrawingInterface, IDrawingInterface } from "./drawing/drawing-interface";
 import { IRenderer, TRendererBuilder } from "./rendering/renderer";
 import { Renderer2DBuilder } from "./rendering/renderer-2d";
@@ -13,7 +12,7 @@ import { NaiveProximityDetectionSystemBuilder } from "./models/proximity-detecti
 import { performanceMetricsHelper } from "./utils/performance-metrics";
 import { TFeatureBuilder } from "./webgl/features/feature";
 import { Subject, BehaviorSubject, IObservable, ISubject } from "./utils/observable";
-import { Params, ILibraryInterface, TOnResize } from "./library-interface";
+import { Params, ILibraryInterface, TOnResize, LibraryInterfaceHook } from "./library-interface";
 import { RendererWebGLBuilder } from "./rendering/renderer-webgl";
 
 export const getDefaultParams = (): DefaultObject<Params> => ({
@@ -46,7 +45,6 @@ export const getDefaultParams = (): DefaultObject<Params> => ({
 });
 
 export class Main extends DrawingInterface implements ILibraryInterface {
-    private _plugin = new PluginAdapter();
     public configuration: TConfiguration = {
         initialized: false,
     };
@@ -55,6 +53,11 @@ export class Main extends DrawingInterface implements ILibraryInterface {
     public renderer: IRenderer = null;
 
     public onResize: ISubject<TOnResize>;
+    public hooks: {
+        [k in LibraryInterfaceHook]?: ISubject<ILibraryInterface>;
+    } = {
+        [LibraryInterfaceHook.RENDERER_INIT]: new Subject()
+    };
 
     constructor(public params: Params) {
         super();
@@ -62,6 +65,7 @@ export class Main extends DrawingInterface implements ILibraryInterface {
     }
 
     start() {
+        this._initHooks();
         this._initParams();
         this._initRenderer();
         this._initContext();
@@ -73,11 +77,16 @@ export class Main extends DrawingInterface implements ILibraryInterface {
         this._loop();
     }
 
+    private _initHooks() {
+        Object.values(LibraryInterfaceHook)
+            .forEach(type => this.hooks[type] = new Subject());
+    }
+
     private _initParams() {
         this.params = getDefault(this.params, getDefaultParams());
         this.systems = this.params.systems.map(builder => builder.build(this));
         this.proximityDetectionSystem = new this.params.proximityDetectionSystem(this);
-        this.renderer = this.params.renderer.build(this._plugin);
+        this.renderer = this.params.renderer.build(this);
         let canvas = this.params.selectorOrCanvas;
         if (typeof canvas === 'string')
             canvas = document.querySelector(canvas) as HTMLCanvasElement;
@@ -86,16 +95,16 @@ export class Main extends DrawingInterface implements ILibraryInterface {
 
     private _initRenderer() {
         this.renderer.register();
-        this._plugin.exec(HookType.RENDERER_INIT, this);
+        this.hooks[LibraryInterfaceHook.RENDERER_INIT].next(this);
     }
 
     private _initContext() {
-        this._plugin.exec(HookType.CONTEXT_INIT, this);
+        this.hooks[LibraryInterfaceHook.CONTEXT_INIT].next(this);
     }
 
     private _initCanvas() {
         this._configureSize();
-        this._plugin.exec(HookType.CANVAS_INIT, this);
+        this.hooks[LibraryInterfaceHook.CANVAS_INIT].next(this);
     }
 
     private _resizeDebounceTimer: number | null = null;
@@ -105,12 +114,12 @@ export class Main extends DrawingInterface implements ILibraryInterface {
             window.addEventListener('resize', () => {
                 if (resizeEvent.debounce === -1 || resizeEvent.debounce === 0) {
                     this._configureSize();
-                    this._plugin.exec(HookType.WINDOW_RESIZE, this);
+                    this.hooks[LibraryInterfaceHook.WINDOW_RESIZE].next(this);
                 } else {
                     clearTimeout(this._resizeDebounceTimer);
                     this._resizeDebounceTimer = setTimeout(() => {
                         this._configureSize();
-                        this._plugin.exec(HookType.WINDOW_RESIZE, this);
+                        this.hooks[LibraryInterfaceHook.WINDOW_RESIZE].next(this);
                     }, resizeEvent.debounce);
                 }
             });
@@ -152,7 +161,7 @@ export class Main extends DrawingInterface implements ILibraryInterface {
     }
 
     private _preStart() {
-        this._plugin.exec(HookType.PRE_START, this);
+        this.hooks[LibraryInterfaceHook.PRE_START].next(this);
     }
 
     public time = 0;
@@ -187,12 +196,12 @@ export class Main extends DrawingInterface implements ILibraryInterface {
                 if (system.tick)
                     system.tick(this.deltaTime, this.time);
             });
-            this._plugin.exec(HookType.UPDATE, this);
+            this.hooks[LibraryInterfaceHook.UPDATE].next(this);
             // #endregion
     
             // #region Draw
-            this._plugin.exec(HookType.CANVAS_CLEAR, this);
-            this._plugin.exec(HookType.DRAW, this);
+            this.hooks[LibraryInterfaceHook.CANVAS_CLEAR].next(this);
+            this.hooks[LibraryInterfaceHook.DRAW].next(this);
             // #endregion
     
             // Loop
@@ -204,7 +213,7 @@ export class Main extends DrawingInterface implements ILibraryInterface {
 
     notify(type: SystemBridgeEventNotification, system: IParticleSystem) {
         if (type === SystemBridgeEventNotification.SYSTEM_UPDATED) {
-            this._plugin.exec(HookType.SYSTEM_UPDATED, this);
+            this.hooks[LibraryInterfaceHook.SYSTEM_UPDATED].next(this);
         }
     }
 

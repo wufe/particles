@@ -8,6 +8,18 @@ import { Subject, IObservable } from "./utils/observable";
 import { TRendererBuilder } from "./rendering/renderer";
 import { TFeatureBuilder } from "./webgl/features/feature";
 
+export enum LibraryInterfaceHook {
+    RENDERER_INIT = 'rendererInit',
+    CONTEXT_INIT = 'contextInit',
+    CANVAS_INIT = 'canvasInit',
+    PRE_START = 'preStart',
+    DRAW = 'draw',
+    UPDATE = 'update',
+    CANVAS_CLEAR = 'canvasClear',
+    SYSTEM_UPDATED = 'systemUpdated',
+    WINDOW_RESIZE = 'windowResize',
+}
+
 export interface ILibraryInterface extends IDrawingInterface, ISystemBridge {
     params: Params;
     configuration: TConfiguration;
@@ -20,6 +32,9 @@ export interface ILibraryInterface extends IDrawingInterface, ISystemBridge {
     getProximityDetectionSystem(): IProximityDetectionSystem;
 
     onResize: IObservable<TOnResize>;
+    hooks: {
+        [k in LibraryInterfaceHook]?: IObservable<ILibraryInterface>;
+    };
 }
 
 export type TOnResize = {

@@ -1,20 +1,20 @@
-import { PluginAdapter, HookType } from "../plugin/plugin-adapter";
 import { IDrawingInterface } from "../drawing/drawing-interface";
 import { IRenderer, TRendererBuilder } from "./renderer";
 import { IParticleSystem } from "../models/particle-system";
+import { ILibraryInterface, LibraryInterfaceHook } from "../library-interface";
 
 export class Renderer2DBuilder {
     static build = (): TRendererBuilder => ({
-        build: (pluginAdapter: PluginAdapter) => new Renderer2D(pluginAdapter)
+        build: libraryInterface => new Renderer2D(libraryInterface)
     })
 }
 
 class Renderer2D implements IRenderer {
-    constructor(private _pluginAdapter: PluginAdapter) {}
+    constructor(private _libraryInterface: ILibraryInterface) {}
 
     register() {
-        this._pluginAdapter.addAfter(HookType.CONTEXT_INIT, this._initContext);
-        this._pluginAdapter.addAfter(HookType.DRAW, this._draw);
+        this._libraryInterface.hooks[LibraryInterfaceHook.CONTEXT_INIT].subscribe(this._initContext.bind(this));
+        this._libraryInterface.hooks[LibraryInterfaceHook.DRAW].subscribe(this._draw.bind(this));
     }
 
     private _initContext(drawingInterface: IDrawingInterface) {

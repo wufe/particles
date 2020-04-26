@@ -1,6 +1,6 @@
-import { PluginAdapter } from "../plugin/plugin-adapter";
+import { ILibraryInterface } from "../library-interface";
 export declare type TRendererBuilder = {
-    build(pluginAdapter: PluginAdapter): IRenderer;
+    build(libraryInterface: ILibraryInterface): IRenderer;
 };
 export interface IRenderer {
     register: () => void;

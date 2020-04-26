@@ -1,13 +1,8 @@
 import { init } from '../src/main';
 import { RendererWebGLBuilder } from '../src/rendering/renderer-webgl';
-import { TParticleSystemBuilder } from '../src/models/particle-system';
-import { LiquidParticleSystemBuilder, LiquidParticleSystem } from '@wufe/liquid-particle-system';
-import { DefaultParticleSystem, DefaultParticleSystemBuilder } from '../src/systems/default-particle-system';
-import { QuadTreeFeatureBuilder, QuadTreeProximityDetectionSystem } from '@wufe/particles-quadtree';
-import { DirectionsFeatureBuilder } from '../src/webgl/features/directions/directions-feature';
+import { DefaultParticleSystemBuilder } from '../src/systems/default-particle-system';
+import { QuadTreeProximityDetectionSystem } from '@wufe/particles-quadtree';
 import { LinksFeatureBuilder } from '../src/webgl/features/links/links-feature';
-import { TFeatureBuilder } from '../src/webgl/features/feature';
-import { IProximityDetectionSystemBuilder } from '../src/models/proximity-detection/proximity-detection-system';
 import { Unit } from '../src/utils/units';
 
 init({
