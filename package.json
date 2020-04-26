@@ -22,7 +22,7 @@
   },
   "devDependencies": {
     "@types/gl-matrix": "^2.4.5",
-    "@wufe/liquid-particle-system": "^1.0.0",
+    "@wufe/liquid-particle-system": "^1.2.1",
     "@wufe/particles-quadtree": "^1.0.1",
     "acorn": "^6.4.1",
     "babel-loader": "^8.1.0",

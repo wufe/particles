@@ -19,7 +19,7 @@ init({
         size: { randomize: true, boundary: { min: 20, max: 30 } }
     })],
     features: [
-        // QuadTreeFeatureBuilder.build({ color: [255, 255, 255, .22] }) as any as TFeatureBuilder,
+        // QuadTreeFeatureBuilder.build({ color: [255, 255, 255, .22] }) as TFeatureBuilder,
         // DirectionsFeatureBuilder.build(),
         LinksFeatureBuilder.build({ distance: { value: 13, unit: Unit.VMIN }}),
     ],
