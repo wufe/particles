@@ -7,7 +7,8 @@ import { TLinksFeatureParams } from "./links-feature";
 declare enum Attr {
     POSITION = "v_position",
     COLOR = "v_color",
-    POSITION_OTHER = "v_positionOther"
+    POSITION_OTHER = "v_positionOther",
+    MAX_DISTANCE = "f_maxDistance"
 }
 declare enum Uni {
     MAX_DISTANCE = "f_maxDistance"
@@ -17,18 +18,10 @@ export declare class LinksProgram extends BaseProgram<Attr, Uni> implements IPro
     private _vectorsBuffer;
     private _vertices;
     private _mapper;
-    private _maxParticleDistance;
-    private _distance;
-    private _unit;
-    private _width;
-    private _height;
-    private _depth;
-    private _pixelRatio;
     constructor(gl: WebGLRenderingContext, viewBox: IViewBox, libraryInterface: IWebGLLibraryInterface, _params: TLinksFeatureParams);
     init(): void;
     _useParticles(particles: IParticle[]): void;
     update(deltaT: number, T: number): void;
-    private _calculateMaxDistance;
     draw(deltaT: number, T: number): void;
 }
 export {};

@@ -7,12 +7,14 @@ import { IParticle } from "./models/particle";
 import { IProximityDetectionSystem } from "./models/proximity-detection/proximity-detection-system";
 import { ISubject } from "./utils/observable";
 import { Params, ILibraryInterface, TOnResize, LibraryInterfaceHook } from "./library-interface";
+import { ProximityManager } from "./models/proximity-detection/proximity-manager";
 export declare const getDefaultParams: () => DefaultObject<Params>;
 export declare class Main extends DrawingInterface implements ILibraryInterface {
     params: Params;
     configuration: TConfiguration;
     systems: IParticleSystem[];
     proximityDetectionSystem: IProximityDetectionSystem | null;
+    proximityManager: ProximityManager | null;
     renderer: IRenderer;
     onResize: ISubject<TOnResize>;
     hooks: {

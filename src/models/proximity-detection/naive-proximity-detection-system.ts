@@ -1,4 +1,4 @@
-import { IProximityDetectionSystem } from "./proximity-detection-system";
+import { IProximityDetectionSystem, TProximityDetectionSystemBuilder } from "./proximity-detection-system";
 import { RecursivePartial, getDefault } from "../../utils/object-utils";
 import { IParticle } from "../particle";
 import { ILibraryInterface } from "../../library-interface";
@@ -7,13 +7,19 @@ export type TNativeProximityDetectionSystemParams = {
     radius: number;
 }
 
-export class NaiveProximityDetectionSystem implements IProximityDetectionSystem {
+export class NaiveProximityDetectionSystemBuilder {
+    static build = (optionalParams?: RecursivePartial<TNativeProximityDetectionSystemParams>): TProximityDetectionSystemBuilder => ({
+        build: manager => new NaiveProximityDetectionSystem(manager, getDefault<TNativeProximityDetectionSystemParams>(optionalParams, {
+            radius: 300
+        }))
+    })
+}
 
-    static params: TNativeProximityDetectionSystemParams;
+export class NaiveProximityDetectionSystem implements IProximityDetectionSystem {
 
     private _objects: IParticle[] = [];
 
-    constructor(private manager: ILibraryInterface) {}
+    constructor(private manager: ILibraryInterface, private _params: TNativeProximityDetectionSystemParams) {}
 
     init(): void {}
 
@@ -21,7 +27,7 @@ export class NaiveProximityDetectionSystem implements IProximityDetectionSystem 
         this._objects = objects;
     }
 
-    getNeighbours(a: IParticle, radius = NaiveProximityDetectionSystem.params.radius) {
+    getNeighbours(a: IParticle, radius = this._params.radius) {
         return this._objects
             .filter(b =>
                 a !== b && this.getDistance(a, b) < radius);
@@ -33,15 +39,5 @@ export class NaiveProximityDetectionSystem implements IProximityDetectionSystem 
             obj2.coords.y - obj1.coords.y,
             obj2.coords.z - obj1.coords.z,
         );
-    }
-}
-
-export class NaiveProximityDetectionSystemBuilder {
-    static build(optionalParams?: RecursivePartial<TNativeProximityDetectionSystemParams>) {
-        const params = getDefault<TNativeProximityDetectionSystemParams>(optionalParams, {
-            radius: 300
-        });
-        NaiveProximityDetectionSystem.params = params;
-        return NaiveProximityDetectionSystem;
     }
 }

@@ -3,7 +3,7 @@ import { ISystemBridge } from "./drawing/system-bridge";
 import { TConfiguration } from "./main";
 import { IParticle } from "./models/particle";
 import { TParticleSystemBuilder, ParticleSystemRequiredFeature } from "./models/particle-system";
-import { IProximityDetectionSystem, IProximityDetectionSystemBuilder } from "./models/proximity-detection/proximity-detection-system";
+import { IProximityDetectionSystem, TProximityDetectionSystemBuilder } from "./models/proximity-detection/proximity-detection-system";
 import { IObservable } from "./utils/observable";
 import { TRendererBuilder } from "./rendering/renderer";
 import { TFeatureBuilder } from "./webgl/features/feature";
@@ -49,7 +49,10 @@ export declare type Params = {
     selectorOrCanvas: string | HTMLCanvasElement;
     renderer?: TRendererBuilder;
     systems?: TParticleSystemBuilder[];
-    proximityDetectionSystem?: IProximityDetectionSystemBuilder;
+    proximityDetection?: {
+        system?: TProximityDetectionSystemBuilder;
+        chunksCount?: number;
+    };
     backgroundColor?: number[];
     detectRetina?: boolean;
     features?: TFeatureBuilder[];

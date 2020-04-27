@@ -17,8 +17,7 @@ export class ProximityManager {
         this._system.update(objects);
     }
 
-    update() {
-        let step = 10;
+    update(step: number) {
         const objectsLength = this._objects.length;
 
         const start = performance.now();

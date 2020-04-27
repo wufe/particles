@@ -7,7 +7,7 @@ import { ISystemBridge, SystemBridgeEventNotification } from "./drawing/system-b
 import { IParticle } from "./models/particle";
 import { DefaultParticleSystem, DefaultParticleSystemBuilder } from "./systems/default-particle-system";
 import { BaseParticleSystem } from "./systems/base-particle-system";
-import { IProximityDetectionSystemBuilder, IProximityDetectionSystem } from "./models/proximity-detection/proximity-detection-system";
+import { TProximityDetectionSystemBuilder, IProximityDetectionSystem } from "./models/proximity-detection/proximity-detection-system";
 import { NaiveProximityDetectionSystemBuilder } from "./models/proximity-detection/naive-proximity-detection-system";
 import { performanceMetricsHelper } from "./utils/performance-metrics";
 import { TFeatureBuilder } from "./webgl/features/feature";
@@ -16,13 +16,14 @@ import { Params, ILibraryInterface, TOnResize, LibraryInterfaceHook } from "./li
 import { RendererWebGLBuilder } from "./rendering/renderer-webgl";
 import { ProximityManager } from "./models/proximity-detection/proximity-manager";
 
-(window as any)['performanceMetrics'] = performanceMetricsHelper;
-
 export const getDefaultParams = (): DefaultObject<Params> => ({
     selectorOrCanvas: '#canvas',
     renderer: RendererWebGLBuilder.build(),
     systems: [DefaultParticleSystemBuilder.build()],
-    proximityDetectionSystem: NaiveProximityDetectionSystemBuilder.build(),
+    proximityDetection: {
+        system: NaiveProximityDetectionSystemBuilder.build(),
+        chunksCount: 5,
+    },
     backgroundColor: [0, 0, 0, 0],
     detectRetina: true,
     fpsLimit: 0,
@@ -90,7 +91,7 @@ export class Main extends DrawingInterface implements ILibraryInterface {
     private _initParams() {
         this.params = getDefault(this.params, getDefaultParams());
         this.systems = this.params.systems.map(builder => builder.build(this));
-        this.proximityDetectionSystem = new this.params.proximityDetectionSystem(this);
+        this.proximityDetectionSystem = this.params.proximityDetection.system.build(this);
 
         this.proximityManager = new ProximityManager();
         this.proximityManager.setProximityDetectionSystem(this.proximityDetectionSystem);
@@ -219,6 +220,8 @@ export class Main extends DrawingInterface implements ILibraryInterface {
 
             const end = performance.now();
             performanceMetricsHelper.set('loop', Math.round(end-start));
+
+            (window as any)['performanceMetrics'] = performanceMetricsHelper;
     
             // Loop
             requestAnimationFrame(this._loop);
@@ -246,7 +249,7 @@ export class Main extends DrawingInterface implements ILibraryInterface {
 
     feedProximityDetectionSystem(objects: IParticle[]) {
         this.proximityManager.feedProximityDetectionSystem(objects);
-        this.proximityManager.update();
+        this.proximityManager.update(this.params.proximityDetection.chunksCount);
     }
 
     getNeighbours(particle: IParticle, radius: number) {

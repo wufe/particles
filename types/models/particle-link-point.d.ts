@@ -8,11 +8,13 @@ export interface IParticleLinkPoint extends IListenable<IParticleLinkPoint, Part
     position: IVector3D;
     color: IVector4D;
     positionNeighbour: IVector3D;
+    maxDistance: number;
 }
 export declare class ParticleLinkPoint extends ListenableDispatcher<IParticleLinkPoint, ParticleLineEventType> implements IParticleLinkPoint {
     position: IVector3D;
     color: IVector4D;
     positionNeighbour: IVector3D;
-    constructor(position: IVector3D, color: IVector4D, positionNeighbour: IVector3D);
+    maxDistance: number;
+    constructor(position: IVector3D, color: IVector4D, positionNeighbour: IVector3D, maxDistance: number);
     notifyUpdated(): void;
 }

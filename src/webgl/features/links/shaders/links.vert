@@ -20,7 +20,7 @@ varying vec4 frag_col;
 
 void main() {
     float f_distance = distance(v_position, v_positionOther);
-    float distanceCoefficient = clamp(1.0 - (f_distance / f_maxDistance), .05, 1.0);
+    float distanceCoefficient = clamp(1.0 - (f_distance / f_maxDistance), .0, 1.0);
     float alpha = min(getParticleColor(v_color, v_position, v_res, BOUNDARY_MARGIN_PERCENTAGE).w, distanceCoefficient);
     frag_col = vec4(v_color.xyz * alpha, alpha);
     vec3 pos = vecToAbs(v_position, v_res);

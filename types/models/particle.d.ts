@@ -5,6 +5,7 @@ import { RecursivePartial } from "../utils/object-utils";
 import { ITransitionSpecification, TransitionSpecificationBuilder } from "../systems/transition/transition-specification";
 import { TRandomizeOptions, TRandomizeBoundary, TRandomizedValueOptions } from "../utils/random";
 import { ILibraryInterface } from "../library-interface";
+import { Unit } from "../utils/units";
 export interface IMoveable {
     coords: IVector3D;
     velocity: IVector3D;
@@ -18,7 +19,12 @@ export interface IDrawable {
     alpha: number;
     setAlpha(value: number): void;
 }
-export interface IParticle extends IMoveable, IDrawable, IParticleBase {
+export interface IConnected {
+    proximity: number;
+    setNeighbours(neighbours: IParticle[]): void;
+    getNeighbours(): IParticle[];
+}
+export interface IParticle extends IMoveable, IDrawable, IConnected, IParticleBase {
     update(delta: number, time: number): void;
 }
 export declare enum ParticleDirection {
@@ -34,6 +40,13 @@ export declare class Particle extends BaseListenableParticle implements IParticl
     coords: Vector3D;
     private _manager;
     constructor(coords: Vector3D, _manager: ILibraryInterface);
+    private _neighbours;
+    proximity: number;
+    private _proximitySubscription;
+    setProximity(distance: number, unit?: Unit): void;
+    unsetProximity(): void;
+    setNeighbours(neighbours: IParticle[]): void;
+    getNeighbours(): IParticle[];
     private _transitionSpecificationBuilder;
     getTransitionSpecification(): ITransitionSpecification;
     useTransition(): TransitionSpecificationBuilder;

@@ -3,7 +3,7 @@ declare type TCallbackContainer<T> = {
     id: Symbol;
     callback: TCallback<T>;
 };
-declare type TSubscription<T> = {
+export declare type TSubscription<T> = {
     id: Symbol;
     value: T;
 };
