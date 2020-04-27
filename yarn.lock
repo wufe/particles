@@ -1018,10 +1018,10 @@
   resolved "https://registry.yarnpkg.com/@wufe/liquid-particle-system/-/liquid-particle-system-1.2.1.tgz#384d08341ecc890d3bcfd73c331bfada1816b309"
   integrity sha512-1f0AE9zHlBwHrcJ7RyV4I5vh6CVo3cYaQcha8YfQoHp+rKfuh3FqwPg5gA6F9FXmd9Ru7SI0k/pUZ9yWF2U0JA==
 
-"@wufe/particles-quadtree@^1.0.2":
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/@wufe/particles-quadtree/-/particles-quadtree-1.0.2.tgz#70574a20ac78f02641b9d58378358b7dd1565db4"
-  integrity sha512-dl06JNolTWIbHjAYif/liKVi1LafZUVbkQt/gMRqLXrnqIkobw3ZCVEojP7biwPK8T2Dq4PQHVfDSqx+nVdjBA==
+"@wufe/particles-quadtree@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@wufe/particles-quadtree/-/particles-quadtree-1.0.3.tgz#9fd4a964550fd984141998d2699b21e381a48745"
+  integrity sha512-TLK4GED4RcpfrFv/QqqUvZ8VMnKotaXZyf7WF5Rpv732EqnHSloGlE4kDnvNHw3pesrxMiqfL2Fzs8xz3bmkeA==
 
 "@xtuc/ieee754@^1.2.0":
   version "1.2.0"

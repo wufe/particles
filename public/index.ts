@@ -4,7 +4,6 @@ import { DefaultParticleSystemBuilder } from '../src/systems/default-particle-sy
 import { QuadTreeProximityDetectionSystemBuilder } from '@wufe/particles-quadtree';
 import { LinksFeatureBuilder } from '../src/webgl/features/links/links-feature';
 import { Unit } from '../src/utils/units';
-import { TProximityDetectionSystemBuilder } from '../src/models/proximity-detection/proximity-detection-system';
 
 init({
     selectorOrCanvas: '#canvas',
