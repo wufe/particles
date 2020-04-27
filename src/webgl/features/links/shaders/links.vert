@@ -8,13 +8,13 @@ precision highp float;
 attribute vec3 v_position;
 attribute vec4 v_color;
 attribute vec3 v_positionOther;
+attribute float f_maxDistance;
 
 uniform vec3 v_res;
 uniform mat4 m_world;
 uniform mat4 m_view;
 uniform mat4 m_projection;
 uniform float f_t;
-uniform float f_maxDistance;
 
 varying vec4 frag_col;
 

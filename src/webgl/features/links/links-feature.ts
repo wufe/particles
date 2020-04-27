@@ -7,19 +7,11 @@ import { ILibraryInterface } from "../../../library-interface"
 import { Unit } from "../../../utils/units"
 
 export type TLinksFeatureParams = {
-    distance: {
-        value: number;
-        unit: Unit;
-    }
 }
 
 export class LinksFeatureBuilder {
     static build = (partialParams?: RecursivePartial<TLinksFeatureParams>): TFeatureBuilder => ({
         build: (manager: ILibraryInterface) => new LinksFeature(manager, getDefault(partialParams, {
-            distance: {
-                value: 15,
-                unit: Unit.VMIN
-            }
         }))
     })
 }

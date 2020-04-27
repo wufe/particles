@@ -20,6 +20,7 @@ enum Attr {
     POSITION       = 'v_position',
     COLOR          = 'v_color',
     POSITION_OTHER = 'v_positionOther',
+    MAX_DISTANCE       = 'f_maxDistance',
 }
 
 enum Uni {
@@ -30,15 +31,6 @@ export class LinksProgram extends BaseProgram<Attr, Uni> implements IProgram {
     private _vectorsBuffer: WebGLBuffer;
     private _vertices: Float32Array = new Float32Array([]);
     private _mapper: ICommittedAttributeMapper<IParticleLinkPoint> | null = null;
-    private _maxParticleDistance = 300;
-
-    private _distance = 1;
-    private _unit = Unit.VMIN;
-
-    private _width = 0;
-    private _height = 0;
-    private _depth = 0;
-    private _pixelRatio = 1;
 
     constructor(
         gl: WebGLRenderingContext,
@@ -59,48 +51,42 @@ export class LinksProgram extends BaseProgram<Attr, Uni> implements IProgram {
 
     init() {
 
-        this._distance = this._params.distance.value;
-        this._unit = this._params.distance.unit;
-
         this._mapper = AttributeMapper.build<IParticleLinkPoint>()
             .bringYourOwnVertices()
             .addMap(this.attr(Attr.POSITION), 3, this._gl.FLOAT, p => p.position)
             .addMap(this.attr(Attr.COLOR), 4, this._gl.FLOAT, p => p.color)
             .addMap(this.attr(Attr.POSITION_OTHER), 3, this._gl.FLOAT, p => p.positionNeighbour)
+            .addMap(this.attr(Attr.MAX_DISTANCE), 1, this._gl.FLOAT, p => p.maxDistance)
             .commit();
 
         this._vectorsBuffer = this._gl.createBuffer();
-
-        this._libraryInterface.onResize.subscribe(({ width, height, depth, pixelRatio }) => {
-            if (width !== this._width || height !== this._height || depth !== this._depth || pixelRatio !== this._pixelRatio) {
-                this._width = width;
-                this._height = height;
-                this._depth = depth;
-                this._pixelRatio = pixelRatio;
-                this._calculateMaxDistance();
-            }
-        });
     }
 
     _useParticles(particles: IParticle[]) {
 
         const vertices: number[] = [];
         
+        const start = performance.now();
         for (const particle of particles) {
-            const neighbours = this._libraryInterface.getNeighbours(particle, this._maxParticleDistance);
+            const neighbours = particle.getNeighbours();
             for (const neighbour of neighbours) {
 
                 vertices.push(
                     particle.coords.x, particle.coords.y, particle.coords.z,
                     particle.color.x, particle.color.y, particle.color.z, particle.color.w,
                     neighbour.coords.x, neighbour.coords.y, neighbour.coords.z,
+                    particle.proximity,
 
                     neighbour.coords.x, neighbour.coords.y, neighbour.coords.z,
                     neighbour.color.x, neighbour.color.y, neighbour.color.z, neighbour.color.w,
                     particle.coords.x, particle.coords.y, particle.coords.z,
+                    particle.proximity,
                 );
             }
         }
+        const end = performance.now();
+
+        performanceMetricsHelper.set('link neighbours', Math.round(end-start));
 
         this._vertices = new Float32Array(vertices);
     }
@@ -116,22 +102,8 @@ export class LinksProgram extends BaseProgram<Attr, Uni> implements IProgram {
         }
     }
 
-    private _calculateMaxDistance() {
-        const {_distance, _unit, _width, _height, _depth, _pixelRatio} = this;
-
-        this._maxParticleDistance = getPxFromUnit(
-            _distance,
-            _unit,
-            _width,
-            _height,
-            _depth,
-            _pixelRatio
-        );
-    }
-
     draw(deltaT: number, T: number) {
         super.draw(deltaT, T);
-        this._gl.uniform1f(this.uni(Uni.MAX_DISTANCE), this._maxParticleDistance);
 
         if (this._vertices.length) {
             this._mapper.enableAttributes(this._gl);

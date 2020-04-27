@@ -1,22 +1,24 @@
 import { init } from '../src/main';
 import { RendererWebGLBuilder } from '../src/rendering/renderer-webgl';
 import { DefaultParticleSystemBuilder } from '../src/systems/default-particle-system';
-import { QuadTreeProximityDetectionSystem } from '@wufe/particles-quadtree';
+import { QuadTreeProximityDetectionSystem, QuadTreeFeatureBuilder } from '@wufe/particles-quadtree';
 import { LinksFeatureBuilder } from '../src/webgl/features/links/links-feature';
 import { Unit } from '../src/utils/units';
+import { IProximityDetectionSystemBuilder } from '../src/models/proximity-detection/proximity-detection-system';
 
 init({
     selectorOrCanvas: '#canvas',
     renderer: RendererWebGLBuilder.build(),
     systems: [DefaultParticleSystemBuilder.build({
         color: [13, 41, 57, 1],
-        count: { value: 500 },
-        size: { randomize: true, boundary: { min: 20, max: 30 } }
+        count: { value: 600 },
+        size: { randomize: true, boundary: { min: 15, max: 25 } },
+        proximity: { value: 13, unit: Unit.VMIN }
     })],
     features: [
-        // QuadTreeFeatureBuilder.build({ color: [255, 255, 255, .22] }) as TFeatureBuilder,
+        // QuadTreeFeatureBuilder.build({ color: [255, 255, 255, .12] }),
         // DirectionsFeatureBuilder.build(),
-        LinksFeatureBuilder.build({ distance: { value: 13, unit: Unit.VMIN }}),
+        LinksFeatureBuilder.build(),
     ],
     camera: {
         enabled: true,
@@ -29,7 +31,7 @@ init({
         depthOfField: true
     },
     fpsLimit: 30,
-    proximityDetectionSystem: QuadTreeProximityDetectionSystem,
+    proximityDetectionSystem: QuadTreeProximityDetectionSystem as any as IProximityDetectionSystemBuilder,
     events: {
         resize: {
             enabled: true,

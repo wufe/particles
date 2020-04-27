@@ -1,6 +1,6 @@
 type TCallback<T> = (model: T) => any;
 type TCallbackContainer<T> = { id: Symbol, callback: TCallback<T> };
-type TSubscription<T> = { id: Symbol, value: T };
+export type TSubscription<T> = { id: Symbol, value: T };
 
 export interface IObservable<T> {
     subscribe(callback: TCallback<T>): TSubscription<T>;

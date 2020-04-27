@@ -11,6 +11,10 @@ type TDefaultParticleSystemParams = {
     color: number[];
     count: TRandomizedValueOptions;
     size: TRandomizedValueOptions;
+    proximity: {
+        value: number;
+        unit: Unit;
+    };
 }
 
 export class DefaultParticleSystemBuilder {
@@ -18,7 +22,8 @@ export class DefaultParticleSystemBuilder {
         build: (manager: ILibraryInterface) => new DefaultParticleSystem(manager, getDefault(partialParams, {
             color: [153, 255, 153, 1],
             size: { value: 10, randomize: false, boundary: { min: 20, max: 30 }},
-            count: { value: 300, randomize: false, boundary: { min: 100, max: 200 }}
+            count: { value: 300, randomize: false, boundary: { min: 100, max: 200 }},
+            proximity: { value: 15, unit: Unit.VMIN }
         }))
     })
 }
@@ -45,6 +50,7 @@ export class DefaultParticleSystem extends BaseParticleSystem implements IPartic
                 const y = Math.random() * height;
                 const z = Math.random() * depth;
                 const particle = new Particle(new Vector3D({ x, y, z }), this.manager);
+                particle.setProximity(this._params.proximity.value, this._params.proximity.unit);
                 particle.setColor(r, g, b, a);
                 particle.setSize(this._params.size)
                 particle.setVelocity(ParticleDirection.UP, {

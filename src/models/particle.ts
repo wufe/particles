@@ -5,7 +5,9 @@ import { RecursivePartial, getDefault } from "../utils/object-utils";
 import { ITransitionSpecification, TransitionSpecificationBuilder } from "../systems/transition/transition-specification";
 import { TRandomizeOptions, TRandomizeBoundary, TRandomizedValueOptions, randomValueFromBoundary, valueFromRandomOptions } from "../utils/random";
 import { getColor } from "../rendering/renderer-webgl";
-import { ILibraryInterface } from "../library-interface";
+import { ILibraryInterface, TOnResize } from "../library-interface";
+import { Unit, getPxFromUnit } from "../utils/units";
+import { TSubscription } from "../utils/observable";
 
 // Represents the parameter and the methods required by the particle
 // to move through the available space.
@@ -29,7 +31,13 @@ export interface IDrawable {
     setAlpha(value: number): void;
 }
 
-export interface IParticle extends IMoveable, IDrawable, IParticleBase {
+export interface IConnected {
+    proximity: number;
+    setNeighbours(neighbours: IParticle[]): void;
+    getNeighbours(): IParticle[];
+}
+
+export interface IParticle extends IMoveable, IDrawable, IConnected, IParticleBase {
     update(delta: number, time: number): void;
 }
 
@@ -59,6 +67,33 @@ export class Particle extends BaseListenableParticle implements IParticle {
     
     constructor(public coords: Vector3D = new Vector3D(), private _manager: ILibraryInterface) {
         super();
+    }
+
+    private _neighbours: IParticle[] = [];
+
+    public proximity = -1;
+    private _proximitySubscription: TSubscription<TOnResize>;
+
+    setProximity(distance: number, unit = Unit.PX) {
+        if (!this._proximitySubscription) {
+            this._proximitySubscription = this._manager.onResize.subscribe(({ width, height, depth, pixelRatio }) => {
+                this.proximity = getPxFromUnit(distance, unit, width, height, depth, pixelRatio);
+            });
+        }
+    }
+
+    unsetProximity() {
+        if (this._proximitySubscription) {
+            this._manager.onResize.unsubscribe(this._proximitySubscription);
+        }
+    }
+
+    setNeighbours(neighbours: IParticle[]) {
+        this._neighbours = neighbours;
+    }
+
+    getNeighbours() {
+        return this._neighbours;
     }
 
     private _transitionSpecificationBuilder = new TransitionSpecificationBuilder(this);

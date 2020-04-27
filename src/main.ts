@@ -14,6 +14,9 @@ import { TFeatureBuilder } from "./webgl/features/feature";
 import { Subject, BehaviorSubject, IObservable, ISubject } from "./utils/observable";
 import { Params, ILibraryInterface, TOnResize, LibraryInterfaceHook } from "./library-interface";
 import { RendererWebGLBuilder } from "./rendering/renderer-webgl";
+import { ProximityManager } from "./models/proximity-detection/proximity-manager";
+
+(window as any)['performanceMetrics'] = performanceMetricsHelper;
 
 export const getDefaultParams = (): DefaultObject<Params> => ({
     selectorOrCanvas: '#canvas',
@@ -49,7 +52,9 @@ export class Main extends DrawingInterface implements ILibraryInterface {
         initialized: false,
     };
     public systems: IParticleSystem[] = [];
-    public proximityDetectionSystem: IProximityDetectionSystem | null = null;;
+    public proximityDetectionSystem: IProximityDetectionSystem | null = null;
+    public proximityManager: ProximityManager | null = null;
+;
     public renderer: IRenderer = null;
 
     public onResize: ISubject<TOnResize>;
@@ -86,6 +91,10 @@ export class Main extends DrawingInterface implements ILibraryInterface {
         this.params = getDefault(this.params, getDefaultParams());
         this.systems = this.params.systems.map(builder => builder.build(this));
         this.proximityDetectionSystem = new this.params.proximityDetectionSystem(this);
+
+        this.proximityManager = new ProximityManager();
+        this.proximityManager.setProximityDetectionSystem(this.proximityDetectionSystem);
+
         this.renderer = this.params.renderer.build(this);
         let canvas = this.params.selectorOrCanvas;
         if (typeof canvas === 'string')
@@ -182,6 +191,10 @@ export class Main extends DrawingInterface implements ILibraryInterface {
         if (fpsLimit > 0 && delta < (1000 / fpsLimit) +1) {
             requestAnimationFrame(this._loop);
         } else {
+
+
+            const start = performance.now();
+
             delta = Math.min(delta, 30);
 
             this.deltaTime = delta;
@@ -189,7 +202,7 @@ export class Main extends DrawingInterface implements ILibraryInterface {
             this.time += this.deltaTime;
             this._lastPerf = currentPerf;
     
-            performanceMetricsHelper.set('fps', fps);
+            performanceMetricsHelper.set('fps', Math.round(fps));
     
             this.systems.forEach(system => {
                 (system as BaseParticleSystem).updateInternalParameters(this.deltaTime, this.time);
@@ -203,6 +216,9 @@ export class Main extends DrawingInterface implements ILibraryInterface {
             this.hooks[LibraryInterfaceHook.CANVAS_CLEAR].next(this);
             this.hooks[LibraryInterfaceHook.DRAW].next(this);
             // #endregion
+
+            const end = performance.now();
+            performanceMetricsHelper.set('loop', Math.round(end-start));
     
             // Loop
             requestAnimationFrame(this._loop);
@@ -229,10 +245,13 @@ export class Main extends DrawingInterface implements ILibraryInterface {
     }
 
     feedProximityDetectionSystem(objects: IParticle[]) {
-        this.proximityDetectionSystem.update(objects);
+        this.proximityManager.feedProximityDetectionSystem(objects);
+        this.proximityManager.update();
     }
 
     getNeighbours(particle: IParticle, radius: number) {
+        if (radius <= 0)
+            return [];
         return this.proximityDetectionSystem.getNeighbours(particle, radius);
     }
 
