@@ -155,6 +155,9 @@ class RendererWebGL implements IRenderer {
 
         // #region Particles program
         const particlesProgram = new ParticlesProgram(context, viewBox, libraryInterface);
+        const useTransitions = libraryInterface.isSystemFeatureRequired(ParticleSystemRequiredFeature.TRANSITIONS);
+        if (useTransitions)
+            particlesProgram.withTransitions();
         particlesProgram.init();
         webgl.programs.particles = particlesProgram;
         // #endregion

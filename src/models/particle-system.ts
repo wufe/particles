@@ -11,6 +11,7 @@ export type TParticleSystemBuilder = {
 export enum ParticleSystemRequiredFeature {
     LINKS               = 'links',
     PROXIMITY_DETECTION = 'proximityDetection',
+    TRANSITIONS         = 'transitions',
 }
 
 export interface IParticleSystem {

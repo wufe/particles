@@ -1,7 +1,7 @@
 import { init } from '../src/main';
 import { RendererWebGLBuilder } from '../src/rendering/renderer-webgl';
 import { DefaultParticleSystemBuilder } from '../src/systems/default-particle-system';
-import { QuadTreeProximityDetectionSystemBuilder } from '@wufe/particles-quadtree';
+import { QuadTreeProximityDetectionSystemBuilder, QuadTreeFeatureBuilder } from '@wufe/particles-quadtree';
 import { LinksFeatureBuilder } from '../src/webgl/features/links/links-feature';
 import { Unit } from '../src/utils/units';
 
@@ -9,9 +9,9 @@ init({
     selectorOrCanvas: '#canvas',
     renderer: RendererWebGLBuilder.build(),
     systems: [DefaultParticleSystemBuilder.build({
-        color: [13, 41, 57, 1],
+        color: [50, 255, 50, 1],
         count: { value: 600 },
-        size: { randomize: true, boundary: { min: 15, max: 25 } },
+        size: { randomize: true, boundary: { min: 5, max: 15 } },
         proximity: { value: 13, unit: Unit.VMIN }
     })],
     features: [

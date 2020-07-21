@@ -32,6 +32,9 @@ export class DirectionsProgram extends BaseProgram<Attr> implements IProgram {
     }
 
     init() {
+
+        super.init();
+
         this._buildVertices();
 
         this._vectorsBuffer = this._gl.createBuffer();

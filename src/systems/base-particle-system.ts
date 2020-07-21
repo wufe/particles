@@ -49,4 +49,8 @@ export abstract class BaseParticleSystem implements IParticleSystem {
     useProximityDetection() {
         this.requirements.push(ParticleSystemRequiredFeature.PROXIMITY_DETECTION);
     }
+
+    useTransitions() {
+        this.requirements.push(ParticleSystemRequiredFeature.TRANSITIONS)
+    }
 }

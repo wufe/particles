@@ -4,7 +4,7 @@ import { Renderer2DBuilder } from "./rendering/renderer-2d";
 import { getDefault, LazyFactory, DefaultObject } from "./utils/object-utils";
 import { IParticleSystem, TParticleSystemBuilder, TSystemLinksConfiguration, ParticleSystemRequiredFeature } from "./models/particle-system";
 import { ISystemBridge, SystemBridgeEventNotification } from "./drawing/system-bridge";
-import { IParticle } from "./models/particle";
+import { IParticle, Particle } from "./models/particle";
 import { DefaultParticleSystem, DefaultParticleSystemBuilder } from "./systems/default-particle-system";
 import { BaseParticleSystem } from "./systems/base-particle-system";
 import { TProximityDetectionSystemBuilder, IProximityDetectionSystem } from "./models/proximity-detection/proximity-detection-system";
@@ -245,6 +245,11 @@ export class Main extends DrawingInterface implements ILibraryInterface {
             .filter(system => system.requirements.includes(feature))
             .map(system => system.getParticles())
             .flat();
+    }
+
+    isSystemFeatureRequired(feature: ParticleSystemRequiredFeature) {
+        return this.systems
+            .some(system => system.requirements.includes(feature));
     }
 
     feedProximityDetectionSystem(objects: IParticle[]) {

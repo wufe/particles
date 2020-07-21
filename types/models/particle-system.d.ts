@@ -6,7 +6,8 @@ export declare type TParticleSystemBuilder = {
 };
 export declare enum ParticleSystemRequiredFeature {
     LINKS = "links",
-    PROXIMITY_DETECTION = "proximityDetection"
+    PROXIMITY_DETECTION = "proximityDetection",
+    TRANSITIONS = "transitions"
 }
 export interface IParticleSystem {
     attach(): void;

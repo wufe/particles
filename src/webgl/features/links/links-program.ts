@@ -50,6 +50,7 @@ export class LinksProgram extends BaseProgram<Attr, Uni> implements IProgram {
     }
 
     init() {
+        super.init();
 
         this._mapper = AttributeMapper.build<IParticleLinkPoint>()
             .bringYourOwnVertices()

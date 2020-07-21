@@ -27,6 +27,7 @@ export interface ILibraryInterface extends IDrawingInterface, ISystemBridge {
     deltaTime: number;
     getAllParticles: () => IParticle[];
     getParticlesBySystemFeature: (feature: ParticleSystemRequiredFeature) => IParticle[];
+    isSystemFeatureRequired: (feature: ParticleSystemRequiredFeature) => boolean;
     feedProximityDetectionSystem(objects: IParticle[]): void;
     getNeighbours(particle: IParticle, radius: number): IParticle[];
     getProximityDetectionSystem(): IProximityDetectionSystem;

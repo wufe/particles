@@ -18,4 +18,5 @@ export declare abstract class BaseParticleSystem implements IParticleSystem {
     clearTimeout(timerHandle: TTimerHandle): void;
     useLinks(): void;
     useProximityDetection(): void;
+    useTransitions(): void;
 }

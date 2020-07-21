@@ -33,6 +33,7 @@ export class ParticlesProgram extends BaseProgram<Attr, Uni> implements IProgram
     private _vectorsBuffer: WebGLBuffer;
     private _vertices: Float32Array;
     private _strideLength = 18;
+    private _useTransitions = false;
 
     constructor(
         gl: WebGLRenderingContext,
@@ -44,14 +45,21 @@ export class ParticlesProgram extends BaseProgram<Attr, Uni> implements IProgram
             viewBox, libraryInterface);
     }
 
-    getResolutionVector() {
-        return this._viewBox.getResolutionVector();
-    }
-
     init() {
+
+        super.init();
+
         this.useParticles();
 
         this._vectorsBuffer = this._gl.createBuffer();
+    }
+
+    withTransitions() {
+        this._useTransitions = true;
+    }
+
+    getResolutionVector() {
+        return this._viewBox.getResolutionVector();
     }
 
     useParticles() {

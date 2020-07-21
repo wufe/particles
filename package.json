@@ -6,8 +6,8 @@
   "license": "MIT",
   "types": "index.d.ts",
   "scripts": {
-    "demo": "run-p watch:client",
-    "demo:build:production": "parcel build -t browser public/index.html -d demo-dist --no-cache",
+    "demo": "yarn link && yarn link @wufe/particles && run-p watch:client",
+    "demo:build:production": "yarn link && yarn link @wufe/particles && parcel build -t browser public/index.html -d demo-dist --no-cache",
     "dev": "run-s build:watch",
     "watch:client": "parcel serve -t browser public/index.html -d demo-dist -p 2345 --hmr-port 44412 --no-cache --open",
     "compile": "webpack",

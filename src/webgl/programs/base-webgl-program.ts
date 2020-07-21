@@ -2,6 +2,7 @@ import { IViewBox } from "../camera/view-box";
 import { IWebGLLibraryInterface } from "../../rendering/renderer-webgl";
 
 export interface IBaseProgram<TUniforms extends string = string> {
+	init(): void;
 	uniformChanged(uniform: BaseUniformAggregationType | TUniforms): void;
 }
 
@@ -19,7 +20,7 @@ export enum BaseUniformAggregationType {
     RESOLUTION = 'resolution',
 }
 
-export class BaseProgram<TAttribs extends string = string, TUniforms extends string = string> implements IBaseProgram<TUniforms> {
+export class BaseProgram<TAttribs extends string = string, TUniforms extends string = string, TFlags extends string = string> implements IBaseProgram<TUniforms> {
 
     protected _uniformsToUpdate: {[k in (BaseUniformAggregationType | TUniforms)]?: boolean} = {
         camera    : true,
@@ -34,11 +35,17 @@ export class BaseProgram<TAttribs extends string = string, TUniforms extends str
         protected _uniforms: (TUniforms | BaseUniforms)[] = [],
         protected _viewBox: IViewBox,
         protected _libraryInterface: IWebGLLibraryInterface,
-	) {
+	) {}
+
+	init() {
 		this.compileShaders();
 		this.createProgram();
-		this.findLocations();
-    }
+		this.findLocations();	
+	}
+
+	addCodeFragment() {}
+	
+	removeCodeFragment() {}
 
     uniformChanged(uniform: BaseUniformAggregationType | TUniforms) {
         this._uniformsToUpdate[uniform] = true;
