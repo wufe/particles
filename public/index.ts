@@ -9,10 +9,10 @@ init({
     selectorOrCanvas: '#canvas',
     renderer: RendererWebGLBuilder.build(),
     systems: [DefaultParticleSystemBuilder.build({
-        color: [50, 255, 50, 1],
-        count: { value: 600 },
+        color: [150, 255, 150, 1],
+        count: { value: 300 },
         size: { randomize: true, boundary: { min: 5, max: 15 } },
-        proximity: { value: 13, unit: Unit.VMIN }
+        proximity: { value: 17, unit: Unit.VMIN }
     })],
     features: [
         // QuadTreeFeatureBuilder.build({ color: [255, 255, 255, .12] }),
@@ -22,7 +22,7 @@ init({
     camera: {
         enabled: true,
         zoom: {
-            value: 7,
+            value: 4,
             locked: false
         },
         pitch: Math.PI / 4,
