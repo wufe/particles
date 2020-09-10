@@ -131,7 +131,8 @@ export class ParticlesProgram extends BaseProgram<Attr, Uni> implements IProgram
     draw(deltaT: number, T: number) {
         super.draw(deltaT, T);
 
-        this._gl.uniform3fv(this.uni(Uni.EYE), new Float32Array(this._viewBox.eye.components));
+        if (this._viewBox.eye)
+            this._gl.uniform3fv(this.uni(Uni.EYE), new Float32Array(this._viewBox.eye.components));
         this._gl.uniform1f(this.uni(Uni.DEPTH_OF_FIELD), +this._libraryInterface.params.camera.depthOfField);
         const zoom = this._libraryInterface.configuration.webgl.camera.zoom.value;
 		this._gl.uniform1f(this.uni(BaseUniforms.ZOOM), zoom);
