@@ -9,27 +9,27 @@ init({
     selectorOrCanvas: '#canvas',
     renderer: RendererWebGLBuilder.build(),
     systems: [DefaultParticleSystemBuilder.build({
-        color: [150, 255, 150, 1],
-        count: { value: 300 },
+        color: [20, 20, 20, 1],
+        count: { value: 100 },
         size: { randomize: true, boundary: { min: 5, max: 15 } },
         proximity: { value: 17, unit: Unit.VMIN }
     })],
     features: [
-        // QuadTreeFeatureBuilder.build({ color: [255, 255, 255, .12] }),
-        // DirectionsFeatureBuilder.build(),
-        LinksFeatureBuilder.build(),
+        QuadTreeFeatureBuilder.build({ color: [255, 255, 150, .32] }),
+        // // DirectionsFeatureBuilder.build(),
+        // LinksFeatureBuilder.build(),
     ],
     camera: {
-        enabled: true,
+        enabled: false,
         zoom: {
-            value: 4,
-            locked: false
+            value: 2,
+            locked: true
         },
-        pitch: Math.PI / 4,
-        yaw: (Math.PI / 6) * -1,
+        // pitch: Math.PI / 4,
+        // yaw: (Math.PI / 6) * -1,
         depthOfField: true
     },
-    fpsLimit: 30,
+    fpsLimit: 40,
     proximityDetection: {
         system: QuadTreeProximityDetectionSystemBuilder.build(),
     },

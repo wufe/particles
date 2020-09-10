@@ -19,6 +19,16 @@
             background-image: linear-gradient(45deg, #93a5cf 0%, #e4efe9 100%);
             background-image: linear-gradient(to right, #212121 0%, black 100%);
             /* background-image: linear-gradient(to top, #09203f 0%, #537895 100%); */
+            background-image: linear-gradient(to right, #434343 0%, black 100%);
+            background-image: linear-gradient(to top, #e6e9f0 0%, #eef1f5 100%);
+        }
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            filter: blur(0px);
         }
         canvas {
             width: 100%;
@@ -27,7 +37,9 @@
     </style>
 </head>
 <body>
-    <canvas id="canvas"></canvas>
+    <div id="canvas-container">
+        <canvas id="canvas"></canvas>
+    </div>
     <script src="./index.ts"></script>
 </body>
 </html>
