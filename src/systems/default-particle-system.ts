@@ -56,22 +56,22 @@ export class DefaultParticleSystem extends BaseParticleSystem implements IPartic
                 particle.setVelocity(ParticleDirection.UP, {
                     randomize: true,
                     boundary: {
-                        min: -2,
-                        max: 2
+                        min: -.5,
+                        max: .5
                     }
                 });
                 particle.setVelocity(ParticleDirection.RIGHT, {
                     randomize: true,
                     boundary: {
-                        min: -2,
-                        max: 2
+                        min: -.5,
+                        max: .5
                     }
                 });
                 particle.setVelocity(ParticleDirection.FRONT, {
                     randomize: true,
                     boundary: {
-                        min: -2,
-                        max: 2
+                        min: 5,
+                        max: 10
                     }
                 });
                 return particle;

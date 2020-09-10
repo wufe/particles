@@ -19,6 +19,7 @@ export type TWebGLConfiguration = {
     backgroundColor: number[];
     camera: {
         enabled: boolean;
+        locked : boolean;
         pitch  : number;
         yaw    : number;
         zoom   : {
@@ -71,7 +72,7 @@ class RendererWebGL implements IRenderer {
         const [r, g, b, a] = libraryInterface.params.backgroundColor;
         const backgroundColor = getColor(r, g, b, a);
 
-        const { enabled, pitch, yaw, zoom, ortho, fov } = libraryInterface.params.camera;
+        const { enabled, locked, pitch, yaw, zoom, ortho, fov } = libraryInterface.params.camera;
         
         const webglConfiguration: TWebGLConfiguration = {
             backgroundColor,
@@ -82,6 +83,7 @@ class RendererWebGL implements IRenderer {
             viewBox: null,
             camera: {
                 enabled,
+                locked,
                 pitch,
                 yaw,
                 zoom: {

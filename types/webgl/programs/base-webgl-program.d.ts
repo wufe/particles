@@ -1,6 +1,7 @@
 import { IViewBox } from "../camera/view-box";
 import { IWebGLLibraryInterface } from "../../rendering/renderer-webgl";
 export interface IBaseProgram<TUniforms extends string = string> {
+    init(): void;
     uniformChanged(uniform: BaseUniformAggregationType | TUniforms): void;
 }
 export declare enum BaseUniforms {
@@ -15,7 +16,7 @@ export declare enum BaseUniformAggregationType {
     CAMERA = "camera",
     RESOLUTION = "resolution"
 }
-export declare class BaseProgram<TAttribs extends string = string, TUniforms extends string = string> implements IBaseProgram<TUniforms> {
+export declare class BaseProgram<TAttribs extends string = string, TUniforms extends string = string, TFlags extends string = string> implements IBaseProgram<TUniforms> {
     protected _gl: WebGLRenderingContext;
     protected _vertexShaderText: string;
     protected _fragmentShaderText: string;
@@ -27,6 +28,9 @@ export declare class BaseProgram<TAttribs extends string = string, TUniforms ext
         [k in (BaseUniformAggregationType | TUniforms)]?: boolean;
     };
     constructor(_gl: WebGLRenderingContext, _vertexShaderText: string, _fragmentShaderText: string, _attributes: TAttribs[], _uniforms: (TUniforms | BaseUniforms)[], _viewBox: IViewBox, _libraryInterface: IWebGLLibraryInterface);
+    init(): void;
+    addCodeFragment(): void;
+    removeCodeFragment(): void;
     uniformChanged(uniform: BaseUniformAggregationType | TUniforms): void;
     update(deltaT: number, T: number): void;
     draw(deltaT: number, T: number): void;

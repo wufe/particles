@@ -31,6 +31,8 @@ export class CameraEvents {
 	) {
 		const camera = this._libraryInterface.configuration.webgl.camera;
 
+		if (camera.locked) return;
+
 		document.body.style.touchAction = "none";
 
 		let pointerEvents: PointerEvent[] = [];

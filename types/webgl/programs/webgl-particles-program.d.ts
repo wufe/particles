@@ -21,9 +21,11 @@ export declare class ParticlesProgram extends BaseProgram<Attr, Uni> implements 
     private _vectorsBuffer;
     private _vertices;
     private _strideLength;
+    private _useTransitions;
     constructor(gl: WebGLRenderingContext, viewBox: IViewBox, libraryInterface: IWebGLLibraryInterface);
-    getResolutionVector(): number[];
     init(): void;
+    withTransitions(): void;
+    getResolutionVector(): number[];
     useParticles(): void;
     private _updateEventAttachedParticles;
     private _attachParticleUpdateEventHandler;

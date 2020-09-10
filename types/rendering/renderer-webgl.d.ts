@@ -14,6 +14,7 @@ export declare type TWebGLConfiguration = {
     backgroundColor: number[];
     camera: {
         enabled: boolean;
+        locked: boolean;
         pitch: number;
         yaw: number;
         zoom: {

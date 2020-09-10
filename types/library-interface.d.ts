@@ -60,6 +60,7 @@ export declare type Params = {
     fpsLimit?: number;
     camera?: {
         enabled?: boolean;
+        locked?: boolean;
         pitch?: number;
         yaw?: number;
         zoom?: {

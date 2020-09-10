@@ -30,6 +30,7 @@ export const getDefaultParams = (): DefaultObject<Params> => ({
     features: [],
     camera: {
         enabled: true,
+        locked: false,
         pitch: 0,
         yaw: 0,
         zoom: {
