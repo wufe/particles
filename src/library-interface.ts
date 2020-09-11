@@ -52,7 +52,14 @@ export enum Feature {
     QUAD_TREE  = 'quadTree',
 }
 
-export type Params = {
+export type UpdateableParams = {
+    camera?: {
+        enabled?: boolean;
+        locked?: boolean;
+    };
+};
+
+export type Params = UpdateableParams & {
     selectorOrCanvas         : string | HTMLCanvasElement;
     renderer?                : TRendererBuilder;
     systems?                 : TParticleSystemBuilder[];

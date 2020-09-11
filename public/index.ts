@@ -5,7 +5,7 @@ import { QuadTreeProximityDetectionSystemBuilder, QuadTreeFeatureBuilder } from 
 import { LinksFeatureBuilder } from '../src/webgl/features/links/links-feature';
 import { Unit } from '../src/utils/units';
 
-init({
+const animation = init({
     selectorOrCanvas: '#canvas',
     renderer: RendererWebGLBuilder.build(),
     systems: [DefaultParticleSystemBuilder.build({
@@ -20,9 +20,9 @@ init({
         // LinksFeatureBuilder.build(),
     ],
     camera: {
-        enabled: false,
+        enabled: true,
         zoom: {
-            value: 2,
+            value: 5,
             locked: true
         },
         // pitch: Math.PI / 4,
@@ -39,4 +39,12 @@ init({
             debounce: -1
         }
     }
-})
+});
+
+setTimeout(() => {
+    animation.set({
+        camera: {
+            enabled: false
+        }
+    })
+}, 1000);

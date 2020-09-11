@@ -1,7 +1,7 @@
 import { DrawingInterface, IDrawingInterface } from "./drawing/drawing-interface";
 import { IRenderer, TRendererBuilder } from "./rendering/renderer";
 import { Renderer2DBuilder } from "./rendering/renderer-2d";
-import { getDefault, LazyFactory, DefaultObject } from "./utils/object-utils";
+import { getDefault, LazyFactory, DefaultObject, RecursivePartial } from "./utils/object-utils";
 import { IParticleSystem, TParticleSystemBuilder, TSystemLinksConfiguration, ParticleSystemRequiredFeature } from "./models/particle-system";
 import { ISystemBridge, SystemBridgeEventNotification } from "./drawing/system-bridge";
 import { IParticle, Particle } from "./models/particle";
@@ -12,7 +12,7 @@ import { NaiveProximityDetectionSystemBuilder } from "./models/proximity-detecti
 import { performanceMetricsHelper } from "./utils/performance-metrics";
 import { TFeatureBuilder } from "./webgl/features/feature";
 import { Subject, BehaviorSubject, IObservable, ISubject } from "./utils/observable";
-import { Params, ILibraryInterface, TOnResize, LibraryInterfaceHook } from "./library-interface";
+import { Params, ILibraryInterface, TOnResize, LibraryInterfaceHook, UpdateableParams } from "./library-interface";
 import { RendererWebGLBuilder } from "./rendering/renderer-webgl";
 import { ProximityManager } from "./models/proximity-detection/proximity-manager";
 
@@ -71,7 +71,7 @@ export class Main extends DrawingInterface implements ILibraryInterface {
         this._loop = this._loop.bind(this);
     }
 
-    start() {
+    start(): this {
         this._initHooks();
         this._initParams();
         this._initRenderer();
@@ -82,11 +82,16 @@ export class Main extends DrawingInterface implements ILibraryInterface {
         this._initProximityDetectionSystems();
         this._preStart();
         this._loop();
+        return this;
     }
 
     private _initHooks() {
         Object.values(LibraryInterfaceHook)
             .forEach(type => this.hooks[type] = new Subject());
+    }
+
+    public set(params: RecursivePartial<UpdateableParams>) {
+        
     }
 
     private _initParams() {
@@ -281,8 +286,8 @@ export type TConfiguration = {
     [k            : string]: any;
 };
 
-export const init = (params: Params) => {
+export const init = (params: Params): Main => {
 
-    new Main(params).start();
+    return new Main(params).start();
 }
 
