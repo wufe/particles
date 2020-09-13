@@ -65,10 +65,13 @@ export class Main extends DrawingInterface implements ILibraryInterface {
     } = {
         [LibraryInterfaceHook.RENDERER_INIT]: new Subject()
     };
-    public updatableParamsObservable = new Subject<UpdatableParams>();
+    public updatableParamsObservable = new Subject<RecursivePartial<UpdatableParams>>();
 
-    constructor(public params: Params) {
+    public params: Params;
+
+    constructor(params: RecursivePartial<Params>) {
         super();
+        this.params = getDefault(params, getDefaultParams());
         this._loop = this._loop.bind(this);
     }
 
@@ -105,7 +108,7 @@ export class Main extends DrawingInterface implements ILibraryInterface {
     }
 
     private _initParams() {
-        this.params = getDefault(this.params, getDefaultParams());
+        
         this.systems = this.params.systems.map(builder => builder.build(this));
         this.proximityDetectionSystem = this.params.proximityDetection.system.build(this);
 

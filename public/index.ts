@@ -4,6 +4,7 @@ import { DefaultParticleSystemBuilder } from '../src/systems/default-particle-sy
 import { QuadTreeProximityDetectionSystemBuilder, QuadTreeFeatureBuilder } from '@wufe/particles-quadtree';
 import { LinksFeatureBuilder } from '../src/webgl/features/links/links-feature';
 import { Unit } from '../src/utils/units';
+import Perlin from 'perlin.js';
 
 const animation = init({
     selectorOrCanvas: '#canvas',
@@ -41,12 +42,20 @@ const animation = init({
     }
 });
 
+
+
+let zoom = 1;
+
 setInterval(() => {
 
     animation.set(params => ({
         camera: {
-            ortho: !params.camera.ortho
+            zoom: {
+                value: Perlin.perlin2(1, zoom) * 2 + 3
+            }
         }
-    }))
+    }));
 
-}, 2000);
+    zoom += .01;
+
+}, 16);

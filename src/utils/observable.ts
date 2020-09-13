@@ -25,11 +25,11 @@ export class Observable<T> implements IObservable<T> {
         return { id, value: this._lastValue };
     }
 
-    partialSubscribe<P>(portion: keyof T, callback: TCallback<T>): TSubscription<P>;
-    partialSubscribe<P>(deepPath: string, callback: TCallback<T>): TSubscription<P>;
-    partialSubscribe<P>(deepPath: string | keyof T, callback: TCallback<T>): TSubscription<P> {
+    partialSubscribe<P = T>(portion: keyof T, callback: TCallback<P>): TSubscription<P>;
+    partialSubscribe<P = T>(deepPath: string, callback: TCallback<P>): TSubscription<P>;
+    partialSubscribe<P = T>(deepPath: string | keyof T, callback: TCallback<P>): TSubscription<P> {
         const id = Symbol();
-        this._callbacks.push({ id, callback, deepPath: deepPath as string });
+        this._callbacks.push({ id, callback: callback as unknown as TCallback<T>, deepPath: deepPath as string });
         let prev = undefined;
         if (typeIsObject(prev))
             prev = objectPath.get(prev, deepPath as string);

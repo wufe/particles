@@ -7,6 +7,7 @@ import { IProximityDetectionSystem, TProximityDetectionSystemBuilder } from "./m
 import { Subject, IObservable, Observable } from "./utils/observable";
 import { TRendererBuilder } from "./rendering/renderer";
 import { TFeatureBuilder } from "./webgl/features/feature";
+import { RecursivePartial } from "./utils/object-utils";
 
 export enum LibraryInterfaceHook {
     RENDERER_INIT = 'rendererInit',
@@ -26,7 +27,7 @@ export interface ILibraryInterface extends IDrawingInterface, ISystemBridge {
     time: number;
     deltaTime: number;
 
-    updatableParamsObservable: Observable<UpdatableParams>;
+    updatableParamsObservable: Observable<RecursivePartial<UpdatableParams>>;
 
     getAllParticles: () => IParticle[];
     getParticlesBySystemFeature: (feature: ParticleSystemRequiredFeature) => IParticle[];
@@ -60,6 +61,10 @@ export type UpdatableParams = {
         locked?      : boolean;
         depthOfField?: boolean;
         ortho?       : boolean;
+        zoom         : {
+            value : number;
+            locked: boolean;
+        }
     };
 };
 
@@ -80,9 +85,9 @@ export type Params = UpdatableParams & {
         locked? : boolean;
         pitch?  : number;
         yaw?    : number;
-        zoom?   : {
-            value? : number;
-            locked?: boolean;
+        zoom    : {
+            value : number;
+            locked: boolean;
         };
         ortho?       : boolean;
         fov?         : number;

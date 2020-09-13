@@ -4610,6 +4610,11 @@ performance-now@^2.1.0:
   resolved "https://registry.yarnpkg.com/performance-now/-/performance-now-2.1.0.tgz#6309f4e0e5fa913ec1c69307ae364b4b377c9e7b"
   integrity sha1-Ywn04OX6kT7BxpMHrjZLSzd8nns=
 
+perlin.js@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/perlin.js/-/perlin.js-1.0.0.tgz#9bd275e6da15360fa30367c226db7f7fe620bc49"
+  integrity sha512-0MVPmdJDH6GjDoa0hOTboFTPNZeJXhFRlsyEi1GPEVke0vhF1zVrtfEaQ3hH7M2NB5+V0rCPOGWjkBksQhZB4A==
+
 physical-cpu-count@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/physical-cpu-count/-/physical-cpu-count-2.0.0.tgz#18de2f97e4bf7a9551ad7511942b5496f7aba660"

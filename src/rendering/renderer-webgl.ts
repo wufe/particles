@@ -126,12 +126,24 @@ class RendererWebGL implements IRenderer {
 
         if (!this._cameraParamsUpdatedSubscription)
             this._cameraParamsUpdatedSubscription =
-                libraryInterface.updatableParamsObservable.partialSubscribe('camera', cameraParams => {
+                libraryInterface.updatableParamsObservable.partialSubscribe<TWebGLConfiguration['camera']>('camera', cameraParams => {
                     cameraConfiguration.locked = libraryInterface.params.camera.locked;
+
+                    let needsViewBoxRecalculation = false;
                     if (cameraConfiguration.ortho !== libraryInterface.params.camera.ortho) {
                         cameraConfiguration.ortho = libraryInterface.params.camera.ortho;
-                        libraryInterface.configuration.webgl.viewBox.recalculate();
+                        needsViewBoxRecalculation = true;
                     }
+
+                    if ('zoom' as keyof TWebGLConfiguration['camera'] in cameraParams) {
+                        if ('value' as keyof TWebGLConfiguration['camera']['zoom'] in cameraParams.zoom)
+                            cameraConfiguration.zoom.value = libraryInterface.params.camera.zoom.value;
+                        cameraConfiguration.zoom.locked = libraryInterface.params.camera.zoom.locked;
+                        needsViewBoxRecalculation = true;
+                    }
+
+                    if (needsViewBoxRecalculation)
+                        libraryInterface.configuration.webgl.viewBox.recalculate();
                 });
         // #endregion
 
