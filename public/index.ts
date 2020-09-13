@@ -45,7 +45,7 @@ setInterval(() => {
 
     animation.set(params => ({
         camera: {
-            locked: !params.camera.locked
+            ortho: !params.camera.ortho
         }
     }))
 

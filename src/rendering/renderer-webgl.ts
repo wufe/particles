@@ -8,6 +8,7 @@ import { IProgram } from "../webgl/programs/webgl-program";
 import { ILibraryInterface, LibraryInterfaceHook, UpdatableParams } from "../library-interface";
 import { ParticleSystemRequiredFeature } from "../models/particle-system";
 import { Observable, TSubscription } from "../utils/observable";
+import objectPath from 'object-path';
 
 export enum WebGLProgram {
     PARTICLES  = 'particles',
@@ -121,9 +122,17 @@ class RendererWebGL implements IRenderer {
 
         initCameraParams();
 
+        const cameraConfiguration = libraryInterface.configuration.webgl.camera;
+
         if (!this._cameraParamsUpdatedSubscription)
             this._cameraParamsUpdatedSubscription =
-                libraryInterface.updatableParamsObservable.partialSubscribe('camera', initCameraParams);
+                libraryInterface.updatableParamsObservable.partialSubscribe('camera', cameraParams => {
+                    cameraConfiguration.locked = libraryInterface.params.camera.locked;
+                    if (cameraConfiguration.ortho !== libraryInterface.params.camera.ortho) {
+                        cameraConfiguration.ortho = libraryInterface.params.camera.ortho;
+                        libraryInterface.configuration.webgl.viewBox.recalculate();
+                    }
+                });
         // #endregion
 
     }
