@@ -45,8 +45,8 @@ setInterval(() => {
 
     animation.set(params => ({
         camera: {
-            enabled: !params.camera.enabled
+            locked: !params.camera.locked
         }
     }))
-    
+
 }, 2000);

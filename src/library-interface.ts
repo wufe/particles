@@ -57,7 +57,6 @@ export enum Feature {
 
 export type UpdatableParams = {
     camera?: {
-        enabled?: boolean;
         locked?: boolean;
     };
 };
