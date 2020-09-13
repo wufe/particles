@@ -130,9 +130,9 @@ export class CameraEvents {
 		}
 
 		if (!this._updatableParamsSubscription)
-			this._updatableParamsSubscription = this._libraryInterface.updatableParamsObservable
-				.partialSubscribe<UpdatableParams['camera']>('camera', () =>
-					this.bind(this._libraryInterface.canvas));
+			this._updatableParamsSubscription =
+				this._libraryInterface.updatableParamsObservable
+					.partialSubscribe<UpdatableParams['camera']>('camera', () => this.bind(this._libraryInterface.canvas));
 	}
 
 	getXY = (event: MouseEvent | TouchEvent) => {

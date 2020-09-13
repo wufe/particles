@@ -42,9 +42,11 @@ const animation = init({
 });
 
 setInterval(() => {
+
     animation.set(params => ({
         camera: {
             enabled: !params.camera.enabled
         }
     }))
+    
 }, 2000);
