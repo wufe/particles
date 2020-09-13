@@ -5,8 +5,9 @@ import { CameraEvents } from "../webgl/camera/camera-events";
 import { BaseUniformAggregationType } from "../webgl/programs/base-webgl-program";
 import { IFeature } from "../webgl/features/feature";
 import { IProgram } from "../webgl/programs/webgl-program";
-import { ILibraryInterface, LibraryInterfaceHook } from "../library-interface";
+import { ILibraryInterface, LibraryInterfaceHook, UpdatableParams } from "../library-interface";
 import { ParticleSystemRequiredFeature } from "../models/particle-system";
+import { Observable, TSubscription } from "../utils/observable";
 
 export enum WebGLProgram {
     PARTICLES  = 'particles',
@@ -67,21 +68,44 @@ class RendererWebGL implements IRenderer {
         this._libraryInterface.hooks[LibraryInterfaceHook.WINDOW_RESIZE].subscribe(this._onResize.bind(this));
     }
 
+    private _cameraParamsUpdatedSubscription: TSubscription<UpdatableParams['camera']>;
     private _initRenderer(libraryInterface: IWebGLLibraryInterface) {
         
         const [r, g, b, a] = libraryInterface.params.backgroundColor;
         const backgroundColor = getColor(r, g, b, a);
 
-        const { enabled, locked, pitch, yaw, zoom, ortho, fov } = libraryInterface.params.camera;
-        
         const webglConfiguration: TWebGLConfiguration = {
             backgroundColor,
             programs: {
-                particles : null,
+                particles: null,
             },
             features: [],
-            viewBox: null,
-            camera: {
+            viewBox: null
+        } as TWebGLConfiguration;
+        libraryInterface.configuration.webgl = webglConfiguration;
+
+        // #region Unwanted double transition
+        /**
+         * Here I'm subscribing to params changing, even if there are not behavioral updates.
+         * 
+         * That's because the behavioral updates happens to be in camera-events.ts, where
+         * the *bind* function utilizes the "libraryInterface.configuration" object instead of
+         * "libraryInterface.params".
+         * 
+         * Thinking about the future of this library, this may be the best approach to split
+         * a user-defined parameter from a software-usable configuration,
+         * but right now it requires subscribing *here and there* to param changes.
+         * 
+         * A generic solution might be implementing a "partial subscribe", which would easen the burden
+         * of raising an event in general, but not in this specific case.
+         * 
+         * > The partial subscribe would accept a callback and a portion of the state that the
+         * > subscriber wants to be subscribed to.
+         */
+        const initCameraParams = () => {
+            const { enabled, locked, pitch, yaw, zoom, ortho, fov } = libraryInterface.params.camera;
+            
+            libraryInterface.configuration.webgl.camera = {
                 enabled,
                 locked,
                 pitch,
@@ -92,9 +116,16 @@ class RendererWebGL implements IRenderer {
                 },
                 ortho,
                 fov,
-            }
+            };
         };
-        libraryInterface.configuration.webgl = webglConfiguration;
+
+        initCameraParams();
+
+        if (!this._cameraParamsUpdatedSubscription)
+            this._cameraParamsUpdatedSubscription =
+                libraryInterface.updatableParamsObservable.partialSubscribe('camera', initCameraParams);
+        // #endregion
+
     }
 
     private _initContext(libraryInterface: IWebGLLibraryInterface) {

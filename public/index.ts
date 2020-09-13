@@ -22,8 +22,8 @@ const animation = init({
     camera: {
         enabled: true,
         zoom: {
-            value: 5,
-            locked: true
+            value: 6,
+            locked: false
         },
         // pitch: Math.PI / 4,
         // yaw: (Math.PI / 6) * -1,
@@ -41,10 +41,10 @@ const animation = init({
     }
 });
 
-setTimeout(() => {
-    animation.set({
+setInterval(() => {
+    animation.set(params => ({
         camera: {
-            enabled: false
+            enabled: !params.camera.enabled
         }
-    })
-}, 1000);
+    }))
+}, 2000);

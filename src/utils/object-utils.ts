@@ -12,7 +12,9 @@ export type DefaultObject<T> = {
         T[P];
 };
 
-export const getDefault = <T>(gotObject: RecursivePartial<T>, defaultObject: T | DefaultObject<T>): T => {
+export function getDefault<T>(gotObject: RecursivePartial<T>, defaultObject: T | DefaultObject<T>): T;
+export function getDefault<T extends P, P>(gotObject: RecursivePartial<P>, defaultObject: T | DefaultObject<T>): T;
+export function getDefault<T>(gotObject: RecursivePartial<T>, defaultObject: T | DefaultObject<T>): T {
     if (gotObject === undefined) {
         if (defaultObject instanceof LazyFactory) {
             return defaultObject.build();

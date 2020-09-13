@@ -4,7 +4,7 @@ import { TConfiguration } from "./main";
 import { IParticle } from "./models/particle";
 import { TSystemLinksConfiguration, TParticleSystemBuilder, ParticleSystemRequiredFeature } from "./models/particle-system";
 import { IProximityDetectionSystem, TProximityDetectionSystemBuilder } from "./models/proximity-detection/proximity-detection-system";
-import { Subject, IObservable } from "./utils/observable";
+import { Subject, IObservable, Observable } from "./utils/observable";
 import { TRendererBuilder } from "./rendering/renderer";
 import { TFeatureBuilder } from "./webgl/features/feature";
 
@@ -25,6 +25,9 @@ export interface ILibraryInterface extends IDrawingInterface, ISystemBridge {
     configuration: TConfiguration;
     time: number;
     deltaTime: number;
+
+    updatableParamsObservable: Observable<UpdatableParams>;
+
     getAllParticles: () => IParticle[];
     getParticlesBySystemFeature: (feature: ParticleSystemRequiredFeature) => IParticle[];
     isSystemFeatureRequired: (feature: ParticleSystemRequiredFeature) => boolean;
@@ -52,14 +55,14 @@ export enum Feature {
     QUAD_TREE  = 'quadTree',
 }
 
-export type UpdateableParams = {
+export type UpdatableParams = {
     camera?: {
         enabled?: boolean;
         locked?: boolean;
     };
 };
 
-export type Params = UpdateableParams & {
+export type Params = UpdatableParams & {
     selectorOrCanvas         : string | HTMLCanvasElement;
     renderer?                : TRendererBuilder;
     systems?                 : TParticleSystemBuilder[];

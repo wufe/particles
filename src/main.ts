@@ -12,7 +12,7 @@ import { NaiveProximityDetectionSystemBuilder } from "./models/proximity-detecti
 import { performanceMetricsHelper } from "./utils/performance-metrics";
 import { TFeatureBuilder } from "./webgl/features/feature";
 import { Subject, BehaviorSubject, IObservable, ISubject } from "./utils/observable";
-import { Params, ILibraryInterface, TOnResize, LibraryInterfaceHook, UpdateableParams } from "./library-interface";
+import { Params, ILibraryInterface, TOnResize, LibraryInterfaceHook, UpdatableParams } from "./library-interface";
 import { RendererWebGLBuilder } from "./rendering/renderer-webgl";
 import { ProximityManager } from "./models/proximity-detection/proximity-manager";
 
@@ -65,6 +65,7 @@ export class Main extends DrawingInterface implements ILibraryInterface {
     } = {
         [LibraryInterfaceHook.RENDERER_INIT]: new Subject()
     };
+    public updatableParamsObservable = new Subject<UpdatableParams>();
 
     constructor(public params: Params) {
         super();
@@ -90,8 +91,17 @@ export class Main extends DrawingInterface implements ILibraryInterface {
             .forEach(type => this.hooks[type] = new Subject());
     }
 
-    public set(params: RecursivePartial<UpdateableParams>) {
-        
+    public set(params: RecursivePartial<UpdatableParams>): void;
+    public set(paramsSetter: (params: Params) => RecursivePartial<UpdatableParams>): void;
+    public set(params: RecursivePartial<UpdatableParams> | ((params: Params) => RecursivePartial<UpdatableParams>)) {
+        if (typeof params === 'function') {
+            const paramsObject = params(this.params);
+            this.params = getDefault<Params, UpdatableParams>(paramsObject, this.params);
+            this.updatableParamsObservable.next(paramsObject);
+        } else {
+            this.params = getDefault<Params, UpdatableParams>(params, this.params);
+            this.updatableParamsObservable.next(params);
+        }
     }
 
     private _initParams() {
